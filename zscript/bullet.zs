@@ -385,11 +385,14 @@ class HDBulletActor:HDActor{
 		realpos=pos;
 		gunsmoke();
 		if(distantsound!="")distantnoise.make(self,distantsound,distantsoundvol,distantsoundpitch);
+		scalebullet();
+	}
+	void scalebullet(){
 		if(hd_debug){
 			scale=(1.,1.);
 			sprite=getspriteindex("BAL1A0");
 		}else{
-			double scaleamt=HDCONST_ONEMETRE*0.000005*stamina;
+			double scaleamt=(HDCONST_ONEMETRE*0.000005)*stamina;
 			scale=(scaleamt,scaleamt);
 		}
 	}
@@ -1009,6 +1012,7 @@ class HDBulletActor:HDActor{
 		//warp the bullet
 		hardness=max(1,hardness-random(0,random(0,3)));
 		stamina=max(1,stamina+random(0,(stamina>>1)));
+		scalebullet();
 	}
 
 	enum HitActorFlags{
