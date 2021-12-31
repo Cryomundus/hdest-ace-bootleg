@@ -561,10 +561,11 @@ class HDMobFallSquishThinker:Thinker{
 		case 1:target.scale.x=scale.x*(1+mult*2);target.scale.y=scale.y*(1-mult*2);break;
 		case 2:target.scale.x=scale.x*(1+mult*4);target.scale.y=scale.y*(1-mult*4);
 			sound landsound;
+			double vol=min(1.,target.mass*0.01);
 			if(hdmobbase(target))landsound=hdmobbase(target).landsound;
 				else landsound="misc/mobland";
-			target.A_StartSound(landsound,CHAN_BODY,CHANF_OVERLAP);
-			if(zvel<-10)target.A_StartSound("misc/punch",CHAN_BODY,CHANF_OVERLAP);
+			target.A_StartSound(landsound,CHAN_BODY,CHANF_OVERLAP,volume:vol);
+			if(zvel<-10)target.A_StartSound("misc/punch",CHAN_BODY,CHANF_OVERLAP,volume:vol);
 			if(!target.cursector.planemoving(sector.floor))
 				target.vel.z-=zvel*(target.bcorpse?0.3:0.1);
 			break;
