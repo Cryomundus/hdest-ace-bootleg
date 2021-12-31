@@ -33,7 +33,7 @@ class ZM66ScopeHaver:HDWeapon{
 			);
 		}else{
 			//the new circular view code that doesn't work with LZDoom 3.87c
-			sb.fill(color(256,0,0,0),0,0,screen.getwidth(),screen.getheight());
+			if(bob.y<104)sb.fill(color(256,0,0,0),0,0,screen.getwidth(),screen.getheight());
 			texman.setcameratotexture(hpc,"HDXCAM_ZM66",degree);
 			let cam  = texman.CheckForTexture("HDXCAM_ZM66",TexMan.Type_Any);
 			sb.DrawCircle(cam,(0,scaledyoffset)+bob*3,.31,usePixelRatio:true);

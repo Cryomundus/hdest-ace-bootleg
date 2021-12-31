@@ -426,18 +426,21 @@ extend class HDPlayerPawn{
 
 
 		//special hud bobbing
-		bobvelmomentum=max(bobvelmomentum,min((bobvelmomentum+0.2)*1.3,max(abs(fm),abs(sm))*0.0003))*0.8;
+		bobvelmomentum=max(bobvelmomentum,min(
+			(bobvelmomentum+0.2)*1.3,
+			max(abs(fm),abs(sm))*0.0003)
+		)*0.8;
 		double bobvel=max(0,bobvelmomentum)*viewbob;
 		let pr=weapon(player.readyweapon);
 		if(player.onground&&bobvel&&pr){
-			bobcounter+=5.3*pr.bobspeed;
+			bobcounter+=5.3*pr.bobspeed*player.crouchfactor;
 			if(bobvel<0.1&&(89<bobcounter<90||269<bobcounter<270))bobcounter=90;
 			else if(bobcounter>360)bobcounter=0;
 		}
 		hudbob=(
-			cos(bobcounter)*(sm?5.:2.)*(pr?pr.bobrangex:1.),
+			cos(bobcounter)*(sm?5.:2.)*(pr?pr.bobrangex:1.)/player.crouchfactor,
 			(sin(bobcounter*2)+1.)*6.*(pr?pr.bobrangey:1.)
-		)*bobvel*((!mustwalk&&runwalksprint<0)?0.5:1.)+hudbobrecoil1;
+		)*bobvel+hudbobrecoil1;
 		hudbobrecoil1=hudbobrecoil1*0.2+hudbobrecoil2;
 		hudbobrecoil2=hudbobrecoil3;
 		hudbobrecoil3=hudbobrecoil4;

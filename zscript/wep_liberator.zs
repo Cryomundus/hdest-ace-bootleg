@@ -405,7 +405,7 @@ class LiberatorRifle:AutoReloadingThingy{
 					);
 				}else{
 					//the new circular view code that doesn't work with LZDoom 3.87c
-					sb.fill(color(256,0,0,0),0,0,screen.getwidth(),screen.getheight());
+					if(bob.y<104)sb.fill(color(256,0,0,0),0,0,screen.getwidth(),screen.getheight());
 					texman.setcameratotexture(hpc,"HDXCAM_LIB",degree);
 					let cam  = texman.CheckForTexture("HDXCAM_LIB",TexMan.Type_Any);
 					let reticle = texman.CheckForTexture(
