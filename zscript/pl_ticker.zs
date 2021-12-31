@@ -425,7 +425,8 @@ extend class HDPlayerPawn{
 
 
 		//special hud bobbing
-		double bobvel=max((mustwalk&&vel.xy!=(0,0))?1:0,abs(vel.x),abs(vel.y))*viewbob;
+		double bobvel=max(0,abs(vel.x),abs(vel.y))*viewbob;
+		if(mustwalk&&vel.xy!=(0,0))bobvel*=3;
 		let pr=weapon(player.readyweapon);
 		if(player.onground&&bobvel&&pr){
 			bobcounter+=5.3*pr.bobspeed;
