@@ -4,6 +4,7 @@
 extend class HDPlayerPawn{
 	string viewstring;
 	bool canmovelegs;
+	double bobvelmomentum;
 	override void Tick(){
 		if(!player||!player.mo||player.mo!=self){super.tick();return;} //anti-voodoodoll
 		let player=self.player;
@@ -425,8 +426,8 @@ extend class HDPlayerPawn{
 
 
 		//special hud bobbing
-		double bobvel=max(0,abs(vel.x),abs(vel.y))*viewbob;
-		if(mustwalk&&vel.xy!=(0,0))bobvel*=3;
+		bobvelmomentum=max(bobvelmomentum,min((bobvelmomentum+0.2)*1.3,max(abs(fm),abs(sm))*0.0003))*0.8;
+		double bobvel=max(0,bobvelmomentum)*viewbob;
 		let pr=weapon(player.readyweapon);
 		if(player.onground&&bobvel&&pr){
 			bobcounter+=5.3*pr.bobspeed;
