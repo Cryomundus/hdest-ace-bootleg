@@ -389,7 +389,8 @@ class HDBulletActor:HDActor{
 			scale=(1.,1.);
 			sprite=getspriteindex("BAL1A0");
 		}else{
-			scale=(0.001,0.001)*stamina;
+			double scaleamt=HDCONST_ONEMETRE*0.000005*stamina;
+			scale=(scaleamt,scaleamt);
 		}
 	}
 	double penetration(){ //still juvenile giggling
