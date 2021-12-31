@@ -1160,6 +1160,7 @@ class DERPController:HDWeapon{
 					}
 				}
 				int yaw=clamp(GetMouseX(true)>>5,-10,10);
+				if(!yaw)yaw=clamp(-player.cmd.sidemove,-10,10);
 				int ptch=clamp(GetMouseY(true)>>5,-10,10);
 				if(yaw||ptch){
 					ddd.A_DerpCrawlSound(150);

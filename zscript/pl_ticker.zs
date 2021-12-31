@@ -426,10 +426,10 @@ extend class HDPlayerPawn{
 
 
 		//special hud bobbing
-		bobvelmomentum=max(bobvelmomentum,min(
+		bobvelmomentum=(reactiontime>0?bobvelmomentum:max(bobvelmomentum,min(
 			(bobvelmomentum+0.2)*1.3,
 			max(abs(fm),abs(sm))*0.0003)
-		)*0.8;
+		))*0.8;
 		double bobvel=max(0,bobvelmomentum)*viewbob;
 		let pr=weapon(player.readyweapon);
 		if(player.onground&&bobvel&&pr){

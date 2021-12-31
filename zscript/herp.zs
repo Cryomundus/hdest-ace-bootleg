@@ -1382,7 +1382,9 @@ class HERPController:HDWeapon{
 						ddd.setstatelabel("shoot");
 					}
 					int yaw=clamp(GetMouseX(true)>>5,-10,10);
+					if(!yaw)yaw=clamp(-player.cmd.sidemove,-10,10);
 					int ptch=clamp(GetMouseY(true)>>5,-10,10);
+					if(!ptch)ptch=clamp(player.cmd.forwardmove,-10,10);
 					if(yaw||ptch){
 						ddd.A_StartSound("herp/crawl",CHAN_BODY);
 						ddd.pitch=clamp(ddd.pitch-clamp(ptch,-10,10),-60,60);
