@@ -145,7 +145,10 @@ class HDRL:HDWeapon{
 					);
 				}else{
 					//the new circular view code that doesn't work with LZDoom 3.87c
-					if(bob.y<104)sb.fill(color(256,0,0,0),0,0,screen.getwidth(),screen.getheight());
+					sb.fill(color(255,0,0,0),
+						bob.x-27,scaledyoffset+bob.y-27,
+						54,54,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+					);
 					texman.setcameratotexture(hpc,"HDXCAM_RLAUN",degree);
 					let cam  = texman.CheckForTexture("HDXCAM_RLAUN",TexMan.Type_Any);
 					double camSize = texman.GetSize(cam);
