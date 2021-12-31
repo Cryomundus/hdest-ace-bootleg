@@ -122,18 +122,17 @@ class HDPistol:HDHandgun replaces Pistol{
 		//if slide is pushed back, throw sights off line
 		if(hpl.player.getpsprite(PSP_WEAPON).frame>=2){
 			sb.SetClipRect(
-				-10+bob.x,-5+bob.y,20,14,
+				-10+bob.x,-10+bob.y,20,19,
 				sb.DI_SCREEN_CENTER
 			);
+			bobb.y-=2;
 			scc=(0.7,0.8);
-			bobb.y=clamp(bobb.y*1.1-3,-10,10);
 		}else{
 			sb.SetClipRect(
-				-8+bob.x,-4+bob.y,16,10,
+				-8+bob.x,-9+bob.y,16,15,
 				sb.DI_SCREEN_CENTER
 			);
 			scc=(0.6,0.6);
-			bobb.y=clamp(bobb.y,-8,8);
 		}
 		sb.drawimage(
 			"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,

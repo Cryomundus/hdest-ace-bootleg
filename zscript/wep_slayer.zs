@@ -90,11 +90,11 @@ class Slayer:HDShotgun replaces HDShotgun{
 		int cx,cy,cw,ch;
 		[cx,cy,cw,ch]=screen.GetClipRect();
 		sb.SetClipRect(
-			-16+bob.x,-4+bob.y,32,12,
+			-16+bob.x,-32+bob.y,32,38,
 			sb.DI_SCREEN_CENTER
 		);
-		vector2 bobb=bob*3;
-		bobb.y=clamp(bobb.y,-8,8);
+		vector2 bobb=bob*2;
+//		bobb.y=clamp(bobb.y,-8,8);
 		sb.drawimage(
 			"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
 			alpha:0.9,scale:(0.7,1)

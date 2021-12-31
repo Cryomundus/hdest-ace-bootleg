@@ -111,11 +111,10 @@ class HDRevolver:HDHandgun{
 		vector2 bobb=bob*1.6;
 
 		sb.SetClipRect(
-			-8+bob.x,-4+bob.y,16,10,
+			-8+bob.x,-9+bob.y,16,15,
 			sb.DI_SCREEN_CENTER
 		);
 		scc=(0.9,0.9);
-		bobb.y=clamp(bobb.y,-8,8);
 
 		sb.drawimage(
 			"revfst",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
