@@ -1,0 +1,19 @@
+clearteams
+
+team "Denim"{
+	textcolor "blue"
+	playercolor "55 77 cc"
+}
+team "Leather"{
+	textcolor "brown"
+	playercolor "80 50 10"
+}
+team "Camo"{
+	textcolor "green"
+	playercolor "6a 99 44"
+}
+team "Lace"{
+	textcolor "brick"
+	playercolor "ff c0 f0"
+}
+

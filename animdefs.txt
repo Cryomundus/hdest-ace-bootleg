@@ -1,0 +1,20 @@
+//the old ones
+cameratexture HDXHCAM1 64 56
+cameratexture HDXHCAM2 142 142  //unused, delete
+cameratexture HDXHCAM3 181 181
+cameratexture HDXHCAM4 300 200
+cameratexture HDXHCAM5 100 161
+cameratexture HDXHCAM6 120 193
+cameratexture HDXHCAM7 128 112
+
+
+//the new ones
+cameratexture HDXCAM_ZM66 181 181
+cameratexture HDXCAM_LIB 181 181
+cameratexture HDXCAM_BOSS 181 181
+cameratexture HDXCAM_TB 77 56
+cameratexture HDXCAM_BRON 181 181
+cameratexture HDXCAM_RLAUN 181 181
+cameratexture HDXCAM_DERP 77 56
+cameratexture HDXCAM_BLUR 360 200
+cameratexture HDXCAM_HERP 154 112

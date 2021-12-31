@@ -1,0 +1,6 @@
+//HD's SNDINFO for Freedoom (any)
+
+$volume misc/bullethit 0.4
+
+imp/pain  dsbgpain
+

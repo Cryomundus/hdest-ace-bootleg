@@ -1,0 +1,3 @@
+//HD's SNDINFO for Doom (proprietary)
+
+misc/bullethit		dspunch		$volume misc/bullethit 0.5
