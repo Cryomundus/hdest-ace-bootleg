@@ -138,6 +138,7 @@ medikit/scan      dsplsidl
 medikit/staple    dsthubm
 medikit/stopper   dspunch
 medikit/done      dsitemup
+medikit/crackle   dsdust  $pitchset medikit/crackle 1.6
 bandage/rip       dsclaw
 bandage/rustle    dspocket
 bloodpack/open    dsgopen

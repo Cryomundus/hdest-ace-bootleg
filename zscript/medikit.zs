@@ -701,12 +701,36 @@ class SecondFleshBeast:IdleDummy{
 	spawn:
 		TNT1 A 30;
 		TNT1 A 12{target.A_Scream();}
+		TNT1 A 14;
+		TNT1 A 16{target.A_StartSound("medikit/crackle",CHAN_BODY,CHANF_OVERLAP);}
+		TNT1 A 0{
+			target.A_StartSound("medikit/crackle",CHAN_BODY,CHANF_OVERLAP);
+			target.A_Scream();
+			let tgt=HDPlayerPawn(target);
+			if(tgt)tgt.AddBlackout(128,24,4);
+		}
+		TNT1 AAA 4{
+			let tgt=HDPlayerPawn(target);
+			if(tgt){
+				tgt.muzzleclimb1+=(frandom(-4,4),frandom(-10,12));
+				tgt.muzzleclimb2+=(frandom(-4,4),frandom(-10,12));
+				tgt.muzzleclimb3+=(frandom(-4,4),frandom(-10,12));
+				tgt.muzzleclimb4+=(frandom(-4,4),frandom(-10,12));
+			}
+		}
 		TNT1 A 4{
 			let tgt=HDPlayerPawn(target);
 			if(!tgt||tgt.bkilled||stamina<1){destroy();return;}
 			if(tgt.health>10)tgt.damagemobj(tgt,tgt,min(tgt.health-10,3),"internal",DMG_NO_ARMOR);
+			if(tgt)tgt.AddBlackout(24,8,4);
+			tgt.A_StartSound("medikit/crackle",CHAN_BODY,CHANF_OVERLAP);
+			tgt.muzzleclimb1+=(frandom(-1,1),frandom(-1,1));
+			tgt.muzzleclimb2+=(frandom(-1,1),frandom(-1,1));
+			tgt.muzzleclimb3+=(frandom(-1,1),frandom(-1,1));
+			tgt.muzzleclimb4+=(frandom(-1,1),frandom(-1,1));
 			tics=clamp(200-stamina,4,random(4,40));
 			if(tics<10)tgt.A_StartSound(tgt.painsound,CHAN_VOICE);
+			if(tics>15)tgt.A_StartSound(tgt.painsound,CHAN_VOICE);
 			tgt.stunned+=10;
 			tgt.burncount--;
 			if(!random(0,200))tgt.aggravateddamage++;
