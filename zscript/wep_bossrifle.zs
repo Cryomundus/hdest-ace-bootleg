@@ -172,30 +172,30 @@ class BossRifle:HDWeapon{
 				);
 			}else{
 				//the new circular view code that doesn't work with LZDoom 3.87c
-				if(
-					bob.y<104  //2021-12-27 values over 104 result in cliprect not being respected
-				){
-					sb.fill(color(256,0,0,0),0,0,screen.getwidth(),screen.getheight());
-					texman.setcameratotexture(hpc,"HDXCAM_BOSS",degree);
-					let cam     = texman.CheckForTexture("HDXCAM_BOSS",TexMan.Type_Any);
-					let reticle = texman.CheckForTexture("reticle1",TexMan.Type_Any);
+				sb.fill(color(255,0,0,0),
+					bob.x-44,scaledyoffset+bob.y-44,
+					88,88,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+				);
 
-					vector2 frontoffs=(0,scaledyoffset)+bob*3;
+				texman.setcameratotexture(hpc,"HDXCAM_BOSS",degree);
+				let cam     = texman.CheckForTexture("HDXCAM_BOSS",TexMan.Type_Any);
+				let reticle = texman.CheckForTexture("reticle1",TexMan.Type_Any);
 
-					double camSize  = texman.GetSize(cam);
-					sb.DrawCircle(cam, frontoffs, 0.5,usePixelRatio:true);
+				vector2 frontoffs=(0,scaledyoffset)+bob*3;
 
-					let reticleScale = camSize / texman.GetSize(reticle);
-					if(hdw.weaponstatus[0]&BOSSF_FRONTRETICLE){
-						sb.DrawCircle(reticle, frontoffs, .5*reticleScale, bob*deg*5-bob, 1.6*deg);
-					}else{
-						sb.DrawCircle(reticle, (0,scaledyoffset)+bob, .5*reticleScale,uvScale:.5);
-					}
+				double camSize  = texman.GetSize(cam);
+				sb.DrawCircle(cam, frontoffs, 0.5,usePixelRatio:true);
 
-					//let holeScale    = camSize / texman.GetSize(hole);
-					//let hole    = texman.CheckForTexture("scophole",TexMan.Type_Any);
-					//sb.DrawCircle(hole, (0, scaledyoffset) + bob, .5 * holeScale, bob * 5, 1.5);
+				let reticleScale = camSize / texman.GetSize(reticle);
+				if(hdw.weaponstatus[0]&BOSSF_FRONTRETICLE){
+					sb.DrawCircle(reticle, frontoffs, .5*reticleScale, bob*deg*5-bob, 1.6*deg);
+				}else{
+					sb.DrawCircle(reticle, (0,scaledyoffset)+bob, .5*reticleScale,uvScale:.5);
 				}
+
+				//let holeScale    = camSize / texman.GetSize(hole);
+				//let hole    = texman.CheckForTexture("scophole",TexMan.Type_Any);
+				//sb.DrawCircle(hole, (0, scaledyoffset) + bob, .5 * holeScale, bob * 5, 1.5);
 			}
 			screen.SetClipRect(cx,cy,cw,ch);
 
