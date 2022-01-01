@@ -177,7 +177,10 @@ class Boner:HDMobBase replaces Revenant{
 		SKEL I 6{
 			//copypasted from A_SkelFist with adjustments
 			let targ=target;
-			if(!targ)return;
+			if(
+				!targ
+				||(targ.bcorpse&&!random(0,31))
+			)return;
 			A_FaceTarget();
 			if(CheckMeleeRange()){
 				int damage=random[SkelFist](1, 10)*6;
