@@ -585,13 +585,11 @@ class HDMobFallSquishThinker:Thinker{
 
 //a thinker that constantly bleeds
 class HDBleedingWound:Thinker{
-	bool hitvital;
 	actor bleeder;
 	actor source;
 	int bleedrate;
 	int bleedpoints;
 	int ticker;
-	double zed;
 	enum bleednums{
 		BLEED_MAXTICS=40,
 	}
@@ -611,7 +609,7 @@ class HDBleedingWound:Thinker{
 			return;
 		}
 		bleedpoints--;
-		ticker=max(0,BLEED_MAXTICS-bleedrate);
+		ticker=max(1,BLEED_MAXTICS-bleedrate);
 		int bleeds=(bleedrate>>4);
 		do{
 			bleeds--;
