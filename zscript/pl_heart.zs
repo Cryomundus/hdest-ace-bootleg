@@ -164,7 +164,6 @@ extend class HDPlayerPawn{
 
 			//reset beatcount
 			beatcount=beatmax;
-//			if(bloodpressure>3)A_SetBlend("20 12 0f",0.003*min(bloodpressure,100),beatcount);
 			beatcounter++;
 
 			//sprinting
@@ -227,14 +226,15 @@ extend class HDPlayerPawn{
 				if(health<40) beatcap=clamp(beatcap,1,24);
 				else if(health<60) beatcap=clamp(beatcap,1,32);
 
-				//bandages come undone
-				if(unstablewoundcount && countinv("IsMoving")>random(0,12)){
-					unstablewoundcount--;
-					if(flip)oldwoundcount++;else woundcount++;
-				}
-				//wounds start settling
-				if(!random(0,unstablewoundcount+woundcount)){
-					if(unstablewoundcount>0){
+				if(unstablewoundcount){
+					//bandages come undone
+					if(countinv("IsMoving")>random(0,100)){
+						unstablewoundcount--;
+						woundcount++;
+					}
+
+					//wounds start settling
+					else if(!random(0,unstablewoundcount+woundcount)){
 						unstablewoundcount--;
 						oldwoundcount++;
 					}
