@@ -229,8 +229,9 @@ extend class HDPlayerPawn{
 				if(unstablewoundcount){
 					//bandages come undone
 					if(countinv("IsMoving")>random(0,100)){
-						unstablewoundcount--;
-						woundcount++;
+						int undone=random(1,random(1,unstablewoundcount));
+						unstablewoundcount-=undone;
+						woundcount+=undone;
 					}
 
 					//wounds start settling
