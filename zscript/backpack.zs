@@ -849,8 +849,12 @@ class HDBackpack : HDWeapon{
 			StorageItem si = Storage.GetSelectedItem();
 			if (si)
 			{
-				amt = clamp(amt, 1, 10);
-				int DropAmt = (si.ItemClass is 'HDAmmo' && GetDefaultByType((class<HDAmmo>)(si.ItemClass)).bMULTIPICKUP ? random(10, 50) : 1);
+				amt=clamp(amt,1,10);
+				int DropAmt=
+					si.ItemClass is "HDPickup"
+					&&GetDefaultByType((class<HDPickup>)(si.ItemClass)).bMULTIPICKUP
+				?int(max(1,ENC_426MAG/GetDefaultByType((class<HDPickup>)(si.ItemClass)).bulk))
+				:1;
 				Storage.RemoveItem(si, owner, null, DropAmt * amt);
 			}
 		}
