@@ -186,9 +186,9 @@ class ItemStorage play
 		let pkp = (class<HDPickup>)(item);
 		bool multipickup=pkp && GetDefaultByType(pkp).bMULTIPICKUP;
 		switch (operation){
-		case SIIAct_Extract:return wpn ? 10 : multipickup ? 6 : 10;
-		case SIIAct_Pocket:return wpn ? 12 : multipickup ? 6 : 10;
-		case SIIAct_Insert:return wpn ? 12 : multipickup ? 4 : 10;
+		case SIIAct_Extract:return wpn ? 10 : multipickup ? 3 : 6;
+		case SIIAct_Pocket:return wpn ? 12 : multipickup ? 3 : 8;
+		case SIIAct_Insert:return wpn ? 14 : multipickup ? 2 : 10;
 		default:break;
 		}
 		return 10;
