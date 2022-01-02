@@ -513,8 +513,7 @@ class ItemStorage play
 		let pkp = (class<HDPickup>)(item.ItemClass);
 
 		Inventory Spawned = null;
-		double SpawnHeight = remover ? remover.height / 2 + 2 : 0;
-		vector3 SpawnPos = remover ? remover.pos + (0, 0, SpawnHeight) : (0, 0, 0);
+		vector3 SpawnPos = remover ? (remover.pos.x+5*cos(remover.angle),remover.pos.y+5*sin(remover.angle),remover.pos.z+remover.height*0.8) : (0, 0, 0);
 		if (wpn)
 		{
 			index = min(index, item.Amounts.Size() - 1);
@@ -544,9 +543,6 @@ class ItemStorage play
 					{
 						newwpn.Translation = remover.Translation;
 					}
-					newwpn.angle = remover.angle;
-					newwpn.A_ChangeVelocity(1.5, 0, 1, CVF_RELATIVE);
-					newwpn.vel += remover.vel;
 				}
 				item.WeaponStatus.Delete(HDWEP_STATUSSLOTS * index, HDWEP_STATUSSLOTS);
 				if (item.Icons.Size() > 1) // [Ace] Don't delete the last icon. It is used for the preview.
@@ -576,9 +572,6 @@ class ItemStorage play
 					{
 						newarm.ActualPickup(receiver, true);
 					}
-					newarm.angle = remover.angle;
-					newarm.A_ChangeVelocity(1.5, 0, 1, CVF_RELATIVE);
-					newarm.vel += remover.vel;
 				}
 				if (item.Icons.Size() > 1)
 				{
@@ -604,9 +597,6 @@ class ItemStorage play
 					{
 						newmag.ActualPickup(receiver, true);
 					}
-					newmag.angle = remover.angle;
-					newmag.A_ChangeVelocity(1.5, 0, 1, CVF_RELATIVE);
-					newmag.vel += remover.vel;
 				}
 				if (item.Icons.Size() > 1)
 				{
@@ -628,9 +618,6 @@ class ItemStorage play
 				{
 					newpkp.ActualPickup(receiver, true);
 				}
-				newpkp.angle = remover.angle;
-				newpkp.A_ChangeVelocity(1.5, 0, 1, CVF_RELATIVE);
-				newpkp.vel += remover.vel;
 			}
 			item.Bulks[0] -= amt * GetDefaultByType(pkp).Bulk;
 			item.Amounts[0] -= amt;
@@ -638,6 +625,12 @@ class ItemStorage play
 			{
 				item.Amounts.Delete(0);
 			}
+		}
+
+		if(Spawned){
+			Spawned.angle = remover.angle;
+			Spawned.A_ChangeVelocity(1.5*cos(remover.pitch),0,1.-1.5*sin(remover.pitch),CVF_RELATIVE);
+			Spawned.vel += remover.vel;
 		}
 
 		RemoveNullOrEmpty(remover);
