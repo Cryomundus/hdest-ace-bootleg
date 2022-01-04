@@ -420,7 +420,13 @@ class doordestroyer:hdactor{
 
 		//explode
 		db.llength=doorwidth;
-		hdactor.HDBlast(caller,
+		if(
+			(
+				!dedicated
+				&&!hdbulletactor(caller)
+			)
+			&&!hdplayerpawn(caller)
+		)hdactor.HDBlast(caller,
 			pushradius:doorwidth,pushamount:24,
 			fragradius:doorwidth*2,fragtype:"HDB_scrapDB",
 			immolateradius:doorwidth,
