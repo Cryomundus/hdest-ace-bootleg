@@ -104,6 +104,8 @@ class HDBlurSphere:HDDamageHandler{
 			&&mod!="internal"
 			&&mod!="bleedout"
 			&&mod!="maxhpdrain"
+			&&mod!="falling"
+			&&random(0,owner.cursector.lightlevel)
 		)worn=false;
 
 		let hdp=hdplayerpawn(owner);
