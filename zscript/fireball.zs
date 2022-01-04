@@ -27,7 +27,7 @@ class HDFireballTail:IdleDummy{
 			return;
 		}
 		if(alpha<0.3){
-			setorigin(master.pos,true);
+			setorigin((master.pos.xy,master.pos.z+master.missileheight),true);
 			clearinterpolation();
 			vel=master.vel*speed+(frandom(-0.1,0.1),frandom(-0.1,0.1),frandom(0.5,1));
 			alpha=height;
@@ -43,7 +43,7 @@ class HDFireballTail:IdleDummy{
 }
 
 //damage would be balefire, electro, radioactivity or heat/immolation
-//missiletype: tail used in A_FBTail()
+//missiletype, missileheight: tail used in A_FBTail()
 //activesound: looping sound
 const HDCONST_MAXFIREFATIGUE=35*5;
 class HDFireball:HDActor{
@@ -62,6 +62,7 @@ class HDFireball:HDActor{
 
 		renderstyle "add";
 		radius 4;height 4;speed 12;gravity 0.05;deathheight 30;
+		missileheight 0;
 		damagetype "hot";damagefunction(1);
 
 		seesound "imp/attack";deathsound "imp/shotx";

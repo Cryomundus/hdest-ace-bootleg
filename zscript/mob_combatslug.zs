@@ -35,6 +35,7 @@ class manjuicesmoke:HDFireballTail{
 }
 class manjuice:hdfireball{
 	default{
+		missileheight 8;
 		missiletype "manjuicesmoke";
 		damagetype "hot";
 		activesound "misc/firecrkl";
@@ -58,7 +59,8 @@ class manjuice:hdfireball{
 		}
 		MANF ABAB 2 A_FBTail();
 	spawn2:
-		MANF AB 2 A_FBFloat();
+		MANF A 2 A_FBFloat();
+		MANF B 2;
 		loop;
 	death:
 		MISL B 0{
@@ -225,7 +227,7 @@ class CombatSlug:HDMobBase replaces Fatso{
 		FATT G 10{
 			if(
 				accuracy<2
-				&&(!random(0,4)||(target&&target.health>0))
+				&&(!random(0,4-(!!target&&target.health>0)))
 			){
 				accuracy++;
 				setstatelabel("shoot");
