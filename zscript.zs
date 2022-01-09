@@ -60,7 +60,6 @@ const HDCONST_MINEYERANGE=HDCONST_HEIGHTOVER54*18;
 #include "zscript/pl_encumbrance.zs"
 #include "zscript/pl_loadout.zs"
 #include "zscript/pl_cheat.zs"
-#include "zscript/pl_pronouns.zs"
 
 #include "zscript/tips.zs"
 
