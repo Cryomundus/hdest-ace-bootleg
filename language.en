@@ -18,7 +18,7 @@ OPTVAL_NEUTRAL="They";
 OPTVAL_OTHER="It";
 
 STARTUP1="        \cq~ \cr* \cq~";
-STARTUP2=" \cyHideous Destructor \cx4.7.? \c[Cyan]AceCorp Hack\c-";
+STARTUP2=" \cyHideous Destructor \cx4.7.1b \c[Cyan]AceCorp Hack\c-";
 STARTUP3=" Please read the manual.";
 STARTUP4="       Have fun!";
 STARTUP5="        \cq~ \cr* \cq~";
