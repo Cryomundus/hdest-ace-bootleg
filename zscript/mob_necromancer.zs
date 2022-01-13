@@ -511,6 +511,7 @@ class Necromancer:HDMobBase replaces ArchVile{
 			A_SpawnItem("spawnFire",0.1,28,0,0);
 			A_Vocalize(deathsound);
 			DistantNoise.Make(self,"world/rocketfar",2.);
+			A_ChangeNecroFlags(false);
 		}
 		VILE Q 14 bright light("HELL") A_Quake(8,14,0,768,0);
 		VILE QQQQQQ 0 A_SpawnItemEx("SpawnFire",
