@@ -27,7 +27,10 @@ extend class HDPlayerPawn{
 		if(CheckFrozen())return;
 		let player=self.player;
 		UserCmd cmd=player.cmd;
-		if(CanCrouch()&&player.health>0){ //guess what i deleted lololol
+		if(
+			CanCrouch() //map settings check intentionally omitted
+			&&player.health>0
+		){
 			int crouchdir=player.crouching;
 			if(
 				cmd.buttons&BT_JUMP
@@ -421,6 +424,7 @@ extend class HDPlayerPawn{
 						!fallroll
 						&&realpitch<0
 					){
+						player.crouching=player.crouchdir; //reset to normal
 						double aac=-realpitch*0.18;
 						muzzleclimb1.y+=aac;
 						muzzleclimb2.y+=aac;
@@ -457,6 +461,7 @@ extend class HDPlayerPawn{
 						!fallroll
 						&&realpitch>0
 					){
+						player.crouching=player.crouchdir; //reset to normal
 						double aac=-realpitch*0.1;
 						muzzleclimb1.y+=aac;
 						muzzleclimb2.y+=aac;
