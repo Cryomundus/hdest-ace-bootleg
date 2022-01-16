@@ -362,7 +362,7 @@ class LiberatorRifle:AutoReloadingThingy{
 				);
 			}
 			sb.drawimage(
-				"riflsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+				"libsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 			);
 			if(scopeview){
 				int scaledyoffset=60;

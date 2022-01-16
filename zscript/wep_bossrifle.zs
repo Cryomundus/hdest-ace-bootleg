@@ -124,13 +124,12 @@ class BossRifle:HDWeapon{
 		vector2 bobb=bob*2;
 		bobb.y=clamp(bobb.y,-8,8);
 		sb.drawimage(
-			"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-			alpha:0.9,scale:(1.6,2)
+			"bsfrntsit",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP
 		);
 		sb.SetClipRect(cx,cy,cw,ch);
 		sb.drawimage(
-			"backsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-			scale:(2,1)
+			"bsbaksit",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
+			alpha:0.9
 		);
 
 		if(scopeview){
@@ -200,7 +199,7 @@ class BossRifle:HDWeapon{
 			screen.SetClipRect(cx,cy,cw,ch);
 
 			sb.drawimage(
-				"libscope",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
+				"bossscope",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
 				scale:(1.24,1.24)
 			);
 			sb.drawstring(

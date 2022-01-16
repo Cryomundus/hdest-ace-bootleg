@@ -136,11 +136,12 @@ class HDPistol:HDHandgun replaces Pistol{
 		}
 		sb.drawimage(
 			"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-			alpha:0.9,scale:scc
+			scale:scc
 		);
 		sb.SetClipRect(cx,cy,cw,ch);
 		sb.drawimage(
 			"backsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
+			alpha:0.9,
 			scale:scc
 		);
 	}

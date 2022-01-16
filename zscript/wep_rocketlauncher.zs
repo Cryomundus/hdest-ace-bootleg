@@ -107,8 +107,7 @@ class HDRL:HDWeapon{
 				);
 			}
 			sb.drawimage(
-				"xh25",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-				scale:(1.6,1.6)
+				"rlrearsight",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 			);
 			if(hdw.weaponstatus[RLS_CHAMBER]<=1){
 				int airburst=hdw.airburst;

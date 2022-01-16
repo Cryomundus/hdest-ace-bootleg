@@ -110,7 +110,8 @@ class Hunter:HDShotgun{
 		);
 		sb.SetClipRect(cx,cy,cw,ch);
 		sb.drawimage(
-			"backsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP
+			"sgbaksit",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
+			alpha:0.9
 		);
 	}
 	override double gunmass(){

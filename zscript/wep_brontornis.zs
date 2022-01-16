@@ -186,7 +186,7 @@ class Brontornis:HDWeapon{
 				);
 			}
 			sb.drawimage(
-				"xh25a",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
+				"brontorearsight",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
 				scale:(1.,1.)
 			);
 		}

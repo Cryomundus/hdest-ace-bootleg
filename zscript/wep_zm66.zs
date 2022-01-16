@@ -208,7 +208,7 @@ class ZM66AssaultRifle:ZM66ScopeHaver{
 				);
 			}
 			sb.drawimage(
-				"riflsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+				"z66site",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 			);
 			if(scopeview)ShowZMScope(hdw.weaponstatus[ZM66S_ZOOM],hpc,sb,scaledyoffset,bob);
 		}

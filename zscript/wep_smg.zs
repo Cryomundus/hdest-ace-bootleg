@@ -114,8 +114,7 @@ class HDSMG:HDWeapon{
 				);
 			}
 			sb.drawimage(
-				"xh25b",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-				scale:(1.,1.)
+				"smgrearsight",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 			);
 		}else{
 			int cx,cy,cw,ch;
@@ -127,12 +126,12 @@ class HDSMG:HDWeapon{
 			vector2 bobb=bob*3;
 			bobb.y=clamp(bobb.y,-8,8);
 			sb.drawimage(
-				"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-				alpha:0.9
+				"smgfrntsit",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP
 			);
 			sb.SetClipRect(cx,cy,cw,ch);
 			sb.drawimage(
-				"backsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP
+				"smgbaksit",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
+				alpha:0.9
 			);
 		}
 	}

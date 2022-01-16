@@ -96,12 +96,12 @@ class Slayer:HDShotgun replaces HDShotgun{
 		vector2 bobb=bob*2;
 //		bobb.y=clamp(bobb.y,-8,8);
 		sb.drawimage(
-			"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-			alpha:0.9,scale:(0.7,1)
+			"dbfrntsit",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP
 		);
 		sb.SetClipRect(cx,cy,cw,ch);
 		sb.drawimage(
-			"dbbaksit",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP
+			"dbbaksit",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
+			alpha:0.9
 		);
 	}
 	override void PostBeginPlay(){

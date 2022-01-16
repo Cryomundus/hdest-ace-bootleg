@@ -884,20 +884,6 @@ sprite ROCKB0,12,27{
 	patch ROCKA0,0,0{}
 }
 
-graphic XH25A,17,14{
-	xscale 0.6
-	yscale 0.6
-	patch XH25,0,0{}
-}
-graphic XH25B,17,14{
-	xscale 0.5
-	yscale 0.5
-	patch XH25,0,0{}
-}
-
-
-
-
 
 // H.E.R.P.
 sprite HERPA1,9,15{
@@ -1160,9 +1146,7 @@ sprite PRNDA0,1,3{
 
 
 #include "texgun.txt"
-
-
-
+#include "texsights.txt"
 
 
 //Obsolete, used only for the old HUD where offsets mattered

@@ -173,7 +173,7 @@ class Vulcanette:ZM66ScopeHaver{
 			);
 		}
 		sb.drawimage(
-			"riflsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+			"z66site",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 		);
 		int scaledyoffset=47;
 

@@ -73,15 +73,13 @@ class ThunderBuster:HDCellWeapon{
 			sb.DI_SCREEN_CENTER
 		);
 		vector2 bobb=bob*3;
-		bobb.y=clamp(bobb.y,-8,8);
 		sb.drawimage(
-			"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-			alpha:0.9,scale:(1.6,2)
+			"tbfrntsit",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP
 		);
 		sb.SetClipRect(cx,cy,cw,ch);
 		sb.drawimage(
-			"backsite",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-			scale:(2,1)
+			"tbbaksit",(0,0)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
+			alpha:0.9
 		);
 
 		if(scopeview){
