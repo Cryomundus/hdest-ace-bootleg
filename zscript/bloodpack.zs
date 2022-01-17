@@ -207,7 +207,13 @@ class BloodBagWorn:HDPickup{
 			if(hp.fatigue<HDCONST_SPRINTFATIGUE)hp.fatigue++;
 		}
 		//fall off
-		if(hp.inpain>0&&bloodleft<random(-20,5))hp.dropinventory(self);
+		if(
+			(
+				hp.inpain>0
+				||hp.incapacitated
+			)
+			&&bloodleft<random(-20,5)
+		)hp.dropinventory(self);
 	}
 
 	override void DrawHudStuff(
