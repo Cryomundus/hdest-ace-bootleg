@@ -177,23 +177,30 @@ extend class HDHandlers{
 				default: break;
 				}
 			}
-			//if block-all and no midtexture, force add a mostly transparent midtexture
+			//remove arbitrary invisible barriers
 			if(
-				hd_dirtywindows
-				&&lll.sidedef[1]
-				&&(
-					lll.flags&line.ML_BLOCKEVERYTHING
-					||lll.flags&line.ML_BLOCKPROJECTILE
-					||lll.flags&line.ML_BLOCKHITSCAN
-//					||lll.flags&line.ML_BLOCKING	//still undecided
-				)
+				!!lll.sidedef[1]
 				&&!lll.sidedef[0].gettexture(side.mid)
 				&&!lll.sidedef[1].gettexture(side.mid)
 			){
-				lll.flags|=line.ML_WRAP_MIDTEX;
-				lll.sidedef[0].settexture(side.mid,dirtyglass);
-				lll.sidedef[1].settexture(side.mid,dirtyglass);
-				lll.alpha=0.2;
+				//err in favour of player movement
+				lll.flags&=~line.ML_BLOCKEVERYTHING;
+				lll.flags&=~line.ML_BLOCKING;
+				lll.flags&=~line.ML_BLOCK_PLAYERS;
+
+				//if block-all and no midtexture, force add a mostly transparent midtexture
+				if(
+					hd_dirtywindows
+					&&lll.flags&(
+						line.ML_BLOCKPROJECTILE
+						|lll.flags&line.ML_BLOCKHITSCAN
+					)
+				){
+					lll.flags|=line.ML_WRAP_MIDTEX;
+					lll.sidedef[0].settexture(side.mid,dirtyglass);
+					lll.sidedef[1].settexture(side.mid,dirtyglass);
+					lll.alpha=0.3;
+				}
 			}
 		}
 
