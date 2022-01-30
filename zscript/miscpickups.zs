@@ -272,7 +272,7 @@ class HDAmBox:HDUPK{
 			if(!iiu)iiu=iid.bulk;
 			if(hd_debug&&!iiu)A_Log(iid.getclassname().." has an effective unit bulk of zero.");
 			let aaa=inventory(spawn(iic,pos,ALLOW_REPLACE));
-			aaa.amount=int(maxcapacity*frandom(0.1,1.)/iiu);
+			aaa.amount=int(max(1, maxcapacity*frandom(0.1,1.)/iiu));
 			aaa.vel=(vel.xy,vel.z+2);
 		}
 	}
