@@ -48,7 +48,14 @@ class HDTree:HDActor{
 	void A_Resize(double scx,double scy){
 		super.postbeginplay();
 		double cz=ceilingz-floorz;
-		if(cz>0&&cz<height*scy)scy*=height/cz;
+		
+		//fit in sector
+		//skip if sector smaller than default since something else is likely happening
+		if(
+			cz>0
+			&&cz<height*scy
+		)scy=max(min(scy,1.),cz/height);
+
 		A_SetSize(radius*scx,height*scy);
 		scale=(scale.x*scx,scale.y*scy);
 		scale.x*=randompick(-1,1);
