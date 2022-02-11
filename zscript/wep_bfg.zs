@@ -120,6 +120,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		..WEPHELP_RELOAD.."  Abort charge/Reload battery\n"
 		..WEPHELP_ALTRELOAD.."  Reload depleted battery\n"
 		..WEPHELP_UNLOADUNLOAD
+		..WEPHELP_USE.."+"..WEPHELP_UNLOAD.."  Charge unattended"
 		;
 	}
 	override void failedpickupunload(){
@@ -171,7 +172,10 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			A_WeaponReady(WRF_ALL);
 		}goto readyend;
 	select0:
-		B9KG A 0{if(!countinv("NulledWeapon"))invoker.weaponstatus[0]&=~BFGF_STRAPPED;}
+		B9KG A 0{
+			if(!countinv("NulledWeapon"))invoker.weaponstatus[0]&=~BFGF_STRAPPED;
+			invoker.weaponstatus[0]&=~BFGF_DROPCHARGE;
+		}
 		BFGG C 0 A_CheckIdSprite("B9KGA0","BFGGA0");
 		goto select0bfg;
 	deselect0:
@@ -224,7 +228,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		}
 		#### B 6{
 			invoker.weaponstatus[BFGS_TIMER]++;
-			if (invoker.weaponstatus[BFGS_TIMER]>3){
+			if(invoker.weaponstatus[BFGS_TIMER]>3){
 				invoker.weaponstatus[BFGS_TIMER]=0;
 				if(invoker.weaponstatus[BFGS_BATTERY]<20){
 					invoker.weaponstatus[BFGS_BATTERY]++;
@@ -358,7 +362,25 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		}goto reload1;
 	unload:
 		#### A 0{
-			if(invoker.weaponstatus[BFGS_BATTERY]<0)setweaponstate("nope");
+			if(pressinguse()){
+				if(
+					!(invoker.weaponstatus[0]&BFGF_STRAPPED)
+					&&invoker.weaponstatus[BFGS_BATTERY]>=0
+					&&pressingunload()
+					&&(
+						invoker.weaponstatus[BFGS_CHARGE]<20
+						||invoker.weaponstatus[BFGS_BATTERY]<20
+					)&&(
+						invoker.weaponstatus[BFGS_CHARGE]>BFGC_MINCHARGE
+						||invoker.weaponstatus[BFGS_BATTERY]>BFGC_MINCHARGE
+					)
+				){
+					invoker.weaponstatus[0]|=BFGF_DROPCHARGE;
+					DropInventory(invoker);
+				}
+				setweaponstate("nope");
+				return;
+			}
 			invoker.weaponstatus[BFGS_LOADTYPE]=-1;
 		}goto reload1;
 	reload1:
@@ -428,6 +450,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 	spawn:
 		BFUG A -1 nodelay{
 			if(invoker.weaponstatus[0]&BFGF_CRITICAL)invoker.setstatelabel("bwahahahaha");
+			else if(invoker.weaponstatus[0]&BFGF_DROPCHARGE)invoker.setstatelabel("dropcharge");
 		}
 	bwahahahaha:
 		BFUG A 3{
@@ -465,6 +488,34 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		BFUG A 0{
 			invoker.A_ChangeVelocity(-cos(pitch)*4,0,sin(pitch)*4,CVF_RELATIVE);
 		}goto spawn;
+
+	dropcharge:
+		BFUG A 6{
+			if(
+				(
+					invoker.weaponstatus[BFGS_BATTERY]>=20
+					&&invoker.weaponstatus[BFGS_CHARGE]>=20
+				)
+				||invoker.weaponstatus[BFGS_BATTERY]<0
+			){
+				invoker.weaponstatus[0]&=~BFGF_DROPCHARGE;
+				invoker.setstatelabel("spawn");
+				return;
+			}
+			invoker.weaponstatus[BFGS_TIMER]++;
+			if (invoker.weaponstatus[BFGS_TIMER]>3){
+				invoker.weaponstatus[BFGS_TIMER]=0;
+				if(invoker.weaponstatus[BFGS_BATTERY]<20){
+					invoker.weaponstatus[BFGS_BATTERY]++;
+					if(invoker.weaponstatus[BFGS_BATTERY]==20)
+						invoker.weaponstatus[0]|=BFGF_DEMON;
+				}
+				else invoker.weaponstatus[BFGS_CHARGE]++;
+			}
+			if(invoker.weaponstatus[BFGS_BATTERY]==20)A_SetTics(5);
+			invoker.A_StartSound("weapons/bfgcharge",CHAN_VOICE);
+			BFG9k.Spark(invoker,1,height-10);
+		}loop;
 	}
 
 	override void postbeginplay(){
@@ -485,6 +536,7 @@ enum bfg9kstatus{
 	BFGF_CRITICAL=1,
 	BFGF_STRAPPED=2,
 	BFGF_DEMON=4,
+	BFGF_DROPCHARGE=8,
 
 	BFGS_STATUS=0,
 	BFGS_CHARGE=1,
@@ -644,6 +696,16 @@ class BFGBalle:HDFireball{
 			}
 		}
 	}
+	void A_BFGScrew(bool tail=false){
+		A_Corkscrew();
+		if(tail){
+			let ttt=spawn("BFGBallTail",pos,ALLOW_REPLACE);
+			if(ttt){
+				ttt.target=target;
+				ttt.vel=vel*0.2;
+			}
+		}
+	}
 	states{
 	spawn:
 		TNT1 A 0 nodelay{
@@ -666,9 +728,11 @@ class BFGBalle:HDFireball{
 		}
 		goto spawn2;
 	spawn2:
-		BFS1 AB 3 A_SpawnItemEx("BFGBallTail",0,0,0,vel.x*0.2,vel.y*0.2,vel.z*0.2,0,168,0);
+		BFS1 AB 1 A_BFGScrew();
+		BFS1 A 1 A_BFGScrew(true);
+		BFS1 BA 1 A_BFGScrew();
+		BFS1 B 1 A_BFGScrew(true);
 		---- A 0 A_BFGBallZap();
-		---- A 0 A_Corkscrew();
 		loop;
 	death:
 		BFE1 A 2;
@@ -856,4 +920,3 @@ class BFGAccelerator:IdleDummy{
 		}stop;
 	}
 }
-
