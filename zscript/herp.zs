@@ -189,7 +189,7 @@ class HERPBot:HDUPK{
 				&&!hitactor.bnevertarget
 				&&(hitactor.bismonster||hitactor.player)
 				&&(!hitactor.player||!(hitactor.player.cheats&CF_NOTARGET))
-				&&hitactor.health>random((hitactor.vel==(0,0,0)&&random(0,99))?0:-2,20)
+				&&hitactor.health>random((hitactor.vel==(0,0,0)&&random(0,99))?0:-2,5)
 				&&hitactor.checksight(self)
 			){
 				target=hitactor;
@@ -281,7 +281,7 @@ class HERPBot:HDUPK{
 
 
 	ready:
-		HERP A 7 A_StartSound("weapons/vulcanup",CHAN_BODY,CHANF_OVERLAP);
+		HERP A 12 A_StartSound("weapons/vulcanup",CHAN_BODY,CHANF_OVERLAP);
 		HERP AAA 1 herpbeep("herp/beepready");
 	aim:
 		HERP A 2 A_FaceTarget(2.,2.,0,0,FAF_TOP,-4);
@@ -323,15 +323,15 @@ class HERPBot:HDUPK{
 			HDBulletActor.FireBullet(self,"HDB_426",zofs:6,spread:1,distantsound:"world/herpfar");
 		}
 		HERP C 2{
-			angle-=frandom(0.4,1.);
-			pitch-=frandom(0.8,1.3);
+			angle-=frandom(0.6,0.8);
+			pitch-=frandom(1.2,1.8);
 			if(bfriendly)A_AlertMonsters(0,AMF_TARGETEMITTER);
 			else A_AlertMonsters();
 		}
 		HERP A 0{
 			if(ammo[0]<1){
 				setstatelabel("swapmag");
-			}else if(target && target.health>random(-30,30)){
+			}else if(target && target.health>random(-10,10)){
 				flinetracedata herpline;
 				linetrace(
 					angle,4096,pitch,
@@ -1472,4 +1472,3 @@ enum HERPControllerNums{
 	HERPS_MODE=3,
 	HERPS_TIMER=4,
 }
-
