@@ -37,7 +37,6 @@ extend class hdplayerpawn{
 			"Hit \cdUser3\cu to access the magazine manager on most weapons.",
 			"Hit \cdUser4\cu to unload most weapons.",
 			"If you are carrying too much useless ammo,\nhit the \cdPurge Useless Ammo\cu key\nor use the \cdhd_purge\cu command.",
-			"Trans rights",
 			"Hit \cdUse\cu on a ladder to start climbing, and again or \cdJump\cu to dismount.\nHit \cdJump\cu while \cdcrouching\cu to take down the ladder.",
 
 			"Your movement and turning affect your punches and grenades.\nGo to the range and practice!",
