@@ -128,8 +128,8 @@ extend class HDPlayerPawn{
 					muzzleclimb1.x+=frandom(-3,3);
 					muzzleclimb1.y+=frandom(-1,1);
 
-					itt.vel.xy+=(frandom(-1,1),frandom(-1,1))
-						+angletovector(angle,frandom(0,1));
+					itt.vel.xy+=(frandom(-0.3,0.3),frandom(-0.3,0.3))
+						+angletovector(angle,frandom(0,0.3));
 
 					bool friendly=itt.isfriend(self);
 
