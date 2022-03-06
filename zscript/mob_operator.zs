@@ -1401,6 +1401,7 @@ extend class HDOperator{
 	){
 		if(caller.bcorpse||caller.health<1)return;
 		for(int i=0;i<MAXPLAYERS;i++){
+			string newmsg = msg;
 			if(
 				playeringame[i]
 				&&(
@@ -1416,8 +1417,8 @@ extend class HDOperator{
 			){
 				actor pmo=players[i].mo;
 				pmo.A_StartSound("misc/chat",420,CHANF_UI|CHANF_NOPAUSE|CHANF_LOCAL);
-				if(!(flags&HDTS_DONTFORMAT))msg="\cd"..caller.gettag()..": "..msg;
-				pmo.A_Log(msg,true);
+				if(!(flags&HDTS_DONTFORMAT))newmsg="\cd"..caller.gettag()..": "..newmsg;
+				pmo.A_Log(newmsg,true);
 			}
 		}
 	}
