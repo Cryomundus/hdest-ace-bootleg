@@ -50,6 +50,8 @@ extend class HDMobBase{
 	){
 		if(HDAIOverride.HDChase(self,meleestate,missilestate,flags,speedmult))return;
 
+		bJUSTCHASED=true;
+
 		if(
 			health<1
 			||MustUnstick()
@@ -708,6 +710,13 @@ extend class HDMobBase{
 
 		if(bINCONVERSATION)return false;
 
+		if(
+			bJUSTCHASED
+			&&!(flags&LOF_NOJUMP)
+		){
+			bJUSTCHASED=false;
+			return false;
+		}
 
 		//set goal
 		if(special==Thing_SetGoal){

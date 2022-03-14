@@ -26,6 +26,7 @@ class HDMobBase : HDActor{
 	flagdef climbpastdropoff:hdmobflags,17;
 	flagdef bloodlesswhileshielded:hdmobflags,18;
 	flagdef headless:hdmobflags,19;  //no separate head target - often it's all head
+	flagdef justchased:hdmobflags,20;  //turned on in chase, turn off and abort A_HDLook if on
 
 	default{
 		monster;
