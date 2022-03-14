@@ -184,6 +184,14 @@ extend class HDHandlers{
 				&&!lll.sidedef[1].gettexture(side.mid)
 			){
 				//err in favour of player movement
+				if(
+					lll.flags&(
+						line.ML_BLOCKEVERYTHING
+						|line.ML_BLOCKING
+					)
+				){
+					lll.flags|=line.ML_BLOCKMONSTERS;
+				}
 				lll.flags&=~line.ML_BLOCKEVERYTHING;
 				lll.flags&=~line.ML_BLOCKING;
 				lll.flags&=~line.ML_BLOCK_PLAYERS;
