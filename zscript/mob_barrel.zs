@@ -98,7 +98,7 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 	}
 	states{
 	spawn:
-		BAR1 AB 10 A_Look();
+		BAR1 AB 10;
 		loop;
 	pain:
 		#### B 1 A_Pain();
@@ -556,15 +556,20 @@ class BarrelGremlin:HDActor{
 	}
 	bool hasmoved;
 	void A_GremlinHunt(){
+		let bbb=HDBarrel(master);
+
 		if(
-			!master
-			||master.health<1
+			!bbb
+			||bbb.health<1
 		){
 			bshootable=true;
 			A_Die();
 			return;
 		}
-		if(!target||target.health<1){
+		if(
+			!target
+			||target.health<1
+		){
 			target=null;
 			hasmoved=false;
 			A_LookEx(
@@ -574,25 +579,26 @@ class BarrelGremlin:HDActor{
 			);
 			return;
 		}
-		setorigin(master.pos,false);
-		master.target=target;
-		if(random(0,31)||A_JumpIfInTargetLOS("null",100))return;
+		setorigin(bbb.pos,false);
+		bbb.target=target;
+
+		if(
+			random(0,31)
+			||A_JumpIfInTargetLOS("null",100)
+		)return;
+
 		double dist=distance3d(target);
 		if(
 			hasmoved
 			&&dist<random(64,1024)
 		){
-			if(master is "HDBarrel"){
-				HDBarrel(master).A_BarrelAttack();
-			}
+			bbb.A_BarrelAttack();
 			return;
 		}
 		if(
 			dist<random(512,2048)
 		){
-			if(master is "HDBarrel"){
-				HDBarrel(master).A_BarrelMove();
-			}
+			bbb.A_BarrelMove();
 			hasmoved=true;
 		}
 	}
@@ -606,4 +612,3 @@ class BarrelGremlin:HDActor{
 		stop;
 	}
 }
-
