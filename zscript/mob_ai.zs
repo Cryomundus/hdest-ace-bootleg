@@ -715,6 +715,7 @@ extend class HDMobBase{
 			&&!(flags&LOF_NOJUMP)
 		){
 			bJUSTCHASED=false;
+			if(!tics)A_SetTics(1);
 			return false;
 		}
 
