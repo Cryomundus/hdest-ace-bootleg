@@ -1228,7 +1228,8 @@ class DERPController:HDWeapon{
 					}
 					owner.A_Log("D.E.R.P. connected at ("..int(mo.pos.x)+random(-100,100)..","..int(mo.pos.y)+random(-100,100)..").",true);
 					mo.cmd=DERP_AMBUSH;
-					if(owner.player)mo.bfriendly=true;
+					if(owner.player)mo.bfriendly=true;else mo.bfriendly=owner.bfriendly;
+					mo.A_StartSound("derp/hacked",69420);
 					updatederps();
 					return true;
 				}else{

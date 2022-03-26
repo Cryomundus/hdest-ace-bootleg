@@ -1449,7 +1449,8 @@ class HERPController:HDWeapon{
 					}
 					owner.A_Log("H.E.R.P. connected.",true);
 					mo.bmissilemore=false;
-					if(owner.player)mo.bfriendly=true;
+					if(owner.player)mo.bfriendly=true;else mo.bfriendly=owner.bfriendly;
+					mo.A_StartSound("herp/hacked",69420);
 					updateherps();
 					return true;
 				}else{

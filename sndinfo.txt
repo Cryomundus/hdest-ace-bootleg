@@ -153,6 +153,7 @@ jetpack/bang    dsfirxpl  $limit jetpack/bang 0
 jetpack/on      dsvulcup
 jetpack/wear    dssgcock
 
+derp/hacked       dsvulcup  $pitchset derp/hacked 1.4
 derp/crawl        dsdrpcrl
 derp/crawl2       dsdrpcrl  $pitchset derp/crawl 1.3
 derp/repair       dsdrpcrl
@@ -161,6 +162,7 @@ derp/repair2      dsgopen
 derp/repair3      dsrifclk
 $random derp/repairtry  {derp/repair derp/crawl weapons/pocket derp/repair1 derp/repair2 derp/repair3 weapons/fmswitch weapons/grenopen}
 
+herp/hacked       dsvulcup  $pitchset herp/hacked 0.8
 herp/crawl        dsdrpcrl
 herp/beep         dsitemup
 herp/beepready    dsitemup
