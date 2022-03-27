@@ -592,7 +592,7 @@ class ItemStorage play
 				{
 					Spawned = Inventory(Actor.Spawn(mag, SpawnPos));
 					HDMagAmmo newmag = HDMagAmmo(Spawned);
-					newmag.Mags.Push(item.Amounts[0]);
+					newmag.Mags[0] = item.Amounts[0];
 					if (receiver)
 					{
 						newmag.ActualPickup(receiver, true);
