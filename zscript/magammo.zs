@@ -317,9 +317,9 @@ class HDMagAmmo:HDAmmo{
 			setstatelabel("spawn2");
 		}
 	}
-	override void postbeginplay(){
-		super.postbeginplay();
+	override void beginplay(){
 		syncamount();
+		super.beginplay();
 	}
 
 
