@@ -123,10 +123,10 @@ class HDArmour:HDMagAmmo{
 		return mega;
 	}
 	override void beginplay(){
+		super.beginplay();
 		cooldown=0;
 		mega=icon==texman.checkfortexture("ARMCB0",TexMan.Type_MiscPatch);
 		mags.push((mega?(1000+HDCONST_BATTLEARMOUR):HDCONST_GARRISONARMOUR));
-		super.beginplay();
 	}
 	override void consolidate(){}
 	override double getbulk(){
