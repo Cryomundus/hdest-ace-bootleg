@@ -304,7 +304,10 @@ class PortableRadsuit:HDPickup replaces RadSuit{
 				}
 				A_TakeInventory("WornRadsuit");
 			}
-			player.crouchfactor=min(player.crouchfactor,0.7);
+			if (player)
+			{
+				player.crouchfactor=min(player.crouchfactor,0.7);
+			}
 		}fail;
 	}
 }
