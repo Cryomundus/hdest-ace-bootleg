@@ -114,7 +114,7 @@ class HDArmour:HDMagAmmo{
 	}
 	override inventory createtossable(int amt){
 		let sct=super.createtossable(amt);
-		if(self)checkmega();
+		if (self) checkmega();
 		return sct;
 	}
 	bool checkmega(){
@@ -125,13 +125,10 @@ class HDArmour:HDMagAmmo{
 	override void beginplay(){
 		super.beginplay();
 		cooldown=0;
-		mega=icon==texman.checkfortexture("ARMCB0",TexMan.Type_MiscPatch);
-		mags.push((mega?(1000+HDCONST_BATTLEARMOUR):HDCONST_GARRISONARMOUR));
 	}
 	override void consolidate(){}
 	override double getbulk(){
 		syncamount();
-		checkmega();
 		double blk=0;
 		for(int i=0;i<amount;i++){
 			if(mags[i]>=1000)blk+=ENC_BATTLEARMOUR;
@@ -200,7 +197,8 @@ class HDArmour:HDMagAmmo{
 	}
 	states{
 	spawn:
-		ARMS A -1 nodelay A_JumpIf(invoker.mega,1);
+		ARMS A 0 NoDelay { invoker.Checkmega(); }
+		ARMS A -1 A_JumpIf(invoker.mega,1);
 		ARMC A -1;
 		stop;
 	use:
@@ -289,6 +287,7 @@ class HDArmourWorn:HDDamageHandler{
 		tossed.mags.clear();
 		tossed.mags.push(mega?durability+1000:durability);
 		tossed.amount=1;
+		tossed.checkmega();
 		HDArmour.ArmourChangeEffect(owner,90);
 		destroy();
 		return tossed;
