@@ -348,7 +348,7 @@ class HDSmoke:HDPuff{
 	override void postbeginplay(){
 		actor smm;
 		int bcc=0;
-		thinkeriterator bexpm=ThinkerIterator.create(getclassname());
+		thinkeriterator bexpm=ThinkerIterator.create(GetClass(), STAT_DEFAULT);
 		actor osm;
 		while(smm=actor(bexpm.next())){
 			if(
