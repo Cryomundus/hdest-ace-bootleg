@@ -258,10 +258,13 @@ extend class HDPlayerPawn{
 			//to do drugs
 			//do drugs
 			//drugs
-			HDDrug drg=null;
-			thinkeriterator drugfinder=thinkeriterator.create("HDDrug");
-			while(drg=HDDrug(drugfinder.next())){
-				if(drg.owner==self)drg.OnHeartbeat(self);
+			for (Inventory next = Inv; next != null; next = next.Inv)
+			{
+				let drug = HDDrug(next);
+				if (drug)
+				{
+					drug.OnHeartbeat(self);
+				}
 			}
 
 			//a lot of weapons divide tics by strength, do not let this hit zero!
