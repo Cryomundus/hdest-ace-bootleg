@@ -70,6 +70,18 @@ class Vulcanette:ZM66ScopeHaver{
 		super.tick();
 		drainheat(VULCS_HEAT,18);
 	}
+	override void DoEffect()
+	{
+		let plr = HDPlayerPawn(owner);
+		if (plr && plr.player && plr.player.ReadyWeapon == self && !plr.gunbraced)
+		{
+			if (pitch < frandom(5, 8) && !gunbraced())
+			{
+				A_MuzzleClimb(frandom(-0.06, 0.06), frandom(0.1, clamp(1 - pitch, 0.06/plr.strength, 0.12)));
+			}
+		}
+		Super.DoEffect();
+	}
 	override inventory createtossable(){
 		let ctt=vulcanette(super.createtossable());
 		if(!ctt)return null;
@@ -216,22 +228,10 @@ class Vulcanette:ZM66ScopeHaver{
 	states{
 	select0:
 		GTGL A 0 A_CheckDefaultReflexReticle(VULCS_DOT);
-		GTLG A 0 A_Overlay(2,"droop");
 		goto select0bfg;
 	deselect0:
 		GTLG A 0;
 		goto deselect0bfg;
-
-	droop:
-		TNT1 A 1{
-			if(pitch<frandom(5,8)&&(!gunbraced())){
-				A_MuzzleClimb(frandom(-0.06,0.06),
-					frandom(0.1,clamp(1-pitch,
-						hdplayerpawn(self)?0.06/hdplayerpawn(self).strength:0.06
-					,0.12))
-				);
-			}
-		}loop;
 
 	ready:
 		GTLG A 1{
