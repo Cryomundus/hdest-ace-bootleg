@@ -379,10 +379,6 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 		TNT1 A 0 SetStateLabel("spawn");
 		stop;
 	}
-	override void ondestroy(){
-		A_BrainDie();
-		super.ondestroy();
-	}
 }
 
 
