@@ -23,6 +23,7 @@ class Tripwire:HDWeapon{
 	class<weapon> weptype;
 	property weptype:weptype;
 	default{
+		+weapon.no_auto_switch +weapon.noalert +weapon.wimpy_weapon
 		+hdweapon.dontnull
 		+nointeraction
 
