@@ -288,7 +288,7 @@ class HDFireCan:HDBarrel replaces BurningBarrel{
 		if(!bkilled){
 			fireticker++;
 			if(fireticker<6)return;
-			fireticker=0;
+			fireticker=random(-1,2);
 			A_StartSound("misc/firecrkl",CHAN_BODY,CHANF_OVERLAP,volume:0.07);
 			A_StartSound("misc/fwoosh",CHAN_BODY,CHANF_OVERLAP,volume:0.04,attenuation:0.6);
 			actor a=spawn("HDSmoke",pos+(0,0,32),ALLOW_REPLACE);
