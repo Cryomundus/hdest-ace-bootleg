@@ -171,8 +171,8 @@ class BloodBagWorn:HDPickup{
 		height 2;radius 2;
 		scale 0.5;
 	}
-	override void postbeginplay(){
-		super.postbeginplay();
+	override void beginplay(){
+		super.beginplay();
 		bloodleft=HDCONST_BLOODBAGAMOUNT;
 	}
 	override void Consolidate(){
