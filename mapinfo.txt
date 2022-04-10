@@ -18,6 +18,7 @@ episode range{name="Hideous Firing Range" noskillmenu}
 adddefaultmap{
 	sucktime=0
 	aircontrol=0
+	airsupply=90
 	allowjump
 	allowcrouch
 	evenlighting
