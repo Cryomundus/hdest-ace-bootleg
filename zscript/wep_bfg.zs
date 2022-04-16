@@ -87,11 +87,17 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		super.doeffect();
 	}
 	override double gunmass(){
-		return 15+(weaponstatus[BFGS_BATTERY]>=0?1:0)+(weaponstatus[0]&BFGF_STRAPPED?0:4);
+		return 15
+		+(weaponstatus[BFGS_CHARGE]>=0?1:0)
+		+(weaponstatus[BFGS_BATTERY]>=0?1:0)
+		+(weaponstatus[0]&BFGF_STRAPPED?0:4);
 	}
 	override double weaponbulk(){
 		double blx=(weaponstatus[0]&BFGF_STRAPPED)?400:240;
-		return blx+(weaponstatus[BFGS_BATTERY]>=0?ENC_BATTERY_LOADED:0);
+		return blx
+			+(weaponstatus[BFGS_CHARGE]>=0?ENC_BATTERY_LOADED:0)
+			+(weaponstatus[BFGS_BATTERY]>=0?ENC_BATTERY_LOADED:0)
+		;
 	}
 	override string,double getpickupsprite(){return "BFUGA0",1.;}
 	override void DrawHUDStuff(HDStatusBar sb,HDWeapon hdw,HDPlayerPawn hpl){
@@ -102,16 +108,23 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		int bffb=hdw.weaponstatus[BFGS_BATTERY];
 		if(bffb>0)sb.drawwepnum(bffb,20,posy:-10);
 		else if(!bffb)sb.drawstring(
-			sb.mamountfont,"00000",
+			sb.mamountfont,"000000",
 			(-16,-14),sb.DI_TEXT_ALIGN_RIGHT|sb.DI_TRANSLATABLE|sb.DI_SCREEN_CENTER_BOTTOM,
 			Font.CR_DARKGRAY
 		);
+		bffb=hdw.weaponstatus[BFGS_CHARGE];
+		if(bffb>0)sb.drawwepnum(bffb,20);
+		else if(!bffb)sb.drawstring(
+			sb.mamountfont,"000000",
+			(-16,-7),sb.DI_TEXT_ALIGN_RIGHT|sb.DI_TRANSLATABLE|sb.DI_SCREEN_CENTER_BOTTOM,
+			Font.CR_DARKGRAY
+		);
+
 		if(hdw.weaponstatus[0]&BFGF_STRAPPED){
 			sb.drawrect(-26,-17,10,1);
 			sb.drawrect(-24,-20,8,1);
 			sb.drawrect(-21,-23,5,1);
 		}
-		sb.drawwepnum(hdw.weaponstatus[BFGS_CHARGE],20);
 	}
 	override string gethelptext(){
 		return
@@ -122,9 +135,6 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		..WEPHELP_UNLOADUNLOAD
 		..WEPHELP_USE.."+"..WEPHELP_UNLOAD.."  Charge unattended"
 		;
-	}
-	override void failedpickupunload(){
-		failedpickupunloadmag(BFGS_BATTERY,"HDBattery");
 	}
 	override void consolidate(){
 		CheckBFGCharge(BFGS_BATTERY);
@@ -349,16 +359,15 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 					&&HDMagAmmo.NothingLoaded(self,"HDBattery")
 				)
 			)setweaponstate("nope");
-			else invoker.weaponstatus[BFGS_LOADTYPE]=1;
+			else invoker.weaponstatus[BFGS_LOADTYPE]=BFGC_RELOADMAX;
 		}goto reload1;
 	altreload:
 	reloadempty:
 		#### A 0{
 			if(
-				!invoker.weaponstatus[BFGS_BATTERY] //already have an empty loaded
-				||!countinv("HDBattery")
+				!countinv("HDBattery")
 			)setweaponstate("nope");
-			else invoker.weaponstatus[BFGS_LOADTYPE]=0;
+			else invoker.weaponstatus[BFGS_LOADTYPE]=BFGC_ONEEMPTY;
 		}goto reload1;
 	unload:
 		#### A 0{
@@ -381,7 +390,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 				setweaponstate("nope");
 				return;
 			}
-			invoker.weaponstatus[BFGS_LOADTYPE]=-1;
+			invoker.weaponstatus[BFGS_LOADTYPE]=BFGC_UNLOADALL;
 		}goto reload1;
 	reload1:
 		#### A 4;
@@ -391,18 +400,28 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			A_MuzzleClimb(-frandom(1.2,2.4),frandom(1.2,2.4));
 			A_StartSound("weapons/bfgclick2",8);
 		}
-		#### C 2 offset(0,42){
-			A_MuzzleClimb(-frandom(1.2,2.4),frandom(1.2,2.4));
+		#### C 2 offset(0,41){
 			A_StartSound("weapons/bfgopen",8);
+
+			A_MuzzleClimb(-frandom(1.2,2.4),frandom(1.2,2.4));
 			if(invoker.weaponstatus[BFGS_BATTERY]>=0){
 				HDMagAmmo.SpawnMag(self,"HDBattery",invoker.weaponstatus[BFGS_BATTERY]);
+				invoker.weaponstatus[BFGS_BATTERY]=-1;
+				A_SetTics(3);
+			}
+		}
+		#### C 2 offset(0,42){
+			A_MuzzleClimb(-frandom(1.2,2.4),frandom(1.2,2.4));
+			if(invoker.weaponstatus[BFGS_CHARGE]>=0){
+				HDMagAmmo.SpawnMag(self,"HDBattery",invoker.weaponstatus[BFGS_CHARGE]);
+				invoker.weaponstatus[BFGS_CHARGE]=-1;
 				A_SetTics(4);
 			}
+
 			if(invoker.weaponstatus[0]&BFGF_DEMON){
 				setweaponstate("unloaddemon");
 				invoker.weaponstatus[0]&=~BFGF_DEMON;
 			}
-			invoker.weaponstatus[BFGS_BATTERY]=-1;
 		}goto batteryout;
 	unloaddemon:
 		//effects for a possessed cell
@@ -418,22 +437,35 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		goto batteryout;
 	batteryout:
 		#### C 4 offset(0,42){
-			if(invoker.weaponstatus[BFGS_LOADTYPE]==-1)setweaponstate("reload3");
+			if(invoker.weaponstatus[BFGS_LOADTYPE]==BFGC_UNLOADALL)setweaponstate("reload3");
 			else A_StartSound("weapons/pocket",9);
 		}
 		#### C 12;
+	insertbatteries:
 		#### C 12 offset(0,42)A_StartSound("weapons/bfgbattout",8);
 		#### C 10 offset(0,36)A_StartSound("weapons/bfgbattpop",8);
 		#### C 0{
 			let mmm=hdmagammo(findinventory("HDBattery"));
-			if(!mmm||mmm.amount<1){setweaponstate("reload3");return;}
-			if(!invoker.weaponstatus[BFGS_LOADTYPE]){
+			if(
+				!mmm
+				||mmm.amount<1
+				||(
+					invoker.weaponstatus[BFGS_BATTERY]>=0
+					&&invoker.weaponstatus[BFGS_CHARGE]>=0
+				)
+			){setweaponstate("reload3");return;}
+			int batslot=(
+				invoker.weaponstatus[BFGS_BATTERY]<0
+				&&invoker.weaponstatus[BFGS_CHARGE]<0
+			)?BFGS_CHARGE:BFGS_BATTERY;
+			if(invoker.weaponstatus[BFGS_LOADTYPE]==BFGC_ONEEMPTY){
+				invoker.weaponstatus[BFGS_LOADTYPE]=BFGC_RELOADMAX;
 				mmm.LowestToLast();
-				invoker.weaponstatus[BFGS_BATTERY]=mmm.TakeMag(false);
+				invoker.weaponstatus[batslot]=mmm.TakeMag(false);
 			}else{
-				invoker.weaponstatus[BFGS_BATTERY]=mmm.TakeMag(true);
+				invoker.weaponstatus[batslot]=mmm.TakeMag(true);
 			}
-		}
+		}loop;
 	reload3:
 		#### C 12 offset(0,38) A_StartSound("weapons/bfgopen",8);
 		#### C 16 offset(0,37) A_StartSound("weapons/bfgclick2",8);
@@ -546,6 +578,10 @@ enum bfg9kstatus{
 	BFGS_CRITTIMER=5,
 
 	BFGC_MINCHARGE=6,
+
+	BFGC_RELOADMAX=0, //dump everything and load as much as possible
+	BFGC_UNLOADALL=1, //dump everything
+	BFGC_ONEEMPTY=2, //dump everything and load one empty, one good
 };
 
 class BFGSpark:HDActor{
@@ -635,7 +671,7 @@ class BFGBalle:HDFireball{
 		alpha 0.9;
 		height 6;
 		radius 6;
-		speed 10;
+		speed 6;
 		gravity 0;
 	}
 	void A_BFGBallZap(){
