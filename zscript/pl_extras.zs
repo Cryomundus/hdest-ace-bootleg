@@ -434,6 +434,8 @@ extend class HDPlayerPawn{
 		if(oldinput&BT_ATTACK)hasgrabbed=true;
 		else if(!(oldinput&BT_USE))hasgrabbed=false;
 
+		PickupGrabber(incapacitated?2:-1);
+
 		//check here because we still need the above pickup checks when incap'd
 		if(incapacitated)return;
 
@@ -467,9 +469,8 @@ extend class HDPlayerPawn{
 				offsetz:height*0.3
 			);
 		}
-
+		
 		bpickup=!hasgrabbed;
-		PickupGrabber();
 
 		//corpse kicking
 		if(
