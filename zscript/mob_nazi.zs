@@ -28,17 +28,17 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 	override void deathdrop(){
 		hdweapon wp=null;
 		if(!bhasdropped){
-			A_DropItem("HDHandgunRandomDrop");
+			DropNewItem("HDHandgunRandomDrop");
 			bhasdropped=true;
-			if(wp=hdweapon(spawn("HDSMG",pos,ALLOW_REPLACE))){
+			if(wp=DropNewWeapon("HDSMG")){
 				wp.weaponstatus[SMGS_AUTO]=2;
 				wp.weaponstatus[SMGS_MAG]=random(0,30);
 				wp.weaponstatus[SMGS_CHAMBER]=2;
 			}
-			A_DropItem("HD9mMag30");
+			DropNewItem("HD9mMag30");
 		}else if(!bfriendly){
-			A_DropItem("HD9mMag30",0,240);
-			A_DropItem("HD9mMag30",0,128);
+			DropNewItem("HD9mMag30",240);
+			DropNewItem("HD9mMag30",128);
 		}
 	}
 	states{

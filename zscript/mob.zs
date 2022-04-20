@@ -161,7 +161,7 @@ class HDMobBase : HDActor{
 	}
 
 	//drop an item without sending it flying
-	//25=always spawn
+	//255=always spawn
 	//256=always spawn and do not add any velocity
 	Actor DropNewItem(class<actor> type,int chance=255){
 		if(random(0,255)>chance)return null;
