@@ -25,10 +25,13 @@ class HDRL:HDWeapon{
 		drainheat(RLS_SMOKE,12);
 	}
 	override double gunmass(){
-		return 10+weaponstatus[RLS_MAG]+weaponstatus[RLS_CHAMBER];
+		return (weaponstatus[0]&RLF_NOMAG)?
+			9+weaponstatus[RLS_CHAMBER]
+			:(10+weaponstatus[RLS_MAG]+weaponstatus[RLS_CHAMBER]);
 	}
 	override double weaponbulk(){
-		double blx=175+weaponstatus[RLS_MAG]*ENC_ROCKETLOADED;
+		double blx=(weaponstatus[0]&RLF_NOMAG)?120:(175+weaponstatus[RLS_MAG]*ENC_ROCKETLOADED);
+
 		int chmb=weaponstatus[RLS_CHAMBER];
 		if(chmb>1)blx+=ENC_HEATROCKETLOADED;
 		else if(chmb==1)blx+=ENC_ROCKETLOADED;
@@ -38,7 +41,7 @@ class HDRL:HDWeapon{
 		super.beginplay();
 		weaponstatus[RLS_DOT]=3;
 	}
-	override string,double getpickupsprite(){return "LAUNA0",1.;}
+	override string,double getpickupsprite(){return weaponstatus[0]&RLF_NOMAG?"LAUNB0":"LAUNA0",1.;}
 	override void DrawHUDStuff(HDStatusBar sb,HDWeapon hdw,HDPlayerPawn hpl){
 		if(sb.hudlevel==1){
 			sb.drawimage("ROQPA0",(-47,-4),sb.DI_SCREEN_CENTER_BOTTOM,scale:(0.6,0.6));
@@ -72,7 +75,7 @@ class HDRL:HDWeapon{
 			(-32,-15),sb.DI_SCREEN_CENTER_BOTTOM|sb.DI_TEXT_ALIGN_RIGHT,
 			ab?Font.CR_WHITE:Font.CR_DARKGRAY
 		);
-		sb.drawwepnum(hdw.weaponstatus[RLS_MAG],6);
+		if(!(hdw.weaponstatus[0]&RLF_NOMAG))sb.drawwepnum(hdw.weaponstatus[RLS_MAG],6);
 		if(hdw.weaponstatus[RLS_CHAMBER]>0)sb.drawrect(-19,-11,3,1);
 	}
 	override string gethelptext(){
@@ -144,10 +147,12 @@ class HDRL:HDWeapon{
 					);
 				}else{
 					//the new circular view code that doesn't work with LZDoom 3.87c
+
 					sb.fill(color(255,0,0,0),
 						bob.x-27,scaledyoffset+bob.y-27,
 						54,54,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 					);
+
 					texman.setcameratotexture(hpc,"HDXCAM_RLAUN",degree);
 					let cam  = texman.CheckForTexture("HDXCAM_RLAUN",TexMan.Type_Any);
 					double camSize = texman.GetSize(cam);
@@ -251,11 +256,16 @@ class HDRL:HDWeapon{
 		goto nope;
 	shoot:
 		#### A 2{
+			bool nomag=invoker.weaponstatus[0]&RLF_NOMAG;
+			if(nomag)invoker.weaponstatus[RLS_MAG]=0;
+
 			int chm=invoker.weaponstatus[RLS_CHAMBER];
 			if(chm<1){
-				setweaponstate("chamber_manual");
+				if(nomag)setweaponstate("nope");
+				else setweaponstate("chamber_manual");
 				return;
 			}
+
 			gyrogrenade rkt;
 			if(
 				invoker.weaponstatus[0]&RLF_GRENADEMODE
@@ -266,12 +276,13 @@ class HDRL:HDWeapon{
 				A_FireHDGL();
 				invoker.weaponstatus[RLS_SMOKE]+=5;
 				invoker.weaponstatus[RLS_CHAMBER]=0;
-				setweaponstate("chamber");
 				A_MuzzleClimb(
 					0,0,
 					-0.4,-0.8,
 					-0.1,-0.3
 				);
+				if(invoker.weaponstatus[0]&RLF_NOMAG)setweaponstate("nope");
+				else setweaponstate("chamber");
 			}else{
 				//shoot a rocket
 				class<actor> rrr;
@@ -322,8 +333,13 @@ class HDRL:HDWeapon{
 				if(self is "hdplayerpawn")hdplayerpawn(self).stunned+=10;
 			}
 			A_Gunflash();
-		} 
-		#### B 5;
+		}
+		#### B 1 offset(0,49);
+		#### B 2 offset(0,54);
+		#### B 2 offset(0,43);
+		#### B 1 offset(0,39);
+		#### B 1 offset(0,36);
+		#### A 0 A_JumpIf(invoker.weaponstatus[0]&RLF_NOMAG,"nope");
 		goto chamber;
 	flash:
 		LAUF ABCD 0;
@@ -341,37 +357,37 @@ class HDRL:HDWeapon{
 		stop;
 
 	chamber:
-		#### A 1 offset(0,34){
+		#### A 1 offset(0,35){
 			if(invoker.weaponstatus[RLS_CHAMBER]>0){
 				setweaponstate("nope");
 				return;
 			}
 			A_StartSound("weapons/rockchamber",8);
 		}
-		#### A 1 offset(1,36){
+		#### A 1 offset(1,38){
 			if(invoker.weaponstatus[RLS_MAG]>0){
 				invoker.weaponstatus[RLS_CHAMBER]=1;
 				invoker.weaponstatus[RLS_MAG]--;
 			}
 		}
-		#### A 1 offset(0,34);
+		#### A 1 offset(0,36);
 		goto nope;
 	chamber_manual:
-		#### A 1 offset(0,34){
+		#### A 1 offset(0,35){
 			if(invoker.weaponstatus[RLS_CHAMBER]>0){
 				setweaponstate("nope");
 				return;
 			}
 			A_StartSound("weapons/rockchamber",8);
 		}
-		#### A 1 offset(0,37);
-		#### A 2 offset(1,36){
+		#### A 1 offset(0,39);
+		#### A 2 offset(1,38){
 			if(invoker.weaponstatus[RLS_MAG]>0){
 				invoker.weaponstatus[RLS_CHAMBER]=1;
 				invoker.weaponstatus[RLS_MAG]--;
 			}
 		}
-		#### A 1 offset(0,34);
+		#### A 1 offset(0,35);
 		goto nope;
 
 	altfire:
@@ -396,6 +412,7 @@ class HDRL:HDWeapon{
 		goto nope;
 	reload:
 		#### A 0 A_JumpIf(invoker.weaponstatus[RLS_CHAMBER]>1,"altreload");
+		#### A 0 A_JumpIf(invoker.weaponstatus[0]&RLF_NOMAG,"nomagreload");
 		#### A 0 A_JumpIf(
 			(invoker.weaponstatus[RLS_CHAMBER]>0&&invoker.weaponstatus[RLS_MAG]>=5)
 			||!countinv("HDRocketAmmo"),
@@ -448,8 +465,14 @@ class HDRL:HDWeapon{
 		#### A 1 offset(0,36);
 		#### B 1 offset(0,38);
 		#### B 4 offset(0,40) A_StartSound("weapons/rockopen",8);
-		#### B 10 offset(0,38) A_StartSound("weapons/rockopen2",8);
-		#### B 9 offset(1,38) A_StartSound("weapons/pocket",8);
+		#### B 10 offset(0,38){
+			A_StartSound("weapons/rockopen2",8);
+			if(invoker.weaponstatus[0]&RLF_NOMAG)A_SetTics(8);
+		}
+		#### B 9 offset(1,38){
+			A_StartSound("weapons/pocket",8);
+			if(invoker.weaponstatus[0]&RLF_NOMAG)A_SetTics(8);
+		}
 		#### B 0{
 			if(health<40)A_SetTics(7);
 			else if(health<60)A_SetTics(3);
@@ -463,12 +486,16 @@ class HDRL:HDWeapon{
 				return;
 			}
 
+			if(invoker.weaponstatus[0]&RLF_NOMAG)A_SetTics(5);
 			if(invoker.weaponstatus[RLS_CHAMBER]<1){
 				setweaponstate("loadheatintoemptychamber");
 				return;
 			}else{
 				invoker.weaponstatus[RLS_CHAMBER]=0;
-				if(invoker.weaponstatus[RLS_MAG]<5){
+				if(
+					!(invoker.weaponstatus[0]&RLF_NOMAG)
+					&&invoker.weaponstatus[RLS_MAG]<5
+				){
 					invoker.weaponstatus[RLS_MAG]++;
 					return;
 				}
@@ -515,6 +542,7 @@ class HDRL:HDWeapon{
 
 	user4:
 	unload:
+		#### A 0 A_JumpIf(invoker.weaponstatus[0]&RLF_NOMAG,"nomagreload");
 		#### B 4{
 			if(
 				invoker.weaponstatus[RLS_CHAMBER]>1
@@ -567,8 +595,57 @@ class HDRL:HDWeapon{
 		#### B 1 offset(2,34);
 		goto nope;
 
+
+
+	nomagreload:
+		#### A 4{
+			if(
+				invoker.weaponstatus[RLS_CHAMBER]>=2
+			)setweaponstate("altreload");
+			else if(
+				invoker.weaponstatus[RLS_CHAMBER]<1
+				&&!countinv("HDRocketAmmo")
+			)setweaponstate("nope");
+		}
+		#### A 1 offset(0,34);
+		#### A 1 offset(0,36);
+		#### B 1 offset(0,38);
+		#### B 3 offset(0,40) A_StartSound("weapons/rockopen",8);
+		#### B 8 offset(0,38) A_StartSound("weapons/rockopen2",8);
+		#### B 7 offset(1,38) A_StartSound("weapons/pocket",8);
+		#### B 0{
+			if(health<40)A_SetTics(7);
+			else if(health<60)A_SetTics(3);
+		}
+		#### B 4 offset(0,40) A_StartSound("weapons/rockreload",8);
+
+		#### B 5{
+			int chh=invoker.weaponstatus[RLS_CHAMBER];
+			if(chh<1){
+				setweaponstate("loadrocketintoemptychamber");
+				return;
+			}else{
+				invoker.weaponstatus[RLS_CHAMBER]=0;
+				if(A_JumpIfInventory("HDRocketAmmo",0,"null"))A_SpawnItemEx(
+					"HDRocketAmmo",10,0,10,vel.x,vel.y,vel.z,
+					0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION
+				);else A_GiveInventory("HDRocketAmmo",1);
+			}
+		}goto altreloadend;
+	loadrocketintoemptychamber:
+		#### B 3 offset(0,38);
+		#### B 2 offset(0,34){
+			if(!countinv("HDRocketAmmo"))return;
+			invoker.weaponstatus[RLS_CHAMBER]=1;
+			A_SetHelpText();
+			A_TakeInventory("HDRocketAmmo",1,TIF_NOTAKEINFINITE);
+		}goto altreloadend;
+
 	spawn:
+		TNT1 A 0 nodelay A_JumpIf(invoker.weaponstatus[0]&RLF_NOMAG,2);
 		LAUN A -1;
+		LAUN B -1;
+		stop;
 	}
 	override void InitializeWepStats(bool idfa){
 		weaponstatus[RLS_MAG]=5;
@@ -580,6 +657,7 @@ class HDRL:HDWeapon{
 			airburst=0;
 			if(!owner){
 				weaponstatus[0]+=random(0,1)*RLF_GRENADEMODE;
+				if(random(0,3))weaponstatus[0]|=RLF_NOMAG;
 			}
 		}
 	}
@@ -598,10 +676,21 @@ class HDRL:HDWeapon{
 			if(!grenademode)weaponstatus[0]&=~RLF_GRENADEMODE;
 			else if(grenademode>0)weaponstatus[0]|=RLF_GRENADEMODE;
 		}
+
+		//singleshot
+		int nomag=getloadoutvar(input,"nomag",1);
+		if(nomag>0){
+			weaponstatus[0]|=RLF_NOMAG;
+			if(nomag>1){
+				weaponstatus[RLS_CHAMBER]=2;
+				weaponstatus[0]&=~RLF_GRENADEMODE;
+			}
+		}else weaponstatus[0]&=~RLF_NOMAG;
 	}
 }
 enum rocketstatus{
 	RLF_GRENADEMODE=2,
+	RLF_NOMAG=4,
 
 	RLS_STATUS=0,
 	RLS_MAG=1,
@@ -636,7 +725,7 @@ class Blooper:HDWeapon{
 		inventory.pickupmessage "You got the grenade launcher!";
 		obituary "%o was blooped by %k.";
 		hdweapon.barrelsize 24,1.6,3;
-		tag "grenade launcher";
+		tag "$TAG_GL";
 		hdweapon.refid HDLD_BLOOPER;
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
