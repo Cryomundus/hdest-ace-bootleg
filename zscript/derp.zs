@@ -1,6 +1,7 @@
 // ------------------------------------------------------------
 // D.E.R.P. Robot
 // ------------------------------------------------------------
+const DERP_CONTROLRANGE=HDCONST_ONEMETRE*150.;
 enum DerpConst{
 	DERP_TID=451816,
 	DERP_MAXTICTURN=15,
@@ -1106,7 +1107,7 @@ class DERPController:HDWeapon{
 				||(
 					bt
 					&&!invoker.weaponstatus[DRPCS_TIMER]
-					&&ddd.distance3d(self)>frandom(1024,2048)
+					&&ddd.distance3d(self)>frandom(0.9,1.1)*DERP_CONTROLRANGE
 				)
 			){
 				A_Log("CONNECTION FAILURE, REBOOT REQUIRED!: D.E.R.P. last position given at ("..int(ddd.pos.x)+random(-100,100)..","..int(ddd.pos.y)+random(-100,100)..")",true);
@@ -1209,7 +1210,7 @@ class DERPController:HDWeapon{
 		while(mo=DERPBot(derpfinder.Next())){
 			if(
 				mo.master!=owner
-				&&mo.distance3d(owner)<frandom(1024,2048)
+				&&mo.distance3d(owner)<frandom(0.9,1.1)*DERP_CONTROLRANGE
 			){
 				let opponent=mo.master;
 				int hackable=0;
@@ -1217,7 +1218,7 @@ class DERPController:HDWeapon{
 				if(
 					!opponent
 					||!mo.checksight(opponent)
-					||mo.distance3d(opponent)>2048
+					||mo.distance3d(opponent)>(DERP_CONTROLRANGE*0.6)
 				)hackable+=3;
 				if(random(0,hackable)){
 					mo.master=owner;

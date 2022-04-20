@@ -1,6 +1,7 @@
 // ------------------------------------------------------------
 // H.E.R.P. Robot
 // ------------------------------------------------------------
+const HERP_CONTROLRANGE=DERP_CONTROLRANGE*1.6;
 enum HERPConst{
 	HERP_TID=851816,
 }
@@ -1359,7 +1360,10 @@ class HERPController:HDWeapon{
 			}
 			int bt=player.cmd.buttons;
 
-			if(ddd.health<1)return;
+			if(
+				ddd.health<1
+				||ddd.distance3d(self)>frandom(0.9,1.1)*HERP_CONTROLRANGE
+			)return;
 
 			if(justpressed(BT_ALTATTACK)){
 				ddd.bmissilemore=ddd.bmissilemore?false:true;
@@ -1405,7 +1409,7 @@ class HERPController:HDWeapon{
 			if(invoker.weaponstatus[HERPS_TIMER]>0)invoker.weaponstatus[HERPS_TIMER]--;
 		}goto readyend;
 	user3:
-		---- A 0 A_MagManager("HD9mMag15");
+		---- A 0 A_MagManager("HD4mMag");
 		goto ready;
 	hack:
 		---- A 5 A_Log("Fetching nearby devices...",true);
@@ -1430,7 +1434,7 @@ class HERPController:HDWeapon{
 		while(mo=HERPBot(herpfinder.Next())){
 			if(
 				mo.master!=owner
-				&&mo.distance3d(owner)<frandom(1024,2048)
+				&&mo.distance3d(owner)<frandom(0.9,1.1)*HERP_CONTROLRANGE
 			){
 				let opponent=mo.master;
 				int hackable=1;
@@ -1438,7 +1442,7 @@ class HERPController:HDWeapon{
 				if(
 					!opponent
 					||!mo.checksight(opponent)
-					||mo.distance3d(opponent)>2048
+					||mo.distance3d(opponent)>(HERP_CONTROLRANGE*0.6)
 				)hackable+=4;
 				if(random(0,hackable)){
 					mo.master=owner;
