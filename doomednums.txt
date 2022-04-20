@@ -21,7 +21,7 @@ DoomEdNums{
 	23011=infiltrator
 	23012=rocketeer
 	23013=lightbearer
-	23014=talismanghost
+	23014=squadghost
 
 	23015=derpbot
 	23016=enemyderp

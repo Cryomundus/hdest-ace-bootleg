@@ -63,7 +63,7 @@ class Yokai:HDMobBase{
 			bfrightened=false;
 			A_SetShootable();
 			alpha=frandom(0.8,0.9);
-			if(target is ("TalismanGhost")){
+			if(target is ("SquadGhost")){
 				A_Die();
 				return;
 			}

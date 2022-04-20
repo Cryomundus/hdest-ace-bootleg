@@ -552,15 +552,17 @@ class HDCopyTrail:IdleDummy{
 	}
 }
 extend class HDActor{
-	void A_Trail(double spread=0.6){
+	actor A_Trail(double spread=0.6){
 		vector3 v=(frandom(-1,1),frandom(-1,1),frandom(-1,1));
-		A_SpawnItemEx("HDCopyTrail",
+		bool gbg;actor aaa;
+		[gbg,aaa]=A_SpawnItemEx("HDCopyTrail",
 			0,0,0,vel.x+v.x,vel.y+v.y,vel.z+v.z,0,
 			SXF_TRANSFERALPHA|SXF_TRANSFERRENDERSTYLE|SXF_TRANSFERSCALE|
 			SXF_TRANSFERPITCH|SXF_TRANSFERSPRITEFRAME|SXF_TRANSFERROLL|
 			SXF_ABSOLUTEVELOCITY|SXF_TRANSFERTRANSLATION|SXF_NOCHECKPOSITION|
 			SXF_TRANSFERSTENCILCOL|SXF_TRANSFERPOINTERS
 		);
+		return aaa;
 	}
 }
 class HDFader:HDCopyTrail{

@@ -328,7 +328,7 @@ actor DERPCC:HERPCC{
 		stop
 	}
 }
-actor TalismanGhostCC:UndeadJackbootmanCC{
+actor SquadGhostCC:UndeadJackbootmanCC{
 	translation "112:120=152:159","121:127=9:12", "48:79=61:79", "18:21=63:63", "213:213=63:63"
 	renderstyle add seesound "operatorn/sight" deathsound "operatorn/death"
 	states{

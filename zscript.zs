@@ -89,6 +89,7 @@ const HDCONST_MINEYERANGE=HDCONST_HEIGHTOVER54*18;
 #include "zscript/ladder.zs"
 #include "zscript/backpack.zs"
 #include "zscript/blursphere.zs"
+#include "zscript/squadghost.zs"
 
 #include "zscript/ammo_9.zs"
 #include "zscript/ammo_12.zs"

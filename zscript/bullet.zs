@@ -1022,7 +1022,10 @@ class HDBulletActor:HDActor{
 		BLAF_SUCKINGWOUND=4,
 	}
 	virtual void onhitactor(actor hitactor,vector3 hitpos,vector3 vu,int flags=0){
-		if(!hitactor.bshootable)return;
+		if(
+			!hitactor.bshootable
+			||hitactor.bnonshootable
+		)return;
 		tracer=hitactor;
 		double hitangle=absangle(angle,angleto(hitactor)); //0 is dead centre
 		double pen=penetration();

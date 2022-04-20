@@ -47,6 +47,9 @@ putto/death   dsbarexp
 
 yokai/sight   dsboscub
 
+ghost/active  dsboscub  $limit ghost/active 0  $pitchset ghost/active 0.7
+ghost/attack  dsbrifle  $limit ghost/attack 5  $pitchset ghost/attack 0.6
+
 caco/ballhum        dsplsidl  $limit caco/ballhum 0
 caco/ballcrack      dsrifclk
 caco/bigexplode     dsbarexp
