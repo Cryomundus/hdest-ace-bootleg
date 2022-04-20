@@ -189,13 +189,23 @@ extend class HDPlayerPawn{
 
 			setxyz(posbak+vel);
 
-
+			flinetracedata bigcoll;
 			//check for super-collision preventing only aligned sights		
 			if(
 				!barehanded
 				&&linetrace(
-					testangle,max(barrellength,HDCONST_MINEYERANGE),testpitch,flags:TRF_NOSKY,
-					offsetz:highheight
+					testangle,max(barrellength,HDCONST_MINEYERANGE),
+					testpitch,
+					flags:TRF_NOSKY,
+					offsetz:highheight,
+					data:bigcoll
+				)
+				&&(
+					!bigcoll.hitactor
+					||(
+						bigcoll.hitactor.bsolid
+						&&!bigcoll.hitactor.bnoclip
+					)
 				)
 			){
 				nocrosshair=12;
