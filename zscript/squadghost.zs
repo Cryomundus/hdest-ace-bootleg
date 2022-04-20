@@ -97,6 +97,10 @@ class SquadGhost:HDMobBase{
 			&&players[fpn].mo.health>0
 		;
 	}
+	override void postbeginplay(){
+		super.postbeginplay();
+		A_GiveInventory("ImmunityToFire");
+	}
 	states{
 	spawn:
 		PLAY A 0 A_SquadGhostTerror();

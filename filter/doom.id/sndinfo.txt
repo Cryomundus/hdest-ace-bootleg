@@ -1,3 +1,4 @@
 //HD's SNDINFO for Doom (proprietary)
 
 misc/bullethit		dspunch		$volume misc/bullethit 0.5
+ghost/active  dspodth1  $pitchset ghost/active 0.2 $volume ghost/active 0.1
