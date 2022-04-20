@@ -8,17 +8,28 @@ class SquadGhost:HDMobBase{
 		-countkill
 		+friendly
 		+floorhugger
+		+shadow
+		+nopain
+		+nofear
+		+noblood
+		+notelefrag
 		renderstyle "add";
 		translation "0:255=%[0,0,0]:[0.3,0.7,0.1]";
 		alpha 0.;
 
-		height 0;radius 0;
+		//-shootable
+		height 0.;  //because linetrace doesn't respect nonshootable
+
 		speed 10.;
+		tag "Ghost";
 	}
 	override int damagemobj(
 		actor inflictor,actor source,int damage,
 		name mod,int flags,double angle
-	){return -1;}
+	){
+		if(damage==TELEFRAG_DAMAGE)return super.damagemobj(inflictor,source,damage,mod,flags,angle);
+		return -1;
+	}
 	override void tick(){
 		actor.tick();
 		if(isfrozen())return;
@@ -67,6 +78,11 @@ class SquadGhost:HDMobBase{
 						||itt.target==self
 					)&&!random(0,3)
 				)itt.target=null;
+				if(
+					target
+					&&itt!=target
+					&&!random(0,3)
+				)itt.target=target;
 				enemies.push(itt);
 			}
 		}
@@ -103,16 +119,22 @@ class SquadGhost:HDMobBase{
 	}
 	states{
 	spawn:
-		PLAY A 0 A_SquadGhostTerror();
-		PLAY AABBCCDD 2 A_SquadGhostWander();
+		PLAY A 0 nodelay A_Jump(80,4);
+		POSS A 0 A_Jump(bplayingid?127:40,3);
+		CPOS A 0 A_Jump(40,2);
+		SPOS A 0;
+		#### E 20 A_SetScale(frandom(0.9,1.1));
+	see:
+		#### A 0 A_SquadGhostTerror();
+		#### AABBCCDD 2 A_SquadGhostWander();
 		loop;
 	missile:
-		PLAY EE 5 A_FaceTarget();
+		#### EE 5 A_FaceTarget();
 	missile2:
-		PLAY F 1 bright light("SHOT") A_SquadGhostAttack();
-		PLAY E 2;
-		PLAY E 10 A_Jump(170,"missile2");
-		goto spawn;
+		#### F 1 bright light("SHOT") A_SquadGhostAttack();
+		#### E 2;
+		#### E 10 A_Jump(170,"missile2");
+		goto see;
 	}
 }
 
@@ -137,9 +159,9 @@ class SquadSummoner:HDPickup{
 		TNT1 A 0{
 			A_StartSound("misc/p_pkup",CHAN_AUTO,attenuation:ATTN_NONE);
 			A_AlertMonsters();
-			A_SpawnItemEx("SquadGhost",0,0,0,-8,0,0,0,SXF_NOCHECKPOSITION|SXF_SETMASTER);
-			A_SpawnItemEx("SquadGhost",0,0,0,0,5,0,0,SXF_NOCHECKPOSITION|SXF_SETMASTER);
-			A_SpawnItemEx("SquadGhost",0,0,0,0,-5,0,0,SXF_NOCHECKPOSITION|SXF_SETMASTER);
+			A_SpawnItemEx("SquadGhost",xvel:-2,yvel:2,angle:180,flags:SXF_NOCHECKPOSITION|SXF_SETMASTER);
+			A_SpawnItemEx("SquadGhost",xvel:-2,yvel:-2,angle:180,flags:SXF_NOCHECKPOSITION|SXF_SETMASTER);
+			A_SpawnItemEx("SquadGhost",xvel:-3,angle:180,flags:SXF_NOCHECKPOSITION|SXF_SETMASTER);
 
 			string deadawaken;
 			int da=random(0,3);

@@ -968,12 +968,14 @@ extend class HDActor{
 		vector3 pvel=(0,0,0),
 		double dev=HDCONST_ZAPARCDEFAULTDEV
 	){
+		if(!a1)a1=a2;
 		vector3 a1pos,a2pos;
 		if(
 			!a2
 			||a1==a2
 		){
 			if(!a2)a2=a1;
+			if(!a1)return;
 			if(radius<=0)radius=a1.radius*1.2;
 			if(height<=0)height=a1.height*1.1;
 			double flr=a1.pos.z>a1.floorz?a1.height*-0.1:0;
