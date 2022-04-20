@@ -103,7 +103,7 @@ class SecondBloodSticker:HDWoundFixer{
 					||tracbak!=blt.hitactor
 					||!hdplayerpawn(tracbak)
 				){
-					A_WeaponMessage("Can't reach patient.");
+					A_WeaponMessage("No valid patient in range.");
 					invoker.weaponstatus[SBS_INJECTCOUNTER]=0;
 					return;
 				}
