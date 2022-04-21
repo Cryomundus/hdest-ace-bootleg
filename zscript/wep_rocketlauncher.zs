@@ -725,7 +725,7 @@ class Blooper:HDWeapon{
 		inventory.pickupmessage "You got the grenade launcher!";
 		obituary "%o was blooped by %k.";
 		hdweapon.barrelsize 24,1.6,3;
-		tag "$TAG_GL";
+		tag "grenade launcher";
 		hdweapon.refid HDLD_BLOOPER;
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
