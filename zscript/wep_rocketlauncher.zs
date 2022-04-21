@@ -657,7 +657,7 @@ class HDRL:HDWeapon{
 			airburst=0;
 			if(!owner){
 				weaponstatus[0]+=random(0,1)*RLF_GRENADEMODE;
-				if(random(0,3))weaponstatus[0]|=RLF_NOMAG;
+				if(random(0,2))weaponstatus[0]|=RLF_NOMAG;
 			}
 		}
 	}
