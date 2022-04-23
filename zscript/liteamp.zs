@@ -129,7 +129,6 @@ class PortableLiteAmp:HDMagAmmo replaces Infrared{
 			}
 
 			//actual goggle effect
-			owner.player.fov=max(30,min(owner.player.fov,90));
 			double nv=min(chargedamount*(NITEVIS_MAX/20.),NITEVIS_MAX);
 			if(!nv){
 				if(thiscvaramplitude<0)amplitude=-0.00001;
@@ -192,7 +191,7 @@ class PortableLiteAmp:HDMagAmmo replaces Infrared{
 		)return;
 		sb.SetSize(0,320,200);
 		sb.BeginHUD(forcescaled:true);
-		int gogheight=int(screen.getheight()*(1.6*90.)/sb.cplayer.fov);
+		int gogheight=int(screen.getheight()*(1.6*90.)/max(30,min(sb.cplayer.fov,90)));
 		int gogwidth=screen.getwidth()*gogheight/screen.getheight();
 		int gogoffsx=-((gogwidth-screen.getwidth())>>1);
 		int gogoffsy=-((gogheight-screen.getheight())>>1);
