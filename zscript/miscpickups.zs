@@ -837,25 +837,61 @@ class KeyLoadoutGiver:HDPickup{
 		}fail;
 	}
 }
-class HDUPKAlwaysGive:HDUPK{
+class HDUPKAlwaysGive:HDActor{
 	class<inventory> toallplayers;property toallplayers:toallplayers;
 	string msgtoall;property msgtoall:msgtoall;
 	default{
 		hdupkalwaysgive.toallplayers "";
 		hdupkalwaysgive.msgtoall "";
 	}
-	override bool OnGrab(actor grabber){
-		if(toallplayers!=""){
+	override void Tick(){
+		super.Tick();
+		if(!isfrozen()){
+			blockthingsiterator it=blockthingsiterator.create(self,36);
 			for(int i=0;i<MAXPLAYERS;i++){
-				if(playeringame[i]&&players[i].mo){
-					players[i].mo.A_GiveInventory(toallplayers);
+				if(!playeringame[i])continue;
+				actor itt=players[i].mo;
+				if(
+					!!itt
+					&&!!itt.player
+					&&(players[i].cmd.buttons&BT_USE)
+					&&itt.health>0
+					&&distance2dsquared(itt)<(56*56)
+					&&abs((pos.z+height*0.5)-(itt.pos.z+itt.height*0.5))<56
+					&&(
+						special
+						||!isrepeating(itt)
+//						||!(players[i].oldbuttons&BT_USE)
+					)
+					&&checksight(itt)
+				){
+					OnGrab(itt);
+					A_CallSpecial(special,args[0],args[1],args[2],args[3],args[4]);
+					special=0;
+					break;
 				}
 			}
-			if(msgtoall!="")A_Log(msgtoall);
 		}
-		return false;
 	}
-	override void A_HDUPKGive(){}
+	virtual bool IsRepeating(actor other){
+		return other.findinventory(toallplayers);
+	}
+	virtual void OnGrab(actor grabber){
+		setstatelabel("grabbed");
+		if(toallplayers!=""){
+			for(int i=0;i<MAXPLAYERS;i++){
+				if(!playeringame[i])continue;
+				let ppp=players[i].mo;
+				if(
+					ppp
+					&&ppp.isfriend(grabber)  //actually pointless since you have all the keys in DM anyway
+				){
+					ppp.A_GiveInventory(toallplayers);
+					if(msgtoall!="")ppp.A_Log(msgtoall,true);
+				}
+			}
+		}
+	}
 }
 class HDKeyLight:PointLight{
 	override void tick(){
@@ -872,9 +908,9 @@ class HDRedKey:HDUPKAlwaysGive replaces RedCard{
 		hdupkalwaysgive.msgtoall "\crRED\c- local area clearance code downloaded.";
 		height 18;
 	}
-	override bool OnGrab(actor grabber){
+	override void OnGrab(actor grabber){
 		setstatelabel("beep");
-		return super.OnGrab(grabber);
+		super.OnGrab(grabber);
 	}
 	override void PostBeginPlay(){
 		super.PostBeginPlay();
@@ -996,45 +1032,57 @@ class MapLoadoutGiver:HDPickup{
 	states{
 	spawn:TNT1 A 0;stop;
 	pickup:
-		TNT1 A 0 A_GiveInventory("MapRevealer");
+		TNT1 A 0{level.allmap=true;}
 		fail;
 	}
 }
 class HDMap:HDUPKAlwaysGive replaces Allmap{
 	default{
 		scale 0.3;
-		hdupkalwaysgive.toallplayers "MapRevealer";
 		hdupkalwaysgive.msgtoall "\c-Local area map downloaded.";
 	}
-	override bool OnGrab(actor grabber){
-		grabber.A_GiveInventory("MapRevealer");
-		setstatelabel("grabbed");
-		return super.OnGrab(grabber);
+	override bool isrepeating(actor other){
+		return
+			level.allmap
+			&&(
+				!other.player
+				||other.player.oldbuttons&BT_USE
+			);
+	}
+	override void OnGrab(actor grabber){
+		if(level.allmap){
+			grabber.A_StartSound("misc/i_pkup",12,CHANF_LOCAL);
+			stamina=0;
+			A_RandomFrame();
+		}else{
+			level.allmap=true;
+			A_Log(msgtoall);
+			A_RandomizeFrame();
+			grabber.A_StartSound("misc/i_pkup",12,CHANF_LOCAL);
+			setstatelabel("grabbed");
+		}
+	}
+	void A_RandomizeFrame(){frame=random(4,7);}
+	void A_RandomFrame(){
+		bool bright=frame<=3;
+		if(bright)frame|=4;  //i.e, is THIS frame going to be bright
+		if(!stamina){
+			frame=((frame+random(1,3))&(1|2));
+			if(bright)frame|=4;
+			stamina=(TICRATE<<1);
+		}else{
+			if(!bright)frame&=~4;
+			stamina--;
+		}
+		A_SetTics(random(1,3));
 	}
 	states{
 	grabbed:
-		PMAP A 4 A_StartSound("misc/i_pkup",12,CHANF_LOCAL);
-		PMAP BCDEFGHABCDEFGH 1;
-		//fallthrough to spawn
+		---- A 4;
+		PMAP BCDEFGHABCDEFGH 1 A_RandomizeFrame();
+		---- A 0 setstatelabel("spawn");
 	spawn:
-		PMAP A 0 nodelay A_Jump(256,"a","b","c","d");
-	a:
-		PMAP AE 1 A_SetTics(random(1,3));
-		---- A 0 A_Jump(4,"spawn");
-		loop;
-	b:
-		PMAP BF 1 A_SetTics(random(1,3));
-		---- A 0 A_Jump(4,"spawn");
-		loop;
-	c:
-		PMAP CG 1 A_SetTics(random(1,3));
-		---- A 0 A_Jump(4,"spawn");
-		loop;
-	d:
-		PMAP DH 1 A_SetTics(random(1,3));
-		---- A 0 A_Jump(4,"spawn");
+		PMAP # 1 nodelay A_RandomFrame();
 		loop;
 	}
 }
-
-
