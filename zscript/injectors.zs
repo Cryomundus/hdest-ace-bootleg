@@ -856,12 +856,12 @@ class HDBlues:HDDrug{
 			max(hdp.oldwoundcount,hdp.burncount,hdp.aggravateddamage)
 		);
 		if(tohealbig>0){
-			hdp.oldwoundcount=max(0,hdp.oldwoundcount-toheal);
-			hdp.burncount=max(0,hdp.burncount-toheal);
-			hdp.aggravateddamage=max(0,hdp.aggravateddamage-toheal);
+			hdp.oldwoundcount=max(0,hdp.oldwoundcount-tohealbig);
+			hdp.burncount=max(0,hdp.burncount-tohealbig);
+			hdp.aggravateddamage=max(0,hdp.aggravateddamage-tohealbig);
 		}
 
-		amount-=max(toheal,tohealbig*12);
+		amount=max(0,amount-max(toheal,tohealbig*12));
 	}
 	override void OnHeartbeat(hdplayerpawn hdp){
 		if(amount<1)return;
