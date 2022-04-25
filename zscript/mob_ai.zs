@@ -192,11 +192,16 @@ extend class HDMobBase{
 			if(!random(0,didntsee)){
 				targsight=
 					!bBOUNCELIKEHERETIC
-					&&checksight(target)
 					&&(
 						blookallaround
-						||aatt<(seefov?seefov:180)*1.3
+						||aatt<
+							(seefov?seefov:180)
+							*frandom(
+								0.4,  //"within X degrees" implies fov of 2X
+								max(abs(lasttargetpos.x-target.pos.x),abs(lasttargetpos.y-target.pos.y))<(10*HDCONST_ONEMETRE)?1.:0.6
+							)
 					)
+					&&checksight(target)
 				;
 				if(targsight){
 					lasttargetpos=target.pos;
@@ -322,7 +327,8 @@ extend class HDMobBase{
 				if(bmissilemore)mms*=0.5;
 				if(bmissileevenmore)mms*=0.25;
 				double mchk=frandom(0.,fastmonsters?5.12:2.56);
-				if(mchk>1.+max(mms,dsp)){
+				mms=1.+max(mms,dsp);
+				if(mchk>mms){
 					setstatelabel(missilestate);
 					return;
 				}
