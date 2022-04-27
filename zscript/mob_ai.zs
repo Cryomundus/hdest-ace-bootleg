@@ -194,6 +194,7 @@ extend class HDMobBase{
 					!bBOUNCELIKEHERETIC
 					&&(
 						blookallaround
+						||target.bspawnsoundsource
 						||aatt<
 							(seefov?seefov:180)
 							*frandom(

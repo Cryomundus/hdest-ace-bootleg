@@ -333,7 +333,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			angle+=frandom(-5,5);
 		}
 	spawn2:
-		CYBR CDDAA 6 A_HDWander();
+		CYBR CDDAA 6 A_HDWander(CHF_LOOK);
 		CYBR B 0 A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 		CYBR BB 6 A_HDWander(CHF_LOOK);
 		CYBR C 6{
