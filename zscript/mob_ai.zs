@@ -50,8 +50,6 @@ extend class HDMobBase{
 	){
 		if(HDAIOverride.HDChase(self,meleestate,missilestate,flags,speedmult))return;
 
-		bJUSTCHASED=true;
-
 		if(
 			health<1
 			||MustUnstick()
@@ -661,7 +659,7 @@ extend class HDMobBase{
 	bool ValidTarget(
 		actor other,
 		bool sightcheck=true,
-		double lookfov=180,
+		double halflookfov=100,
 		double mindist=0,
 		double maxdist=0
 	){
@@ -674,7 +672,7 @@ extend class HDMobBase{
 		)return false;
 
 		double dist=distance3dsquared(other);
-		double feelrange=(radius+other.radius)*1.1;
+		double feelrange=(radius+other.radius)*HDCONST_SQRTTWO;
 
 		return(
 				!mindist
@@ -693,8 +691,8 @@ extend class HDMobBase{
 					&&checksight(other)
 					&&(
 						bLOOKALLAROUND
-						||lookfov>=360
-						||absangle(angle,angleto(other))<lookfov
+						||halflookfov>=180
+						||absangle(angle,angleto(other))<halflookfov
 					)
 				)
 			)
@@ -717,15 +715,6 @@ extend class HDMobBase{
 
 		if(bINCONVERSATION)return false;
 
-		if(
-			bJUSTCHASED
-			&&!(flags&LOF_NOJUMP)
-		){
-			bJUSTCHASED=false;
-			if(!tics)A_SetTics(1);
-			return false;
-		}
-
 		//set goal
 		if(special==Thing_SetGoal){
 			actoriterator itt=level.CreateActorIterator(args[1],"PatrolPoint");
@@ -741,6 +730,7 @@ extend class HDMobBase{
 
 		if(bjustattacked){
 			bjustattacked=false;
+			if(!tics)tics=1;
 			return false;
 		}
 
@@ -759,7 +749,7 @@ extend class HDMobBase{
 
 
 			//precalculate a few things
-			double lfv=lookfov?lookfov*0.5:100;
+			double hlfv=lookfov?lookfov*0.5:100;
 			double dmax=maxseedist*maxseedist;
 			double dmin=minseedist*minseedist;
 			double hmax=maxheardist*maxheardist;
@@ -795,7 +785,7 @@ extend class HDMobBase{
 					blockthingsiterator itt=blockthingsiterator.create(self,1280);
 					while(itt.next()){
 						actor aaa=itt.thing;
-						if(ValidTarget(aaa,true,lfv,dmin,dmax)){
+						if(ValidTarget(aaa,true,hlfv,dmin,dmax)){
 							targetlist.push(aaa);
 
 							//let hostiles return the favour
@@ -844,7 +834,7 @@ extend class HDMobBase{
 							}
 						}
 
-						if(ValidTarget(aaa,true,lfv,dmin,dmax))targetlist.push(aaa);
+						if(ValidTarget(aaa,true,hlfv,dmin,dmax))targetlist.push(aaa);
 					}
 				}
 			}
