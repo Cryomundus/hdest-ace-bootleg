@@ -187,6 +187,7 @@ extend class HDActor{
 					if(pushamount<it.mass)push=(0,0,0);
 					else if(it.mass)push/=it.mass;
 				}
+				if(push.length()>0)it.vel+=push;
 			}
 
 			//concussive
