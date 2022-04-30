@@ -47,6 +47,7 @@ extend class HDActor{
 		double bigradius=max(
 			blastradius,
 			fragradius,
+			pushradius,
 			immolateradius
 		);
 
