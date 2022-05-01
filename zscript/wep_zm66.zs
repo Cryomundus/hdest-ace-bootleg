@@ -39,7 +39,7 @@ class ZM66ScopeHaver:HDWeapon{
 			);
 			texman.setcameratotexture(hpc,"HDXCAM_ZM66",degree);
 			let cam  = texman.CheckForTexture("HDXCAM_ZM66",TexMan.Type_Any);
-			sb.DrawCircle(cam,(0,scaledyoffset)+bob*3,.31,usePixelRatio:true);
+			sb.DrawCircle(cam,(0,scaledyoffset)+bob*3,.075,usePixelRatio:true);
 
 			//This can only work if the hole texture could be offset,
 			//and even then the scope picture would not be looking in the right direction.

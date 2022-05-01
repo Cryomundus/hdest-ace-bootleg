@@ -92,7 +92,7 @@ class ThunderBuster:HDCellWeapon{
 			texman.setcameratotexture(hpc,ctex,3);
 			sb.drawimage(
 				ctex,(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-				alpha:alt?(hpl.flip?0.7:0.8):1.,scale:(lz?1:(1/1.2),1)
+				alpha:alt?(hpl.flip?0.7:0.8):1.,scale:(lz?0.25:(0.25/1.2),0.25)
 			);
 			let tb=ThunderBuster(hdw);
 			sb.drawnum(min(tb.rangefinder,999),

@@ -418,7 +418,7 @@ class LiberatorRifle:AutoReloadingThingy{
 					vector2 frontoffs=(0,scaledyoffset)+bob*2;
 
 					double camSize = texman.GetSize(cam);
-					sb.DrawCircle(cam,frontoffs,.393,usePixelRatio:true);
+					sb.DrawCircle(cam,frontoffs,.08825,usePixelRatio:true);
 
 					let reticleScale = camSize / texman.GetSize(reticle);
 					if(hdw.weaponstatus[0]&LIBF_FRONTRETICLE){

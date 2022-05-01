@@ -183,7 +183,7 @@ class BossRifle:HDWeapon{
 				vector2 frontoffs=(0,scaledyoffset)+bob*3;
 
 				double camSize  = texman.GetSize(cam);
-				sb.DrawCircle(cam, frontoffs, 0.5,usePixelRatio:true);
+				sb.DrawCircle(cam, frontoffs, 0.125,usePixelRatio:true);
 
 				let reticleScale = camSize / texman.GetSize(reticle);
 				if(hdw.weaponstatus[0]&BOSSF_FRONTRETICLE){

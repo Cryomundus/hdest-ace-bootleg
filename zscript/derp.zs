@@ -1051,13 +1051,13 @@ class DERPController:HDWeapon{
 		if(!derpcam)return;
 
 		bool dead=(derpcam.health<1);
-		int scaledyoffset=66;
+		int scaledyoffset=46;
 		bool lz=HDMath.Pre460();
 		name ctex=lz?"HDXHCAM1":"HDXCAM_DERP";
 		texman.setcameratotexture(derpcam,ctex,60);
 		sb.drawimage(
 			ctex,(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-			alpha:dead?frandom[derpyderp](0.6,0.9):1.,scale:(lz?1:(1/1.2),1)
+			alpha:dead?frandom[derpyderp](0.6,0.9):1.,scale:(lz?0.25:(0.25/1.2),0.25)
 		);
 		sb.drawimage(
 			"tbwindow",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
@@ -1068,11 +1068,11 @@ class DERPController:HDWeapon{
 			alpha:0.4,scale:(2,2)
 		);
 		sb.drawnum(dead?0:max(0,derpcam.ammo),
-			24+bob.x,42+bob.y,sb.DI_SCREEN_CENTER,Font.CR_RED,0.4
+			24+bob.x,22+bob.y,sb.DI_SCREEN_CENTER,Font.CR_RED,0.4
 		);
 		int cmd=dead?0:derpcam.oldcmd;
 		sb.drawnum(cmd,
-			24+bob.x,52+bob.y,sb.DI_SCREEN_CENTER,cmd==3?Font.CR_BRICK:cmd==1?Font.CR_GOLD:Font.CR_LIGHTBLUE,0.4
+			24+bob.x,32+bob.y,sb.DI_SCREEN_CENTER,cmd==3?Font.CR_BRICK:cmd==1?Font.CR_GOLD:Font.CR_LIGHTBLUE,0.4
 		);
 	}
 	states{

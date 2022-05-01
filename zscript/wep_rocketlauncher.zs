@@ -156,7 +156,7 @@ class HDRL:HDWeapon{
 					texman.setcameratotexture(hpc,"HDXCAM_RLAUN",degree);
 					let cam  = texman.CheckForTexture("HDXCAM_RLAUN",TexMan.Type_Any);
 					double camSize = texman.GetSize(cam);
-					sb.DrawCircle(cam, (0, scaledyoffset) + bob*5, .34, usePixelRatio: true);
+					sb.DrawCircle(cam,(0,scaledyoffset)+bob*5,.085,usePixelRatio:true);
 				}
 				screen.SetClipRect(cx,cy,cw,ch);
 

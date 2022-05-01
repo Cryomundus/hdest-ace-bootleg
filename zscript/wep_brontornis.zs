@@ -161,7 +161,7 @@ class Brontornis:HDWeapon{
 				texman.setcameratotexture(hpc,"HDXCAM_BRON",degree);
 				let cam=texman.CheckForTexture("HDXCAM_BRON",TexMan.Type_Any);
 				double camSize=texman.GetSize(cam);
-				sb.DrawCircle(cam,(0,scaledyoffset)+ bob*5, .34,usePixelRatio:true);
+				sb.DrawCircle(cam,(0,scaledyoffset)+ bob*5, .085,usePixelRatio:true);
 			}
 			screen.SetClipRect(cx,cy,cw,ch);
 

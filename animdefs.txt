@@ -9,12 +9,12 @@ cameratexture HDXHCAM7 128 112
 
 
 //the new ones
-cameratexture HDXCAM_ZM66 181 181
-cameratexture HDXCAM_LIB 181 181
-cameratexture HDXCAM_BOSS 181 181
-cameratexture HDXCAM_TB 77 56
-cameratexture HDXCAM_BRON 181 181
-cameratexture HDXCAM_RLAUN 181 181
-cameratexture HDXCAM_DERP 77 56
+cameratexture HDXCAM_ZM66 720 720
+cameratexture HDXCAM_LIB 720 720
+cameratexture HDXCAM_BOSS 720 720
+cameratexture HDXCAM_BRON 720 720
+cameratexture HDXCAM_RLAUN 720 720
+cameratexture HDXCAM_TB 308 224
+cameratexture HDXCAM_DERP 308 224
+cameratexture HDXCAM_HERP 308 224
 cameratexture HDXCAM_BLUR 360 200
-cameratexture HDXCAM_HERP 154 112

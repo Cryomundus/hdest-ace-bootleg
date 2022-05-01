@@ -169,12 +169,6 @@ class Vulcanette:ZM66ScopeHaver{
 		HDStatusBar sb,HDWeapon hdw,HDPlayerPawn hpl,
 		bool sightbob,vector2 bob,double fov,bool scopeview,actor hpc
 	){
-		if(hpl.countinv("IsMoving")>2){
-			sb.drawimage(
-				"riflsite",(bob.x,bob.y+48),sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
-			);
-			return;
-		}
 		double dotoff=max(abs(bob.x),abs(bob.y));
 		if(dotoff<6){
 			string whichdot=sb.ChooseReflexReticle(hdw.weaponstatus[VULCS_DOT]);

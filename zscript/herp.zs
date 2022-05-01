@@ -1296,13 +1296,13 @@ class HERPController:HDWeapon{
 
 		bool dead=herpcam.health<1;
 		bool nobat=dead||!herpcam.bmissilemore||herpcam.battery<1;
-		int scaledyoffset=66;
+		int scaledyoffset=46;
 		bool lz=HDMath.Pre460();
 		name ctex=nobat?"HDXHCAM1BLANK":lz?"HDXHCAM7":"HDXCAM_HERP";
 		if(!nobat)texman.setcameratotexture(herpcam,ctex,60);
 		sb.drawimage(
 			ctex,(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-			scale:nobat?(1,1):((lz||nobat)?0.5:(0.5/1.2),0.5)
+			scale:nobat?(1,1):((lz||nobat)?0.25:(0.25/1.2),0.25)
 		);
 		sb.drawimage(
 			"tbwindow",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
@@ -1312,11 +1312,11 @@ class HERPController:HDWeapon{
 			alpha:0.4,scale:(2,2)
 		);
 		sb.drawnum(dead?0:max(0,herpcam.ammo[0]%100),
-			24+bob.x,42+bob.y,sb.DI_SCREEN_CENTER,Font.CR_RED,0.4
+			24+bob.x,22+bob.y,sb.DI_SCREEN_CENTER,Font.CR_RED,0.4
 		);
 		int cmd=dead?0:herpcam.battery;
 		sb.drawnum(cmd,
-			24+bob.x,52+bob.y,sb.DI_SCREEN_CENTER,cmd>10?Font.CR_OLIVE:Font.CR_BROWN,0.4
+			24+bob.x,32+bob.y,sb.DI_SCREEN_CENTER,cmd>10?Font.CR_OLIVE:Font.CR_BROWN,0.4
 		);
 
 		string hpst1="\cxAUTO",hpst2="press \cdreload\cu for manual";
