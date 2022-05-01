@@ -221,7 +221,7 @@ class Vulcanette:ZM66ScopeHaver{
 	}
 	states{
 	select0:
-		GTGL A 0 A_CheckDefaultReflexReticle(VULCS_DOT);
+		GTLG A 0 A_CheckDefaultReflexReticle(VULCS_DOT);
 		goto select0bfg;
 	deselect0:
 		GTLG A 0;
