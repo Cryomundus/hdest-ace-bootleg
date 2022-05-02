@@ -53,7 +53,7 @@ extend class HDActor{
 		}
 
 		actor f=null;
-		thinkeriterator fit=thinkeriterator.create("HDFire");
+		thinkeriterator fit=thinkeriterator.create("HDFire", STAT_DEFAULT);
 		while(f=actor(fit.next(true))){
 			if(f.target==victim){
 				f.master=perpetrator;
