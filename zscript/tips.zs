@@ -61,13 +61,10 @@ extend class hdplayerpawn{
 
 			"If a map contains a mandatory drop that is harmless\nin vanilla but absolutely cannot be survived in HD,\nit is socially acceptable to cheat past it with \cdiddqd\cu or \cdfly\cu."
 		};
-		int newtip;
-		int lasttip=cvar.getcvar("hd_lasttip",player).getint();
-		do{newtip=random(0,specialtips.size()-1);}while(newtip==lasttip);
+		int newtip=random(0,specialtips.size()-1);
 
 //		newtip=specialtips.size()-1;
 
-		hd_lasttip.setint(newtip);
 		specialtip="\crTIP: \cu"..specialtips[newtip];
 		specialtipalpha=1001.;
 		A_Log(specialtip,true);

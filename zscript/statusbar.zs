@@ -680,7 +680,7 @@ class HDStatusBar:DoomStatusBar{
 			string s=hpl.specialtip;
 			screen.DrawText(NewSmallFont,OptionMenuSettings.mFontColorValue,
 				2,
-				450-NewSmallFont.GetHeight()*5,
+				450-NewSmallFont.GetHeight()*5.5,
 				s,
 				DTA_VirtualWidth,600,
 				DTA_VirtualHeight,450,
