@@ -95,6 +95,7 @@ extend class HDMobBase{
 
 		//deal with some synonyms
 		HDMath.ProcessSynonyms(mod);
+
 		//process all items (e.g. armour) that may affect the damage
 		array<HDDamageHandler> handlers;
 		if(
@@ -116,7 +117,6 @@ extend class HDMobBase{
 		}
 
 		// [Ace] Take into account damage factors.
-		int originaldamage = damage;
 		if (!(flags & DMG_NO_FACTOR) && !(flags & DMG_FORCED))
 		{
 			damage = ApplyDamageFactor(mod, damage);
@@ -204,7 +204,7 @@ extend class HDMobBase{
 			if(hd_debug)console.printf(getclassname().." bleed "..damage..", est. remain "..blhlth-bloodloss);
 			if(bloodloss<blhlth)return 1;
 			return super.damagemobj(
-				inflictor,source,random(originaldamage,health),mod,DMG_NO_PAIN|DMG_THRUSTLESS,angle
+				inflictor,source,random(damage,health),mod,DMG_NO_PAIN|DMG_THRUSTLESS,angle
 			);
 		}
 
@@ -256,7 +256,7 @@ extend class HDMobBase{
 
 		if(hd_debug)console.printf(gettag().."   "..damage.." "..mod.."   remain "..health);
 
-		damage=super.damagemobj(inflictor,source,originaldamage,mod,flags,angle);
+		damage=super.damagemobj(inflictor,source,damage,mod,flags,angle);
 
 
 
