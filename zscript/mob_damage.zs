@@ -95,7 +95,6 @@ extend class HDMobBase{
 
 		//deal with some synonyms
 		HDMath.ProcessSynonyms(mod);
-
 		//process all items (e.g. armour) that may affect the damage
 		array<HDDamageHandler> handlers;
 		if(
@@ -116,8 +115,12 @@ extend class HDMobBase{
 			}
 		}
 
-
-
+		// [Ace] Take into account damage factors.
+		int originaldamage = damage;
+		if (!(flags & DMG_NO_FACTOR) && !(flags & DMG_FORCED))
+		{
+			damage = ApplyDamageFactor(mod, damage);
+		}
 
 		//if any other stuff is to be added dealing with damage types, add them here
 		//alternatively consider a virtual
@@ -141,8 +144,6 @@ extend class HDMobBase{
 			//add stun for all other damage types
 			stunned+=(damage>>(inpain?2:3));
 		}
-
-
 
 		//process all items that may affect damage after all the above
 		if(
@@ -203,7 +204,7 @@ extend class HDMobBase{
 			if(hd_debug)console.printf(getclassname().." bleed "..damage..", est. remain "..blhlth-bloodloss);
 			if(bloodloss<blhlth)return 1;
 			return super.damagemobj(
-				inflictor,source,random(damage,health),mod,DMG_NO_PAIN|DMG_THRUSTLESS,angle
+				inflictor,source,random(originaldamage,health),mod,DMG_NO_PAIN|DMG_THRUSTLESS,angle
 			);
 		}
 
@@ -211,7 +212,6 @@ extend class HDMobBase{
 		//make sure bodily integrity tracker is affected
 		int sgh=sphlth+gibhealth;
 		if(bodydamage<(sgh<<(HDMOB_GIBSHIFT+1)))bodydamage+=damage;
-
 
 		//check for gibbing
 		if(
@@ -256,7 +256,7 @@ extend class HDMobBase{
 
 		if(hd_debug)console.printf(gettag().."   "..damage.." "..mod.."   remain "..health);
 
-		damage=super.damagemobj(inflictor,source,damage,mod,flags,angle);
+		damage=super.damagemobj(inflictor,source,originaldamage,mod,flags,angle);
 
 
 
