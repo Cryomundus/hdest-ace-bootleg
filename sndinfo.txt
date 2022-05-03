@@ -199,7 +199,7 @@ $alias    blursphere/scream  tree/pain
 
 
 //weapons
-weapons/bulletcrack  dsrifsbm  $limit weapons/bulletcrack 40
+weapons/bulletcrack  dsbulcrk  $limit weapons/bulletcrack 40
 weapons/bigcrack     dsthubm   $limit weapons/bigcrack 40
 misc/arccrackle      dsdust    $limit misc/arccrackle 0
 

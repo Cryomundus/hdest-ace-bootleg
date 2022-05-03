@@ -743,15 +743,15 @@ class HDBulletActor:HDActor{
 					bool gotplayer=false;
 
 					bool supersonic=speed>HDCONST_SPEEDOFSOUND;
-					double crackvol=(speed*10+(pushfactor*mass))*0.00003;
-					double fwooshvol=crackvol*0.4;
+					double crackvol=(speed*10+(pushfactor*mass))*0.00004;
+					double fwooshvol=crackvol*0.32;
 					double crackpitch=clamp(speed*0.001,0.9,1.5);
 
 					for(int k=0;!gotplayer && k<MAXPLAYERS;k++){
 						if(playeringame[k] && players[k].mo){
 							vector3 vvv=players[k].mo.pos-crackpos;  //vec3offset is wrong; portals don't work
 							if(
-								(vvv dot vvv)<(256*256)
+								(vvv dot vvv)<(512*512)
 							){
 								gotplayer=true;
 								actor ccc=spawn("BulletSoundTrail",crackpos,ALLOW_REPLACE);
@@ -759,11 +759,11 @@ class HDBulletActor:HDActor{
 								do{
 									ccc.A_StartSound("weapons/subfwoosh",
 										CHAN_BODY,CHANF_OVERLAP,volume:clamp(fwooshvol,0,1),
-										pitch:crackpitch
+										attenuation:ATTN_STATIC,pitch:crackpitch
 									);
 									if(supersonic)ccc.A_StartSound("weapons/bulletcrack",
 										CHAN_BODY,CHANF_OVERLAP,volume:clamp(thisvol,0,1),
-										pitch:crackpitch
+										attenuation:ATTN_STATIC,pitch:crackpitch
 									);
 									if(thisvol>1)thisvol-=1;
 								}while(thisvol>1);
