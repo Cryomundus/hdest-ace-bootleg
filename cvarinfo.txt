@@ -47,8 +47,6 @@ user int hd_maglimit=0;
 user bool hd_consolidate=true;
 nosave bool hd_monstervoicepitch=true;
 
-user noarchive int hd_lasttip=-1; //don't try to customize this
-
 user string hd_skin="";
 user float hd_voicepitch=1.;
 
