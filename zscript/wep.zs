@@ -733,21 +733,21 @@ class HDWeapon:Weapon{
 		if(time<0)A_Log(msg,true);
 	}
 	//because I'm too lazy to retype all that shit
-	action bool PressingFire(){return player.cmd.buttons&BT_ATTACK;}
-	action bool PressingAltfire(){return player.cmd.buttons&BT_ALTATTACK;}
-	action bool PressingReload(){return player.cmd.buttons&BT_RELOAD;}
-	action bool PressingZoom(){return player.cmd.buttons&BT_ZOOM;}
-	action bool PressingAltReload(){return player.cmd.buttons&BT_USER1;}
-	action bool PressingFiremode(){return player.cmd.buttons&BT_USER2;}
-	action bool PressingUser3(){return player.cmd.buttons&BT_USER3;}
-	action bool PressingUnload(){return player.cmd.buttons&BT_USER4;}
-	action bool PressingUse(){return player.cmd.buttons&BT_USE;}
-	action bool Pressing(int whichbuttons){return player.cmd.buttons&whichbuttons;}
+	action bool PressingFire(){return invoker.owner.player.cmd.buttons&BT_ATTACK;}
+	action bool PressingAltfire(){return invoker.owner.player.cmd.buttons&BT_ALTATTACK;}
+	action bool PressingReload(){return invoker.owner.player.cmd.buttons&BT_RELOAD;}
+	action bool PressingZoom(){return invoker.owner.player.cmd.buttons&BT_ZOOM;}
+	action bool PressingAltReload(){return invoker.owner.player.cmd.buttons&BT_USER1;}
+	action bool PressingFiremode(){return invoker.owner.player.cmd.buttons&BT_USER2;}
+	action bool PressingUser3(){return invoker.owner.player.cmd.buttons&BT_USER3;}
+	action bool PressingUnload(){return invoker.owner.player.cmd.buttons&BT_USER4;}
+	action bool PressingUse(){return invoker.owner.player.cmd.buttons&BT_USE;}
+	action bool Pressing(int whichbuttons){return invoker.owner.player.cmd.buttons&whichbuttons;}
 	action bool JustPressed(int whichbutton){return(
-		player.cmd.buttons&whichbutton&&!(player.oldbuttons&whichbutton)
+		invoker.owner.player.cmd.buttons&whichbutton&&!(invoker.owner.player.oldbuttons&whichbutton)
 	);}
 	action bool JustReleased(int whichbutton){return(
-		!(player.cmd.buttons&whichbutton)&&player.oldbuttons&whichbutton
+		!(invoker.owner.player.cmd.buttons&whichbutton)&&invoker.owner.player.oldbuttons&whichbutton
 	);}
 	action void A_StartDeselect(bool gotodzero=true){
 		A_WeaponBusy();
