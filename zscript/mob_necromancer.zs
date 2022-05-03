@@ -309,6 +309,7 @@ class Necromancer:HDMobBase replaces ArchVile{
 		bsmallhead=bplayingid;
 
 		nickname=RandomName();
+		settag(nickname);
 
 		resize(0.8,1.3);
 		A_GiveInventory("ImmunityToFire");
