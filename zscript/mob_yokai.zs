@@ -78,7 +78,7 @@ class Yokai:HDMobBase{
 				1,!random(0,63)?"balefire":"internal",
 				DMG_NO_ARMOR
 			);
-			if(target.health>0&&!random(0,3))target.givebody(1);
+			if(target&&target.health>0&&!random(0,3))target.givebody(1);
 		}
 		#### B 1 bright{
 			A_SetScale(0.680);

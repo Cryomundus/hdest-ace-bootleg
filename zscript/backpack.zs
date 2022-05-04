@@ -186,24 +186,32 @@ class ItemStorage play
 		return 10;
 	}
 
-	virtual clearscope string GetIcon(Inventory item)
+	static clearscope string GetIcon(Inventory item, int magAmt = -1, bool invIconFirst = false)
 	{
-		int Type = CheckConditions(item);
-		if (Type == IType_Invalid)return "";
+		if (!item)
+		{
+			return "UNKNA0";
+		}
 
 		string Icon = "";
 		let wpn = HDWeapon(item);
-		let arm = HDArmour(item);
+		let arm = HDArmourWorn(item);
 		let mag = HDMagAmmo(item);
 
-		switch (Type)
+		if (!invIconFirst)
 		{
-			case IType_Weapon:
-				Icon = wpn.GetPickupSprite(); break;
-			case IType_Armour:
-				Icon = arm.Mags[arm.Mags.Size() - 1] >= 1000 ? "ARMCA0" : "ARMSA0"; break;
-			case IType_Mag:
-				Icon = mag.GetMagSprite(mag.Mags[mag.Mags.Size() - 1]); break;
+			if (wpn)
+			{
+				Icon = wpn.GetPickupSprite();
+			}
+			else if (arm)
+			{
+				Icon = arm.mega ? "ARMCA0" : "ARMSA0";
+			}
+			else if (mag)
+			{
+				Icon = mag.GetMagSprite(magAmt > -1 ? magAmt : mag.MaxPerUnit);
+			}
 		}
 
 		// [Ace] Still empty? Fallback time.
@@ -213,6 +221,11 @@ class ItemStorage play
 			if (Icon == "") // [Ace] Persistent bastard, aren't ya?
 			{
 				Icon = TexMan.GetName(item.SpawnState.GetSpriteTexture(0));
+
+				if (Icon == "")
+				{
+					Icon = GetIcon(item, magAmt, false);
+				}
 			}
 		}
 
@@ -305,7 +318,18 @@ class ItemStorage play
 		si.ItemClass = item.GetClass();
 		si.NiceName = item.GetTag();
 		si.InvRef = item;
-		string Icon = GetIcon(item);
+
+		int iconAmt = -1;
+		if (item is 'HDMagAmmo')
+		{
+			HDMagAmmo mag = HDMagAmmo(item);
+			// [Ace] This can be 0 in the event of purging ammo.
+			if (mag.Mags.Size() > 0)
+			{
+				iconAmt = mag.Mags[mag.Mags.Size() - 1];
+			}
+		}
+		string Icon = GetIcon(item, iconAmt);
 
 		// [Ace] Only insert the icon for the purpose of displaying the item if it's not in the backpack yet.
 		if (si.Icons.Size() == 0)
@@ -435,7 +459,7 @@ class ItemStorage play
 					{
 						// [Ace] Gotta fetch the icon for the current magazine in the iteration.
 						// The code near the top only does it for the very first inserted mag.
-						si.Icons.Insert(index, GetIcon(mag));
+						si.Icons.Insert(index, GetIcon(mag, mag.Mags[0]));
 					}
 					si.Bulks.Insert(index, MagBulk);
 					si.Amounts.Insert(index, mag.TakeMag(false));
