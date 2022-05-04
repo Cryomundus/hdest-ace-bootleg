@@ -6,7 +6,13 @@ class GrabThinker:Thinker{
 	actor pickobj;
 	int ticker;
 	bool oldsolid;
-	static void Grab(actor grabber,actor grabee){
+	static void Grab(actor grabber,actor grabee,int delay=0){
+		let hdp=hdpickup(grabee);
+		if(hdp){
+			if(hdp.bisbeingpickedup)return;
+			hdp.bisbeingpickedup=true;
+		}
+
 		let grabthink=new("GrabThinker");
 		grabthink.picktarget=grabber;
 		if(grabee){
@@ -287,14 +293,7 @@ extend class HDPlayerPawn{
 					}
 
 					//final check for pickup process before spawning grabber
-					let hdpg=hdpickup(grabbed);
-					if(
-						!hdpg
-						||!hdpg.bisbeingpickedup
-					){
-						if(hdpg)hdpg.bisbeingpickedup=true;
-						grabthinker.Grab(self,grabbed);
-					}
+					grabthinker.Grab(self,grabbed);
 				}
 			}
 		}
