@@ -1495,6 +1495,7 @@ extend class HDOperator{
 			&&target.health>0
 		;
 		string barkset=Wads.ReadLump(Wads.CheckNumForName("opbarks",0));
+		barkset.Replace("\r","");
 		if(incombat)barkset=barkset.mid(barkset.indexof("\n---")+5);
 		else barkset=barkset.left(barkset.indexof("\n---"));
 		array<string>barks;barks.clear();

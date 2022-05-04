@@ -48,6 +48,7 @@ extend class HDMobBase{
 	static string GenerateUserName(int flags=0){
 		array<string>namebases;namebases.clear();
 		string mmmn=Wads.ReadLump(Wads.CheckNumForName("opnames",0));
+		mmmn.Replace("\r","");
 		mmmn=mmmn.left(mmmn.indexof("\n---"));
 		mmmn.split(namebases,"\n");
 

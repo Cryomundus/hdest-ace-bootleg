@@ -10,6 +10,7 @@ extend class hdplayerpawn{
 		else caller.A_Log(message,true);
 	}
 	void usegametip(string arbitrarystring){
+		arbitrarystring.replace("\r","");
 		arbitrarystring.replace("\n\n\n","\n");
 		arbitrarystring.replace("\n\n","\n");
 		specialtipalpha=1001.;

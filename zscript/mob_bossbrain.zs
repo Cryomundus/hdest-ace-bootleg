@@ -444,6 +444,7 @@ class HDBossEye:HDActor replaces BossEye{
 		}
 
 		string allmessages=Wads.ReadLump(Wads.CheckNumForName("bbtalk",0));
+		allmessages.Replace("\r","");
 
 		//set up array of intros
 		int dashpos=allmessages.indexof("---");
