@@ -68,6 +68,7 @@ extend class HDMobBase{
 		if(!random(0,3)){
 			array<string>titles;titles.clear();
 			string titleset=Wads.ReadLump(Wads.CheckNumForName("opnames",0));
+			titleset.Replace("\r","");
 
 			//there are three sections and we want the middle one
 			titleset=titleset.mid(titleset.indexof("\n---")+5);
@@ -151,6 +152,7 @@ extend class HDMobBase{
 		if(!random(0,7)){
 			array<string>titles;titles.clear();
 			string titleset=Wads.ReadLump(Wads.CheckNumForName("opnames",0));
+			titleset.Replace("\r","");
 			titleset=titleset.mid(titleset.indexof("\n---")+5);
 			titleset=titleset.mid(titleset.indexof("\n---")+5);
 			if(titleset!=""){
