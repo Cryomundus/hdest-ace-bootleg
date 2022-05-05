@@ -478,7 +478,7 @@ class Necromancer:HDMobBase replaces ArchVile{
 		loop;
 	painedandgone:
 		TNT1 AAAAAAAAA 0 A_Wander();
-		TNT1 A 0 A_SetTics(random(350,3500));
+		TNT1 A 0 A_SetTics(random(350,2100));
 		VILE F 0 A_ChangeNecroFlags(true);
 		---- A 0 setstatelabel("see");
 	death:
