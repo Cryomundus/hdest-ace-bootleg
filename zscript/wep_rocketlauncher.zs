@@ -342,8 +342,6 @@ class HDRL:HDWeapon{
 		#### A 0 A_JumpIf(invoker.weaponstatus[0]&RLF_NOMAG,"nope");
 		goto chamber;
 	flash:
-		LAUF ABCD 0;
-		MISF ABCD 0;
 		MISF A 2 bright{
 			A_CheckIdSprite("LAUFA0","MISFA0",PSP_FLASH);
 			A_StartSound("weapons/rocklaunch",CHAN_WEAPON,CHANF_OVERLAP,volume:0.6);
@@ -354,6 +352,8 @@ class HDRL:HDWeapon{
 		#### C 2 bright A_Light1();
 		#### D 1 bright A_Light0();
 		TNT1 A 0 A_AlertMonsters();
+		LAUF ABCD 0;
+		MISF ABCD 0;
 		stop;
 
 	chamber:
