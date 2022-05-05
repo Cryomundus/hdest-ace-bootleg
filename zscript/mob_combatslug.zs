@@ -132,7 +132,7 @@ class CombatSlug:HDMobBase replaces Fatso{
 		return
 		(
 			targdist<(HDCONST_ONEMETRE*100)
-			||target.pos.z-pos.z<56
+			||target&&target.pos.z-pos.z<56
 		)&&super.CanDoMissile(targsight,targdist,missilestate);
 	}
 	states{
