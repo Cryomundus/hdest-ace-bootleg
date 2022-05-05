@@ -183,7 +183,7 @@ class HDJetPack:HDCellWeapon{
 			for(int i=0;i<4;i++){
 				if(!!invoker.pods[i]){
 					let aaa=invoker.pods[i];
-					aaa.A_StartSound(!chn?"jetpack/bang":"jetpack/fwoosh",chn,volume:0.35,pitch:1+0.2*chn);
+					aaa.A_StartSound(!chn?"jetpack/bang":"jetpack/fwoosh",chn,volume:0.25,pitch:1+0.2*chn);
 					if(!chn){
 						let bbb=spawn("HDExplosion",(aaa.pos.xy,aaa.pos.z-20),ALLOW_REPLACE);
 						bbb.vel.z-=20;
