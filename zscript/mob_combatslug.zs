@@ -21,7 +21,7 @@ class manjuicelight:PointLight{
 		}
 	}
 }
-const CSLUG_BALLSPEED=37.;
+const CSLUG_BALLSPEED=56.;
 class manjuicesmoke:HDFireballTail{
 	default{
 		deathheight 0.9;
@@ -35,12 +35,12 @@ class manjuicesmoke:HDFireballTail{
 }
 class manjuice:hdfireball{
 	default{
-		missileheight 8;
 		missiletype "manjuicesmoke";
+		missileheight 8;
 		damagetype "hot";
 		activesound "misc/firecrkl";
 		decal "scorch";
-		gravity 0.1;
+		gravity HDCONST_GRAVITY*0.8;
 		speed CSLUG_BALLSPEED;
 		radius 7;
 		height 8;
@@ -67,7 +67,7 @@ class manjuice:hdfireball{
 			vel.z+=1.;
 			A_HDBlast(
 				128,66,16,"hot",
-				immolateradius:frandom(96,196),random(20,90),42,
+				immolateradius:48,random(20,90),42,
 				false
 			);
 			A_SpawnChunks("HDSmokeChunk",random(2,4),6,20);
@@ -82,11 +82,16 @@ class manjuice:hdfireball{
 			alpha-=0.15;
 			scale*=1.01;
 		}
-		TNT1 A 0 A_Immolate(null,target,80);
+		TNT1 A 0 A_Immolate(tracer,target,80);
 		TNT1 AAAAAAAAAAAAAAA 4{
+			if(tracer){
+				setorigin(tracer.pos,false);
+				vel=tracer.vel;
+			}
 			A_SpawnItemEx("HDSmoke",
-				random(-2,2),random(-2,2),random(-2,2),
-				frandom(2,-4),frandom(-2,2),frandom(1,4),0,SXF_NOCHECKPOSITION
+				frandom(-2,2),frandom(-2,2),frandom(0,2),
+				vel.x+frandom(2,-4),vel.y+frandom(-2,2),vel.z+frandom(1,4),
+				0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM
 			);
 		}stop;
 	}
@@ -132,7 +137,8 @@ class CombatSlug:HDMobBase replaces Fatso{
 		return
 		(
 			targdist<(HDCONST_ONEMETRE*100)
-			||target&&target.pos.z-pos.z<56
+			||!target
+			||target.pos.z-pos.z<128
 		)&&super.CanDoMissile(targsight,targdist,missilestate);
 	}
 	states{
@@ -207,9 +213,8 @@ class CombatSlug:HDMobBase replaces Fatso{
 
 			//random
 			int opt=random(0,2);
-			A_FaceTarget(5,5);
 			if(opt==1){
-				leadoffset*=frandom(-0.6,1.);
+				leadoffset*=frandom(-2.,0.2);
 				angle+=leadoffset.x;
 				pitch+=leadoffset.y;
 			}else if(opt==2){
@@ -299,4 +304,3 @@ class CombatSlug:HDMobBase replaces Fatso{
 		stop;
 	}
 }
-

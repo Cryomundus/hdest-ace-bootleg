@@ -344,7 +344,7 @@ class Heat:Inventory{
 					aaa=spawn("HDFlameRed",owner.pos+(
 						frandom(-radius,radius),
 						frandom(-radius,radius),
-						frandom(2,owner.height)
+						frandom(0.1,owner.height*0.6)
 					),ALLOW_REPLACE);
 				}else{
 					burnouttimer+=2;

@@ -163,8 +163,7 @@ class HDSmokeChunk:HDDebris{
 	}
 	states{
 	spawn:
-		DUST ABCD 0;
-		---- A 0{
+		DUST A 0 NoDelay{
 			frame=random(0,3);
 			scale*=randompick(-1,1);
 			if(!random(0,4))brockettrail=true;
@@ -180,16 +179,16 @@ class HDSmokeChunk:HDDebris{
 		}
 		loop;
 	death:
-		TNT1 A 0 A_Jump(256,1,2,3);
-		PUFF CC 3 A_SpawnItemEx("HDSmoke",0,0,frandom(1,3),
-			vel.x,vel.y,vel.z+frandom(0,1),
-			0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION,96
-		);
-		PUFF CCCC random(4,8) A_SpawnItemEx("HDSmoke",0,0,frandom(1,3),
-			vel.x,vel.y,vel.z+frandom(0,1),
-			0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION,96
-		);
-		PUFF CDD 2 A_FadeOut(0.3);
+		PUFF C 0{
+			bnogravity=true;
+			vel.z+=0.3;
+			A_SetScale(randompick(-1,1)*frandom(0.4,0.6),frandom(0.4,0.6));
+			A_SetRenderStyle(0.6,Style_Add);
+		}
+		PUFF CCCCCDDDD 1{
+			scale*=1.1;
+			A_FadeOut(0.05);
+		}
 		stop;
 	}
 }
