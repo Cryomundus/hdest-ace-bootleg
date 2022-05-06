@@ -82,10 +82,13 @@ class manjuice:hdfireball{
 			alpha-=0.15;
 			scale*=1.01;
 		}
-		TNT1 A 0 A_Immolate(tracer,target,80);
+		TNT1 A 0{
+			A_Immolate(tracer,target,80);
+			addz(-20);
+		}
 		TNT1 AAAAAAAAAAAAAAA 4{
 			if(tracer){
-				setorigin(tracer.pos,false);
+				setorigin((tracer.pos.xy,tracer.pos.z+frandom(0.1,tracer.height*0.4)),false);
 				vel=tracer.vel;
 			}
 			A_SpawnItemEx("HDSmoke",
