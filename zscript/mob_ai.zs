@@ -78,13 +78,18 @@ extend class HDMobBase{
 		//restore pitch to something not ridiculous
 		if(abs(pitch)>20)pitch*=0.5;
 
+//if(hd_debug>2)console.printf(level.time.."   "..gettag().." is targeting   "..(target?target.gettag():"nothing"));
+
 		//wander and look
 		if(
 			flags&CHF_LOOK
 		){
 			actor tgt=target;
 			A_HDLook();
-			if(target&&target!=tgt)flags|=CHF_WANDER;
+			if(
+				target
+				&&target!=tgt
+			)flags|=CHF_WANDER;
 		}
 
 
@@ -226,23 +231,20 @@ extend class HDMobBase{
 				||!random(0,255)
 			)
 		){
+			let lll=lastenemy;
 			if(
-				lastenemy
-				&&lastenemy.health>0
+				lll
+				&&lll.health>0
 			){
-				let lll=lastenemy;
-
 				if(lll==target)lastenemy=null;
 				else lastenemy=target;
-
-				if(
-					lll!=target
-					&&random(0,3)
-				)target=lll;
-				else target=null;
-
-				return;
 			}
+
+			if(
+				!!lll
+				&&random(0,3)
+			)target=lll;
+			else target=null;
 		}
 
 
@@ -333,37 +335,7 @@ extend class HDMobBase{
 				}
 			}
 
-			//heal a corpse
-			if(
-				findstate("heal")
-			){
-				blockthingsiterator it=blockthingsiterator.create(self,radius*1.2);
-				while(it.next()){
-					actor itt=it.thing;
-					if(
-						itt.bcorpse
-						&&itt.canresurrect(self,true)
-						&&canresurrect(itt,false)
-						&&itt.findstate("raise")
-						&&abs(itt.pos.z-pos.z)<maxstepheight*2
-						&&heat.getamount(itt)<50
-						&&checksight(itt)
-						&&distance3dsquared(itt)<(radius*radius*1.44)
-					){
-						A_Face(itt);
-
-						RaiseActor(itt,RF_NOCHECKPOSITION);
-						itt.A_SetFriendly(bfriendly);
-						itt.master=self;
-						itt.target=target;
-						itt.friendplayer=friendplayer;
-						tracer=itt;
-
-						setstatelabel("heal");
-						return;
-					}
-				}
-			}
+			HealNearbyCorpse(radius*1.4);
 		}
 
 
@@ -674,7 +646,6 @@ extend class HDMobBase{
 
 		double dist=distance3dsquared(other);
 		double feelrange=(radius+other.radius)*HDCONST_SQRTTWO;
-
 		return(
 				!mindist
 				||mindist<dist
@@ -712,7 +683,6 @@ extend class HDMobBase{
 		if(
 			HDAIOverride.HDLook(self,flags,minseedist,maxseedist,maxheardist,lookfov,label)
 		)return target&&target!=tgbk;
-
 
 		if(bINCONVERSATION)return false;
 
@@ -795,7 +765,7 @@ extend class HDMobBase{
 								&&!aaa.target
 								&&(
 									aaa.blookallaround
-									||deltaangle(aaa.angle,aaa.angleto(self)<100)
+									||deltaangle(aaa.angle,aaa.angleto(self))<100
 								)
 							){
 								aaa.target=self;
@@ -1039,6 +1009,37 @@ extend class HDMobBase{
 		return false;
 	}
 
+	//heal a corpse
+	virtual actor HealNearbyCorpse(double healradius){
+		if(!findstate("heal"))return null;
+		blockthingsiterator it=blockthingsiterator.create(self,healradius);
+		while(it.next()){
+			actor itt=it.thing;
+			if(
+				itt.bcorpse
+				&&itt.canresurrect(self,true)
+				&&canresurrect(itt,false)
+				&&itt.findstate("raise")
+				&&abs(itt.pos.z-pos.z)<maxstepheight*2
+				&&heat.getamount(itt)<50
+				&&checksight(itt)
+				&&distance3dsquared(itt)<(healradius*healradius)
+			){
+				A_Face(itt);
+
+				RaiseActor(itt,RF_NOCHECKPOSITION);
+				itt.A_SetFriendly(bfriendly);
+				itt.master=self;
+				itt.target=target;
+				itt.friendplayer=friendplayer;
+				tracer=itt;
+
+				setstatelabel("heal");
+				return itt;
+			}
+		}
+		return null;
+	}
 
 
 	//default for deciding a direction
@@ -1136,5 +1137,3 @@ class HDAIOverride:Actor{
 	}
 
 }
-
-
