@@ -83,7 +83,11 @@ class HDMagicShield:HDDamageHandler{
 		}
 	}
 	override void DoEffect(){
-		if(owner.bcorpse||owner.health<1)return;
+		if(
+			owner.bcorpse
+			||owner.health<1
+			||owner.isfrozen()
+		)return;
 		if(accuracy>0)accuracy--;
 
 		if(

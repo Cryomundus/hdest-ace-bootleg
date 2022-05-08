@@ -190,10 +190,9 @@ class HDB_bronto:HDBulletActor{
 	default{
 		pushfactor 0.05;
 		mass 5000;
-		speed HDCONST_MPSTODUPT*420;//500;
+		speed HDCONST_MPSTODUPT*420;
 		accuracy 600;
 		stamina 3700;
-
 		hdbulletactor.distantsound "world/shotgunfar";
 		hdbulletactor.distantsoundvol 2.;
 		missiletype "HDGunsmoke";
@@ -201,22 +200,46 @@ class HDB_bronto:HDBulletActor{
 		seesound "weapons/riflecrack";
 		obituary "%o played %k's cannon.";
 	}
+	override double penetration(){
+		//The main penetration code doesn't factor in diminishing returns from
+		//friction caused by larger projectiles moving through more material.
+		//Since only the Brontornis shell is anywhere near big enough
+		//for this to make a real difference, it gets its own formula.
+		double pen=
+			speed
+			/(
+				(HDCONST_MPSTODUPT*420.*20./40.)  //the *20 assumes base pushfactor 0.05
+				*pushfactor
+			)
+		;
+		if(hd_debug>1)console.printf(getclassname().." penetration:  "..pen.."   "..realpos.x..","..realpos.y);
+		return pen;
+	}
 	override actor Puff(){
-		if(max(abs(pos.x),abs(pos.y))>=32768)return null;
-		setorigin(pos-(2*(cos(angle),sin(angle)),0),false);
-
+		for(int i=0;i<20;i++){
+			let bbb=spawn("HugeWallChunk",pos+(frandom(-1,1),frandom(-1,1),frandom(-1,1)));
+			bbb.vel=(frandom(-4,4),frandom(-4,4),frandom(-1,4))+vel*0.001;
+			bbb.scale*=frandom(0.3,1.2);
+		}
+		let ppp=super.puff();
+		if(ppp){
+			ppp.A_StartSound("misc/bigbulhol",CHAN_BODY,CHANF_OVERLAP);
+		}
+		return ppp;
+	}
+	override void Detonate(){
+		if(max(abs(pos.x),abs(pos.y))>=32768)return;
+		vector2 facingpoint=(cos(angle),sin(angle));
+		setorigin(pos-(2*facingpoint,0),false);
 		A_SprayDecal("BrontoScorch",16);
 		if(vel==(0,0,0))A_ChangeVelocity(cos(pitch),0,-sin(pitch),CVF_RELATIVE|CVF_REPLACE);
 		else vel*=0.01;
 		if(tracer){ //warhead damage
 			int dmg=random(1000,1200);
-
 			//find the point at which it would pierce the middle
 			vector3 hitpoint=pos+vel.unit()*tracer.radius;
-
 			//find the "heart" point on the victim
 			vector3 tracmid=(tracer.pos.xy,tracer.pos.z+tracer.height*0.618);
-
 			dmg=int((1.-((hitpoint-tracmid).length()/tracer.radius))*dmg);
 			tracer.damagemobj(
 				self,target,
@@ -237,18 +260,18 @@ class HDB_bronto:HDBulletActor{
 		aaa=spawn("HDExplosion",pos,ALLOW_REPLACE);aaa.vel.z=2;
 		distantnoise.make(aaa,"world/rocketfar");
 		A_SpawnChunks("HDSmokeChunk",random(3,4),6,12);
-
+		A_AlertMonsters();
 		bmissile=false;
 		bnointeraction=true;
 		vel=(0,0,0);
 		if(!instatesequence(curstate,findstate("death")))setstatelabel("death");
-		return null;
 	}
-	override void onhitactor(actor hitactor,vector3 hitpos,vector3 vu,int flags){
-		double spbak=speed;
-		super.onhitactor(hitactor,hitpos,vu,flags);
-		if(spbak-speed>10)puff();
-	}
+	override name GetBulletDecal(
+		double bulletspeed,
+		line hitline,
+		int hitpart,
+		bool exithole
+	){return "BulletChipGiant";}
 	override void postbeginplay(){
 		super.postbeginplay();
 		for(int i=2;i;i--){
@@ -257,11 +280,6 @@ class HDB_bronto:HDBulletActor{
 				SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS
 			);
 		}
-	}
-	states{
-	death:
-		TNT1 A 0{if(tracer)puff();}
-		goto super::death;
 	}
 }
 
@@ -396,7 +414,7 @@ class HDBulletActor:HDActor{
 			scale=(scaleamt,scaleamt);
 		}
 	}
-	double penetration(){ //still juvenile giggling
+	virtual double penetration(){ //still juvenile giggling
 		double pen=
 			(25+hardness)
 			*(8000+accuracy)
@@ -825,17 +843,12 @@ class HDBulletActor:HDActor{
 		double pen=penetration();
 		//TODO: MATERIALS AFFECTING PENETRATION AMOUNT
 		//(take these fancy todos with a grain of salt - we may be reaching computational limits)
-
 		setorigin(pos-vu,false);
 		if(pen>1)A_SprayDecal(GetBulletDecal(speed,hitline,hitpart,false),4);
 		setorigin(pos+vu,false);
-
 		//inflict damage on destructibles
 		//GZDoom native first
 		int geodmg=int(pen*(1+pushfactor));
-		if(hitline){
-			destructible.DamageLinedef(hitline,self,geodmg,"piercing",hitpart,pos,false);
-		}
 		if(hitsector){
 			switch(hitpart-999){
 			case TIER_Upper:
@@ -853,49 +866,56 @@ class HDBulletActor:HDActor{
 			}
 			destructible.DamageSector(hitsector,self,geodmg,"piercing",hitpart,pos,false);
 		}
-
+		//then windowbuster
+		bool dodestroydoor=true;
+		if(hitline)destructible.DamageLinedef(hitline,self,geodmg,"piercing",hitpart,pos,false);
 		//then doorbuster
-		doordestroyer.destroydoor(self,10*pen*0.001*stamina,frandom(stamina*0.0006,pen*0.00005*stamina),1);
-
-
+		if(dodestroydoor){
+			double hlalpha=hitline?hitline.alpha:1.;
+			bool ddd=doordestroyer.destroydoor(self,0.01*pen*stamina,frandom(stamina*0.0006,pen*0.00005*stamina),1);
+			//windows absorb a lot of energy
+			if(
+				ddd
+				||(
+					hitline
+					&&hitline.alpha>hlalpha
+				)
+			){
+				double glassmult=min(1.,frandom(0.003,0.006)*mass);
+				pen*=glassmult;
+				vel*=glassmult;
+			}
+		}
 		puff();
-
 		//in case the puff() detonated or destroyed the bullet
 		if(!self||!bmissile)return;
-
 		//everything below this should be ricochet or penetration
 		if(pen<1.){
+			detonate();
 			bulletdie();
 			return;
 		}
-
 		//see if the bullet ricochets
 		bool didricochet=false;
 		//TODO: don't ricochet on meat, require much shallower angle for liquids
-
 		//if impact is too steep, randomly fail to ricochet
 		double maxricangle=frandom(50,90)-pen-hardness;
-
 		if(hitline){
 			//angle of line
 			//above plus 180, normalized
 			//pick the one closer to the bullet's own angle
-
 			//deflect along the line
 			if(lastdist>128){ //to avoid infinite back-and-forth at certain angles
 				double aaa1=hdmath.angleto(hitline.v1.p,hitline.v2.p);
 				double aaa2=aaa1+180;
 				double ppp=angle;
-
 				double abs1=absangle(aaa1,ppp);
 				double abs2=absangle(aaa2,ppp);
 				double hitangle=min(abs1,abs2);
-
 				if(hitangle<maxricangle){
 					didricochet=true;
 					double aaa=(abs1>abs2)?aaa2:aaa1;
 					vel.xy=rotatevector(vel.xy,deltaangle(ppp,aaa)*frandom(1.,1.05));
-
 					//transfer some of the deflection upwards or downwards
 					double vlz=vel.z;
 					if(vlz){
@@ -914,20 +934,16 @@ class HDBulletActor:HDActor{
 		){
 			bool isceiling=hitpart==SECPART_CEILING;
 			double planepitch=0;
-
 			//get the relative pitch of the surface
 			if(lastdist>128){ //to avoid infinite back-and-forth at certain angles
 				double zdif;
 				if(checkmove(pos.xy+vel.xy.unit()*0.5))zdif=getzat(0.5,flags:isceiling?GZF_CEILING:0)-pos.z;
 				else zdif=pos.z-getzat(-0.5,flags:isceiling?GZF_CEILING:0);
 				if(zdif)planepitch=atan2(zdif,0.5);
-
 				planepitch+=frandom(0.,1.);
 				if(isceiling)planepitch*=-1;
-
 				double hitangle=absangle(-pitch,planepitch);
 				if(hitangle>90)hitangle=180-hitangle;
-
 				if(hitangle<maxricangle){
 					didricochet=true;
 					//at certain angles the ricochet should reverse xy direction
@@ -945,7 +961,6 @@ class HDBulletActor:HDActor{
 				}
 			}
 		}
-
 		//see if the bullet penetrates
 		if(!didricochet){
 			//calculate the penetration distance
@@ -970,7 +985,6 @@ class HDBulletActor:HDActor{
 				//warp forwards to that distance
 				setorigin(pendest,true);
 				realpos=pendest;
-
 				//do a REGULAR ACTOR linetrace
 				angle-=180;pitch=-pitch;
 				flinetracedata penlt;
@@ -981,34 +995,29 @@ class HDBulletActor:HDActor{
 					flags:TRF_THRUACTORS|TRF_ABSOFFSET,
 					data:penlt
 				);
-
 				//move to emergence point and spray a decal
 				setorigin(pendest+vu*0.3,true);
 				puff();
 				A_SprayDecal(GetBulletDecal(speed,hitline,hitpart,true));
 				angle+=180;pitch=-pitch;
-
 				if(penlt.hittype==TRACE_HitActor){
 					//if it hits an actor, affect that actor
 					onhitactor(penlt.hitactor,penlt.hitlocation,vu);
 					if(penlt.hitactor)traceactors.push(penlt.hitactor);
 				}
-
 				//reduce momentum, increase tumbling, etc.
 				angle+=frandom(-pushfactor,pushfactor)*penunits;
 				pitch+=frandom(-pushfactor,pushfactor)*penunits;
 				speed=max(0,speed-frandom(-pushfactor,pushfactor)*penunits*10);
 				A_ChangeVelocity(cos(pitch)*speed,0,-sin(pitch)*speed,CVF_RELATIVE|CVF_REPLACE);
 			}else{
-				puff();
+				detonate();
 				bulletdie();
 				return;
 			}
 		}
-
 		//update realpos to keep these values in sync
 		realpos=pos;
-
 		//warp the bullet
 		hardness=max(1,hardness-random(0,random(0,3)));
 		stamina=max(1,stamina+random(0,(stamina>>1)));
@@ -1164,7 +1173,10 @@ class HDBulletActor:HDActor{
 				speed<16
 				||hardness<random(1,3)
 				||!random(0,6)
-			)bulletdie();
+			){
+				detonate();
+				bulletdie();
+			}
 
 			//randomly deflect
 			//if deflected, reduce impact
@@ -1235,7 +1247,10 @@ class HDBulletActor:HDActor{
 		A_ChangeVelocity(cos(pitch)*speed,0,-sin(pitch)*speed,CVF_RELATIVE|CVF_REPLACE);
 
 		if(flags&BLAF_ALLTHEWAYTHROUGH)channelwidth*=1.2;
-		else bulletdie();
+		else{
+			detonate();
+			bulletdie();
+		}
 
 
 		//add size of channel to damage
@@ -1363,6 +1378,7 @@ class HDBulletActor:HDActor{
 			return;
 		}
 	}
+	virtual void Detonate(){}
 	virtual actor Puff(){
 		//TODO: virtual actor puff(textureid hittex,bool reverse=false){}
 			//flesh: bloodsplat

@@ -378,7 +378,7 @@ misc/ladder        dsbelt
 misc/mobshieldf    dsfwoosh
 misc/mobshieldx    dsfwoosh
 misc/mobland       dsland
-
+misc/bigbulhol     icebrk1a $limit misc/bigbulhol 0 $pitchset misc/bigbulhol 4.
 
 //delimit some stock doom sounds
 $limit weapons/pistol 0
