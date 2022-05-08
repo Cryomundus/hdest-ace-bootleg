@@ -760,12 +760,14 @@ class AngelFire:Thinker{
 		}
 		master.givebody(1);
 		double mrad=master.radius*0.3;
-		vector3 flamepos=master.pos+(
-			frandom(-mrad,mrad),
-			frandom(-mrad,mrad),
-			frandom(0.4,0.6)*master.height
+		if(level.time&1)master.A_SpawnParticle(
+			"green",SPF_FULLBRIGHT,50,
+			frandom(4,8),0,
+			frandom(-mrad,mrad),frandom(-mrad,mrad), frandom(0.1,0.9)*master.height,
+			frandom(-0.2,0.2),frandom(-0.2,0.2),frandom(0.05,0.2),
+			frandom(-0.05,0.05),frandom(-0.05,0.05),0.06,
+			startalphaf:0.8,
+			sizestep:0.1
 		);
-		let fff=actor.spawn("HDFlameRed",flamepos,ALLOW_REPLACE);
-		fff.vel=master.vel+(frandom(-0.3,0.3),frandom(-0.3,0.3),0.6);
 	}
 }
