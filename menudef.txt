@@ -40,7 +40,8 @@ OptionValue "NVGStyle"{
 	4, "Digital Green"
 	5, "Digital Amber"
 	6, "Modern Green"
-	7, "Truecolor"
+	7, "Modern Cyan"
+	8, "Truecolor"
 }
 OptionValue "DoorBuster"{
 	0,"Allow all"
