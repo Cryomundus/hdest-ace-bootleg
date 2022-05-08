@@ -279,7 +279,7 @@ extend class PortableLiteAmp {
 			case 5: // Digital amber
 				resfactor=3;hscan=1;vscan=1;scanfactor=resfactor;scanstrength=0.025;posterize=16;posfilter=(1.0,1.0,0.05);whiteclip=0.9;desat=0.0;break;
 			case 6: // Modern green
-				resfactor=2;hscan=1;vscan=0;scanfactor=2;scanstrength=0.1;posterize=256;posfilter=(0.15,1.0,0.15);whiteclip=0.8;desat=0.0;break;
+				resfactor=2;hscan=1;vscan=0;scanfactor=2;scanstrength=0.1;posterize=256;posfilter=(0.1,1.0,0.1);whiteclip=0.8;desat=0.0;break;
 			case 7: // Modern cyan
 				resfactor=2;hscan=1;vscan=0;scanfactor=2;scanstrength=0.1;posterize=256;posfilter=(0.0,1.0,0.75);whiteclip=0.8;desat=0.0;break;
 			default: // Truecolor
