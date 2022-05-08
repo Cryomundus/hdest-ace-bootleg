@@ -108,8 +108,6 @@ class PortableLiteAmp:HDMagAmmo replaces Infrared{
 
 		if(
 			worn
-			&&!owner.binvisible
-			&&!owner.bshadow
 		){
 
 			//check if totally drained
