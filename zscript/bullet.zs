@@ -216,9 +216,12 @@ class HDB_bronto:HDBulletActor{
 		return pen;
 	}
 	override actor Puff(){
+		vector3 vu=(-cos(pitch)*(cos(angle),sin(angle)),sin(pitch));
+		vector3 pv=pos+vu;
+
 		for(int i=0;i<20;i++){
-			let bbb=spawn("HugeWallChunk",pos+(frandom(-1,1),frandom(-1,1),frandom(-1,1)));
-			bbb.vel=(frandom(-4,4),frandom(-4,4),frandom(-1,4))+vel*0.001;
+			let bbb=spawn("HugeWallChunk",pv+(frandom(-1,1),frandom(-1,1),frandom(-1,1)));
+			bbb.vel=(frandom(-4,4),frandom(-4,4),frandom(-1,4))+vu;
 			bbb.scale*=frandom(0.3,1.2);
 		}
 		let ppp=super.puff();
@@ -1380,7 +1383,7 @@ class HDBulletActor:HDActor{
 	}
 	virtual void Detonate(){}
 	virtual actor Puff(){
-		//TODO: virtual actor puff(textureid hittex,bool reverse=false){}
+		//TODO: virtual actor puff(textureid hittex){}
 			//flesh: bloodsplat
 			//fluids: splash
 			//anything else: puff and add bullet hole

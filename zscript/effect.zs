@@ -291,7 +291,7 @@ class HDBulletPuff:HDPuff{
 			A_SpawnParticle("gray",
 				SPF_RELATIVE,70,frandom(4,20)*gdfmt.scale.x,0,
 				frandom(-3,3),frandom(-3,3),frandom(0,4),
-				frandom(-0.4,0.4)*stm,frandom(-0.4,0.4)*stm,frandom(0.4,1.2)*stm,
+				vel.x+frandom(-0.4,0.4)*stm,vel.y+frandom(-0.4,0.4)*stm,vel.z+frandom(0.4,1.2)*stm,
 				frandom(-0.1,0.1),frandom(-0.1,0.1),-HDCONST_GRAVITY
 			);
 		}
