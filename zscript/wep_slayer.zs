@@ -17,7 +17,7 @@ class Slayer:HDShotgun replaces HDShotgun{
 		weapon.bobrangey 0.7;
 		scale 0.6;
 		hdweapon.barrelsize 26,1,1;
-		tag "side-by-side shotgun";
+		tag "slayer";
 		hdweapon.refid HDLD_SLAYER;
 	}
 	static void Fire(actor caller,bool right,int choke=7){
