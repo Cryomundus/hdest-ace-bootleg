@@ -357,6 +357,7 @@ extend class HDMobBase{
 						itt.master=self;
 						itt.target=target;
 						itt.friendplayer=friendplayer;
+						tracer=itt;
 
 						setstatelabel("heal");
 						return;
