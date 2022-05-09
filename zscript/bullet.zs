@@ -778,12 +778,12 @@ class HDBulletActor:HDActor{
 								actor ccc=spawn("BulletSoundTrail",crackpos,ALLOW_REPLACE);
 								double thisvol=crackvol;
 								do{
-									ccc.A_StartSound("weapons/subfwoosh",
-										CHAN_BODY,CHANF_OVERLAP,volume:clamp(fwooshvol,0,1),
-										attenuation:ATTN_STATIC,pitch:crackpitch
-									);
 									if(supersonic)ccc.A_StartSound("weapons/bulletcrack",
 										CHAN_BODY,CHANF_OVERLAP,volume:clamp(thisvol,0,1),
+										attenuation:ATTN_STATIC,pitch:crackpitch
+									);
+									else ccc.A_StartSound("weapons/subfwoosh",
+										CHAN_BODY,CHANF_OVERLAP,volume:clamp(fwooshvol,0,1),
 										attenuation:ATTN_STATIC,pitch:crackpitch
 									);
 									if(thisvol>1)thisvol-=1;
