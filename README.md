@@ -1,26 +1,38 @@
-# Hideous Destructor
-A gameplay modification for GZDoom https://github.com/coelckers/gzdoom
+# Hideous Destructor [AceCorp Bootleg]
+If you're reading this, you already know what the fuck this mod is and how to load it.
 
-To use (assuming you are reading this on the Git page):
-1. Download the repository as a zip file.
-2. Drag that file into GZDoom.exe or select it using the GZDoom command line or your favourite launcher.
+For the most part this build is the same as the master branch at any given time.
 
-If you are reading this after having pulled it out of the already-downloaded zip/folder, load that zip/folder into GZDoom.
-
-If you are downloading the release, just load the .pk7 the same way you do a .pk3, and open it as a .7z archive to access the manual. 
-
-Make sure you have keys bound for speed, crouch, reload, zoom, and user1 through 4.
-
+### Things that I have not ported and will not port, ever, in no particular order
 ---
+- 7.76 recasts;
+- New archviles;
+- New bronto;
+- Breakable windows;
+- Woke shit. Keep your politics and personal views out of games and mods.
 
-hd_manual.md contains the full manual.
-
-hd.txt contains a draft of the relevant information for any future archival in /idgames.
-
+### Things that are different
 ---
+Highlights:
+- You can pick stuff up while incapped;
+- Fixed extremely rare desync that happens if one player has CRLR line endings while the other has only CR.
 
-For more info, stop by at:
 
-Accensus' HD site: https://accensi.gitlab.io/hdportal/
-
-The thread on the ZDoom forums: https://forum.zdoom.org/viewtopic.php?f=43&t=12973
+- Various optimizations. More to come as more bottlenecks are spotted.
+- Various modding support:
+	- Pressing* can now be called from weapon context such as Tick overrides on the weapon itself rather than being locked to states.
+- Various bugfixes and tweaks:
+	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless.
+	- A_HDBlast's pushing actually works now;
+	- Bloodbags don't immediately come off if another player puts one on you while you're incapped;
+	- BossBrain does not cause a VM abort with followers sometimes when loading save games;
+	- Radsuits can be used by NPCs now;
+	- Checkin names are not multiplied in co-op;
+- Various tweaks:
+	- Living actor climbing is less insufferable;
+	- 90 seconds of air supply underwater instead of the standard 20.
+	- NVGs Modern Green is now Modern Cyan and Modern Green is actually fucking green.
+	- Invisibility does not hide NVGs' effect, only the overlay;
+	- Standard Commander Keen sprites;
+	- Archviles take less time on average to reappear;
+	- Reduced jetpack volume.
