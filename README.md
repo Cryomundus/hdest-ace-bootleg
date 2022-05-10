@@ -15,14 +15,14 @@ For the most part this build is the same as the master branch at any given time.
 ---
 - Various optimizations. More to come as more bottlenecks are spotted.
 - Various modding support:
-	- Pressing* can now be called from weapon context such as Tick overrides on the weapon itself rather than being locked to states.
-- Various bugfixes and tweaks:
-	- Fixed extremely rare desync that happens if one player has CRLR line endings while the other has only CR.
-	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless.
+	- Pressing* can now be called from weapon context such as Tick overrides on the weapon itself rather than being locked to states;
+	- Radsuits can be used by NPCs now;
+- Various bugfixes:
+	- Fixed extremely rare desync that happens if one player has CRLR line endings while the other has only CR;
+	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless;
 	- A_HDBlast's pushing actually works now;
 	- Bloodbags don't immediately come off if another player puts one on you while you're incapped;
 	- BossBrain does not cause a VM abort with followers sometimes when loading save games;
-	- Radsuits can be used by NPCs now;
 	- Checkin names are not multiplied in co-op;
 - Various tweaks:
 	- You can pick stuff up while incapped;
@@ -30,6 +30,7 @@ For the most part this build is the same as the master branch at any given time.
 	- 90 seconds of air supply underwater instead of the standard 20.
 	- NVGs Modern Green is now Modern Cyan and Modern Green is actually fucking green.
 	- Invisibility does not hide NVGs' effect, only the overlay;
+	- NVGs don't fuck with your FOV.
 	- Standard Commander Keen sprites;
 	- Archviles take less time on average to reappear;
-	- Reduced jetpack volume.
+	- Reduced jetpack volume;
