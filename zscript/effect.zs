@@ -283,7 +283,7 @@ class HDBulletPuff:HDPuff{
 		int stm=stamina;
 		double vol=min(1.,0.1*stm);
 		A_StartSound("misc/bullethit",CHAN_BODY,CHANF_OVERLAP,vol);
-		A_ChangeVelocity(-0.4,0,frandom(0.1,0.4),CVF_RELATIVE);
+		A_ChangeVelocity(-0.4*cos(pitch),0,frandom(0.1,0.4)*-sin(pitch),CVF_RELATIVE);
 		trymove(pos.xy+vel.xy,false);
 		scale*=frandom(0.9,1.1);
 		let gdfmt=getdefaultbytype((class<actor>)(missilename));
@@ -291,7 +291,7 @@ class HDBulletPuff:HDPuff{
 			A_SpawnParticle("gray",
 				SPF_RELATIVE,70,frandom(4,20)*gdfmt.scale.x,0,
 				frandom(-3,3),frandom(-3,3),frandom(0,4),
-				vel.x+frandom(-0.4,0.4)*stm,vel.y+frandom(-0.4,0.4)*stm,vel.z+frandom(0.4,1.2)*stm,
+				frandom(-0.1,.8)*stm,frandom(-0.3,0.3)*stm,vel.z+frandom(0.1,0.3)*stm,
 				frandom(-0.1,0.1),frandom(-0.1,0.1),-HDCONST_GRAVITY
 			);
 		}
