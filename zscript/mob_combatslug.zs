@@ -83,7 +83,7 @@ class manjuice:hdfireball{
 			scale*=1.01;
 		}
 		TNT1 A 0{
-			A_Immolate(tracer,target,80);
+			A_Immolate(tracer,target,80,requireSight:true);
 			addz(-20);
 		}
 		TNT1 AAAAAAAAAAAAAAA 4{

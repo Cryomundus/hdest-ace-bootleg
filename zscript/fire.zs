@@ -36,9 +36,15 @@ extend class HDActor{
 	virtual void A_Immolate(
 		actor victim,
 		actor perpetrator,
-		int duration=0
+		int duration=0,
+		bool requireSight=false
 	){
 		if(victim&&victim.countinv("ImmunityToFire"))return;
+
+		if (requireSight && victim && perpetrator && !perpetrator.CheckSight(victim, SF_IGNOREVISIBILITY))
+		{
+			return;
+		}
 
 		if(
 			!victim
