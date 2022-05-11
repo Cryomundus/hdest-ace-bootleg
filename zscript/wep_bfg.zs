@@ -242,10 +242,9 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 				invoker.weaponstatus[BFGS_TIMER]=0;
 				if(invoker.weaponstatus[BFGS_BATTERY]<20){
 					invoker.weaponstatus[BFGS_BATTERY]++;
-					if(invoker.weaponstatus[BFGS_BATTERY]==20)
-						invoker.weaponstatus[0]|=BFGF_DEMON;
 				}
 				else invoker.weaponstatus[BFGS_CHARGE]++;
+				if(!random(0,60))invoker.weaponstatus[0]|=BFGF_DEMON;
 			}
 			if(invoker.weaponstatus[BFGS_BATTERY]==20)A_SetTics(5);
 			if(health<40){
@@ -539,10 +538,9 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 				invoker.weaponstatus[BFGS_TIMER]=0;
 				if(invoker.weaponstatus[BFGS_BATTERY]<20){
 					invoker.weaponstatus[BFGS_BATTERY]++;
-					if(invoker.weaponstatus[BFGS_BATTERY]==20)
-						invoker.weaponstatus[0]|=BFGF_DEMON;
 				}
 				else invoker.weaponstatus[BFGS_CHARGE]++;
+				if(!random(0,60))invoker.weaponstatus[0]|=BFGF_DEMON;
 			}
 			if(invoker.weaponstatus[BFGS_BATTERY]==20)A_SetTics(5);
 			invoker.A_StartSound("weapons/bfgcharge",CHAN_VOICE);
