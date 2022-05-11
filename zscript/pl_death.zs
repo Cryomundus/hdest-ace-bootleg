@@ -277,7 +277,6 @@ class HDPlayerCorpse:HDHumanoid{
 				corpsegiver
 				&&corpsegiver.incapacitated>(4<<2)
 			)setstatelabel("dead");
-			else scale.x*=randompick(-1,1);
 		}
 		#### IJ 8;
 		#### K 3;
