@@ -326,7 +326,7 @@ class ItemStorage play
 			// [Ace] This can be 0 in the event of purging ammo.
 			if (mag.Mags.Size() > 0)
 			{
-				iconAmt = mag.Mags[mag.Mags.Size() - 1];
+				iconAmt = mag.Mags[0];
 			}
 		}
 		string Icon = GetIcon(item, iconAmt);
