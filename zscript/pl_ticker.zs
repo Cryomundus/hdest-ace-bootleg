@@ -438,9 +438,10 @@ extend class HDPlayerPawn{
 			else if(bobcounter>360)bobcounter=0;
 		}
 		hudbob=(
-			cos(bobcounter)*(sm?5.:2.)*(pr?pr.bobrangex:1.)/player.crouchfactor,
+			cos(bobcounter)*(sm?5.:2.)*(pr?pr.bobrangex:1.)/(player.crouchfactor?player.crouchfactor:1.),
 			(sin(bobcounter*2)+1.)*6.*(pr?pr.bobrangey:1.)
 		)*bobvel+hudbobrecoil1;
+		Console.Printf("%f", player.crouchfactor);
 		hudbobrecoil1=hudbobrecoil1*0.2+hudbobrecoil2;
 		hudbobrecoil2=hudbobrecoil3;
 		hudbobrecoil3=hudbobrecoil4;
