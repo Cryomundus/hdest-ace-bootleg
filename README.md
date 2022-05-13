@@ -35,3 +35,5 @@ For the most part this build is the same as the master branch at any given time.
 	- Standard Commander Keen sprites;
 	- Archviles take less time on average to reappear;
 	- Reduced jetpack volume;
+- Miscellaneous:
+	- Corruption Cards support. Somewhat. Removes cards that do not mix well with CC.

@@ -244,7 +244,7 @@ class HDArmourWorn:HDDamageHandler{
 	){
 		vector2 coords=
 			(hdflags&HDSB_AUTOMAP)?(4,86):
-			(hdflags&HDSB_MUGSHOT)?((sb.hudlevel==1?-85:-55),-4):
+			(hdflags&HDSB_MUGSHOT)?((sb.hudlevel==1?-85:-65),-4):
 			(0,-sb.mIndexFont.mFont.GetHeight()*2)
 		;
 		string armoursprite=mega?"ARMCA0":"ARMSA0";
