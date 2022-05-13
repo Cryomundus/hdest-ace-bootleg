@@ -253,6 +253,11 @@ class HDPuff:HDActor{
 
 		NextTic();
 	}
+	override void BeginPlay()
+	{
+		ChangeStatNum(STAT_USER);
+		Super.BeginPlay();
+	}
 }
 class HDBulletPuff:HDPuff{
 	int scarechance;
@@ -344,10 +349,15 @@ class HDSmoke:HDPuff{
 		hdpuff.grow 0.02;
 		hdpuff.minalpha 0.005;
 	}
+	override void BeginPlay()
+	{
+		ChangeStatNum(STAT_USER + 2);
+		Super.BeginPlay();
+	}
 	override void postbeginplay(){
 		actor smm;
 		int bcc=0;
-		thinkeriterator bexpm=ThinkerIterator.create(GetClass(), STAT_DEFAULT);
+		thinkeriterator bexpm=ThinkerIterator.create(GetClass(), STAT_USER + 2);
 		actor osm;
 		while(smm=actor(bexpm.next())){
 			if(
@@ -408,7 +418,24 @@ class HDFlameRed:HDPuff{
 	spawn:
 		BAL1 A 0 nodelay A_SpawnItemEx("HDRedFireLight",flags:SXF_SETTARGET);
 		BAL1 ABCDE 1;
-		TNT1 A 0 A_CheckProximity("death","HDFlameRed",64,4,CPXF_LESSOREQUAL);
+		TNT1 A 0
+		{
+			ThinkerIterator it = ThinkerIterator.Create('HDFlameRed', STAT_USER);
+			Actor a = null;
+			int count = 0;
+			while (a = Actor(it.Next()))
+			{
+				if (Distance3D(a) <= 64)
+				{
+					count++;
+				}
+				if (count == 4)
+				{
+					SetStateLabel('Death');
+					break;
+				}
+			}
+		}
 		stop;
 	death:
 		TNT1 A 0{

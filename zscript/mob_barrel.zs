@@ -87,7 +87,7 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 	void A_BarrelCheckCrowd(){
 		int bcc=0;
 		barrelexplodemarker bpm;
-		thinkeriterator bexpm=ThinkerIterator.create("BarrelExplodeMarker");
+		thinkeriterator bexpm=ThinkerIterator.create("BarrelExplodeMarker", STAT_USER + 1);
 		while(bpm=barrelexplodemarker(bexpm.next(true))){
 			bcc++;
 			if(bcc>random(1,12)){
@@ -122,19 +122,8 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 			A_NoBlocking();
 			A_SetSize(-1,deathheight);
 			bsolid=false;
-			new("BarrelExplodeMarker");
-
-			//set counter for spawning chunks in a crowd
-			stamina=0;
-			blockthingsiterator a=blockthingsiterator.create(self,320);
-			while(a.next()){
-				if(
-					a.thing is "BarrelExplodeMarker"
-				){
-					stamina++;
-				}
-			}
-
+			Thinker t = new("BarrelExplodeMarker");
+			t.ChangeStatNum(STAT_USER + 1);
 			actor xpl=spawn("HDExplosionLight",pos,ALLOW_REPLACE);
 			xpl.target=self;xpl.stamina=256;
 		}
