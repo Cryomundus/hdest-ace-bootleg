@@ -326,7 +326,7 @@ class ItemStorage play
 			// [Ace] This can be 0 in the event of purging ammo.
 			if (mag.Mags.Size() > 0)
 			{
-				iconAmt = mag.Mags[0];
+				iconAmt = mag.Mags[mag.Mags.Size() - 1];
 			}
 		}
 		string Icon = GetIcon(item, iconAmt);
@@ -459,7 +459,7 @@ class ItemStorage play
 					{
 						// [Ace] Gotta fetch the icon for the current magazine in the iteration.
 						// The code near the top only does it for the very first inserted mag.
-						si.Icons.Insert(index, GetIcon(mag, mag.Mags[0]));
+						si.Icons.Insert(index, GetIcon(mag, mag.Mags[mag.Mags.Size() - 1]));
 					}
 					si.Bulks.Insert(index, MagBulk);
 					si.Amounts.Insert(index, mag.TakeMag(false));
