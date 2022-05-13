@@ -25,6 +25,7 @@ For the most part this build is the same as the master branch at any given time.
 	- BossBrain does not cause a VM abort with followers sometimes when loading save games;
 	- Checkin names are not multiplied in co-op;
 - Various tweaks:
+	- Archviles only need 4 times to be pained in order to die instead of 6.
 	- You can pick stuff up while incapped;
 	- Living actor climbing is less insufferable;
 	- 90 seconds of air supply underwater instead of the standard 20.
