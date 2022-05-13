@@ -274,7 +274,7 @@ class Necromancer:HDMobBase replaces ArchVile{
 		}
 	}
 	override void beginplay(){
-		hitsleft=bfriendly?7:6;
+		hitsleft=bfriendly?7:4;
 		super.beginplay();
 	}
 	override void postbeginplay(){
