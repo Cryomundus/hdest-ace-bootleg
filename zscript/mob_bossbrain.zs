@@ -70,6 +70,7 @@ class bossbrainspawnsource:hdactor{
 		if(!(flags&BOSF_NOTELE))spawn("TeleFog",pos,ALLOW_REPLACE);
 		let bbs=spawn(spawntype,pos,ALLOW_REPLACE);
 		bbs.master=master;bbs.target=target;
+		bbs.bbossspawned=true;
 		if(flags&BOSF_USEANGLE)bbs.angle=angle;else bbs.angle=frandom(0,360);
 		stamina-=accuracy;
 		if(stamina<1)destroy();
@@ -130,12 +131,10 @@ class HDBossCube:bossbrainspawnsource{
 		BOSF ABCD 3;
 		loop;
 	pain:
-		TNT1 AAAAA 0 A_SpawnItemEx("NecroShard",
+		TNT1 AAAAA 0 A_SpawnItemEx("BossShard",
 			0,0,frandom(0,6),10,0,vel.z,flags:SXF_NOCHECKPOSITION
 		);
-		TNT1 A 0 A_SpawnItemEx("NecroGhostShard",
-			0,0,frandom(0,6),10,0,vel.z,flags:SXF_TRANSFERPOINTERS|SXF_NOCHECKPOSITION
-		);
+		TNT1 A 0{NecromancerGhost.Init(self,50);}
 		TNT1 A 0 spawn("HDExplosion",pos,ALLOW_REPLACE);
 		stop;
 	death:
@@ -173,6 +172,8 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 			!bincombat
 			||damage==TELEFRAG_DAMAGE
 			||mod=="crush"
+			||HDB_scrap(inflictor)
+			||HDBarrel(inflictor)
 		){
 			bshootable=false;
 			setstatelabel("deathfade");
@@ -211,10 +212,10 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 		}
 
 		DistantQuaker.Quake(
-			self,4,120,8192,10,
+			self,4,120,16384,10,
 			HDCONST_SPEEDOFSOUND,
-			HDCONST_MINDISTANTSOUND*2,
-			HDCONST_MINDISTANTSOUND*4
+			HDCONST_SPEEDOFSOUND*10,
+			HDCONST_SPEEDOFSOUND*5
 		);
 
 		return returnvalue;
@@ -251,8 +252,8 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 		DistantQuaker.Quake(
 			self,random(4,7),120,16384,10,
 			HDCONST_SPEEDOFSOUND,
-			16384,
-			HDCONST_MINDISTANTSOUND*4
+			HDCONST_SPEEDOFSOUND*10,
+			HDCONST_SPEEDOFSOUND*5
 		);
 	}
 	default{
@@ -261,6 +262,7 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 		+oldradiusdmg
 		+hdmobbase.noblurgaze
 		+dontthrust
+		-ismonster
 	}
 	override void postbeginplay(){
 		paintimes=0;
@@ -272,9 +274,9 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 		wait;
 	pain:
 		TNT1 AAAAAAAAAAAAAAAA 0 A_SpawnItemEx("TyrantWallSplodeDelayed",
-			frandom(80,120),frandom(-20,20),frandom(64,82),
+			frandom(80,120),frandom(-30,30),frandom(74,82),
 			frandom(4,20),0,frandom(-4,4),
-			frandom(-1,1),SXF_NOCHECKPOSITION
+			frandom(-10,10),SXF_NOCHECKPOSITION
 		);
 		MISL B 10;
 		BBRN B 70 A_BrainPain();
@@ -282,14 +284,18 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 		---- A 0{bshootable=true;}
 		goto spawn;
 	death:
-		MISL B 10;
+		BBRN BBBBBBBBBB 1 A_SpawnItemEx("TyrantWallSplodeDelayed",
+			frandom(80,120),frandom(-30,30),frandom(74,82),
+			frandom(4,20),0,frandom(-4,4),
+			frandom(-10,10),SXF_NOCHECKPOSITION
+		);
 		BBRN B 70 A_BrainPain();
 		BBRN B 100;
 
 		TNT1 AAAAAAA 0 A_SpawnItemEx("TyrantWallSplode",
-			frandom(100,140),frandom(-30,30),frandom(64,82),
-			frandom(20,30),0,frandom(-4,4),
-			frandom(-2,2),SXF_NOCHECKPOSITION
+			frandom(100,140),frandom(-30,30),frandom(74,82),
+			frandom(4,20),0,frandom(-4,4),
+			frandom(-20,20),SXF_NOCHECKPOSITION
 		);
 
 		BBRN A 20{
@@ -319,12 +325,12 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 		TNT1 AAAAAAAAAAAAAAAA 0 A_SpawnItemEx("TyrantWallSplode",
 			frandom(100,140),frandom(-30,30),frandom(64,82),
 			frandom(20,30),0,frandom(-4,4),
-			frandom(-2,2),SXF_NOCHECKPOSITION
+			frandom(-20,20),SXF_NOCHECKPOSITION
 		);
 		TNT1 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0 A_SpawnItemEx("TyrantWallSplode",
-			frandom(100,340),frandom(-100,100),frandom(-100,156),
+			frandom(140,340),frandom(-100,100),frandom(-100,156),
 			frandom(12,24),0,frandom(-4,4),
-			frandom(-2,2),SXF_NOCHECKPOSITION
+			frandom(-20,20),SXF_NOCHECKPOSITION
 		);
 		BBRN A 0 A_DeathQuake(false);
 		BBRN A 0 A_StartSound("brain/death",CHAN_BODY,attenuation:ATTN_NONE);
@@ -344,28 +350,27 @@ class HDBossBrain:HDMobBase replaces BossBrain{
 		BBRN AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1{
 			A_SetTics(randompick(0,0,0,1));
 			A_SpawnItemEx("TyrantWallSplode",
-				frandom(100,240),frandom(-600,600),frandom(-300,300),
+				frandom(120,240),frandom(-600,600),frandom(-300,300),
 				frandom(10,20),0,frandom(-2,2),
 				frandom(-2,2),SXF_NOCHECKPOSITION
 			);
 		}
 		BBRN AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1 A_SpawnItemEx("TyrantWallSplode",
-			frandom(100,240),frandom(-500,500),frandom(-300,300),
+			frandom(120,240),frandom(-500,500),frandom(-300,300),
 			frandom(10,20),0,frandom(-2,2),
 			frandom(-1,1),SXF_NOCHECKPOSITION
 		);
 		BBRN AAAAAAAAAAAAAAAAA 2 A_SpawnItemEx("TyrantWallSplode",
-			random(100,240),random(-500,500),random(-300,300),
+			random(120,240),random(-500,500),random(-300,300),
 			random(10,20),0,random(-2,2),
 			frandom(-1,1),SXF_NOCHECKPOSITION
 		);
-		BBRN A 0 A_BrainDie();
 		BBRN AAAAAAAAAAA 6 A_SpawnItemEx("TyrantWallSplode",
-			random(100,240),random(-500,500),random(-300,300),
+			random(120,240),random(-500,500),random(-300,300),
 			random(10,20),0,random(-2,2),
-			frandom(-3,3),SXF_NOCHECKPOSITION,72
+			frandom(-3,3),SXF_NOCHECKPOSITION
 		);
-		BBRN A -1;
+		BBRN A -1 A_BrainDie();
 		stop;
 
 	death.instafade:
@@ -387,20 +392,14 @@ class TyrantWallSplode:HDExplosion{
 	states{
 	spawn:
 		TNT1 A 0 nodelay{
-			scale*=frandom(1.3,2.);
+			scale*=frandom(1.3,3.);
 			A_StartSound("world/explode",CHAN_AUTO,attenuation:0.8);
-			setz(frandom(floorz,ceilingz));
-			for(int i=0;i<10;i++){
-				let aaa=spawn("WallChunk",pos);
-				aaa.vel=(frandom(-40,40),frandom(-40,40),frandom(-4,20));
+			for(int i=0;i<12;i++){
+				let aaa=spawn(random(0,3)?"WallChunk":"HDSmokeChunk",pos);
+				aaa.vel=(frandom(-14,14),frandom(-14,14),frandom(-1,7));
 				aaa.scale*=frandom(3,10);
 			}
 		}
-		TNT1 AA 0 A_SpawnItemEx("HDSmokeChunk",
-			0,0,0,
-			vel.x+frandom(-12,12),vel.y+frandom(-12,12),vel.z+frandom(4,8),
-			0,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS|SXF_ABSOLUTEMOMENTUM,96
-		);
 		TNT1 AAAAA 0 A_SpawnItemEx("HDSmoke",frandom(-12,12),frandom(-12,12),frandom(0,7));
 		MISL BCDD 3 bright A_FadeOut (0.2);
 		stop;
@@ -411,6 +410,56 @@ class TyrantWallSplodeDelayed:TyrantWallSplode{
 	spawn:
 		TNT1 A 1 nodelay A_SetTics(random(3,20));
 		goto super::spawn;
+	}
+}
+
+
+class BossShard:HDActor{
+	default{
+		+missilemore
+		+nointeraction
+		+bright
+		+forcexybillboard
+		scale 0.2;
+		height 0;
+		radius 0;
+		translation 1;
+		renderstyle "add";
+	}
+	vector3 thrustvel;
+	override void postbeginplay(){
+		super.postbeginplay();
+		updatethrustvel();
+	}
+	void updatethrustvel(){
+		thrustvel=(cos(pitch)*(cos(angle),sin(angle)),-sin(pitch))*0.2;
+	}
+	states{
+	spawn:
+		APLS AB 1{
+			vel*=0.9;
+			vel+=thrustvel;
+			if(!bmissilemore)vel+=(frandom(-0.4,0.4),frandom(-0.4,0.4),frandom(-0.05,0.1));
+			if(!random(0,255)){
+				angle+=frandom(-40,40);
+				pitch=normalize180(pitch+frandom(-40,40));
+				updatethrustvel();
+			}
+			if(
+				bmissilemore
+				&&!(level.time&(1|2))
+			){
+				let sss=spawn("BossShard",pos,ALLOW_REPLACE);
+				if(sss){
+					sss.angle=angle+frandom(-20,20);
+					sss.pitch=pitch+frandom(-20,20);
+					sss.vel=(vel.xy,vel.z+frandom(0,0.3));
+					sss.bmissilemore=false;
+				}
+			}
+			A_FadeOut(0.005);
+			scale*=1.002;
+		}wait;
 	}
 }
 
@@ -444,7 +493,6 @@ class HDBossEye:HDActor replaces BossEye{
 		}
 
 		string allmessages=Wads.ReadLump(Wads.CheckNumForName("bbtalk",0));
-		allmessages.Replace("\r","");
 
 		//set up array of intros
 		int dashpos=allmessages.indexof("---");
@@ -497,11 +545,11 @@ class HDBossEye:HDActor replaces BossEye{
 		thismessage.replace("/","\n\n\cj");
 		double messecs=max(2.,thismessage.length()*0.08);
 		A_PrintBold("\cj"..thismessage,messecs,"newsmallfont");
-//		HDPlayerPawn.MassGameTip("\cj"..thismessage);
 		intromessages.delete(msgsize);
 	}
 	override void tick(){
 		super.tick();
+		if(isfrozen())return;
 
 		//harass the player if they're doing too well
 		if(
@@ -532,14 +580,37 @@ class HDBossEye:HDActor replaces BossEye{
 				thismessage!=""
 				&&thismessage!=" "
 			)
-//			HDPlayerPawn.MassGameTip("\cj"..thismessage);
 			A_PrintBold("\cj"..thismessage,messecs,"newsmallfont");
 			messageticker+=int(messecs*35);
 		}else if(messageticker>0)messageticker--;
+
+		//spread chaos if dead
+		if(
+			master
+			&&master.health<1
+			&&(
+				!stamina
+				||!(level.time&1)
+			)
+		){
+			if(stamina>0)stamina--;
+			if(!random(0,stamina)){
+				flinetracedata tlt;
+				linetrace(
+					frandom(-160,160),
+					16384,
+					frandom(-90,90),
+					offsetz:32,
+					data:tlt
+				);
+				spawn("TyrantWallSplode",tlt.hitlocation-tlt.hitdir,ALLOW_REPLACE);
+			}
+		}
 	}
 	default{
 		-solid -shootable +noblockmap +lookallaround +nointeraction
-		maxtargetrange 8192;
+		maxtargetrange 16384;
+		stamina 100;
 	}
 	void A_ShootCube(){
 		if(!target||!checksight(target))return;
@@ -604,4 +675,3 @@ class Zaplinger:IdleDummy{
 		}
 	}
 }
-
