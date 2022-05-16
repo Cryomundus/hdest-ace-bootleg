@@ -216,6 +216,60 @@ class HeckFire:HDActor{
 	}
 }
 
+class NecromancerGhost:Thinker{
+	int targetplayer;
+	int ticker;
+	bool bfriendly;
+	actor ghoster;
+	static void Init(actor caller,int time=-1){
+		let nnn=new("NecromancerGhost");
+		nnn.bfriendly=caller.bfriendly;
+		nnn.targetplayer=caller.friendplayer-1;
+		nnn.ghoster=caller;
+		if(time<0)nnn.ticker=TICRATE*random(60,600);
+	}
+	override void tick(){
+		ticker--;
+		if(ticker&(1|2|4|8|16))return;
+		if(ticker<=0){
+			if(!multiplayer)targetplayer=0;
+			else if(
+				targetplayer<0
+				||targetplayer>=MAXPLAYERS
+				||hdspectator(players[targetplayer].mo)
+				||!hdplayerpawn(players[targetplayer].mo)
+			){
+				array<int> pcs;pcs.clear();
+				for(int i=0;i<MAXPLAYERS;i++){
+					if(
+						hdplayerpawn(players[i].mo)
+						&&!hdspectator(players[i].mo)
+					)pcs.push(i);
+				}targetplayer=pcs[random(0,pcs.size()-1)];
+			}
+			actor pmo=players[targetplayer].mo;
+			if(!ticker||!random(0,15)){
+				pmo.A_StartSound("vile/active",420,CHANF_UI|CHANF_NOPAUSE|CHANF_LOCAL);
+				if(!ticker)return;
+			}
+			if(!random(0,7)){
+				actor aaa;
+				blockthingsiterator it=blockthingsiterator.create(pmo,HDCONST_ONEMETRE*5);
+				while(it.next()){
+					aaa=it.thing;
+					if(
+						aaa.bcorpse
+						&&aaa.findstate("raise")
+					){
+						HDRaiser.Init(aaa,ghoster,random(35,200));
+					}
+				}
+			}
+		}
+		if(ticker<(-TICRATE*60))destroy();
+	}
+}
+
 class Necromancer:HDMobBase replaces ArchVile{
 	string nickname;
 	default{
@@ -264,12 +318,7 @@ class Necromancer:HDMobBase replaces ArchVile{
 					abs(aaa.pos.y-caller.pos.y),
 					abs(aaa.pos.z-caller.pos.z)
 				));
-				actor hhh=spawn("HDRaiser",aaa.pos,ALLOW_REPLACE);
-				hhh.A_SetFriendly(caller.bfriendly);
-				hhh.friendplayer=caller.friendplayer;
-				hhh.master=aaa;
-				hhh.tracer=caller;
-				hhh.stamina=(dist>>3)+random(10,30);
+				HDRaiser.Init(aaa,caller,(dist>>3)+random(10,30));
 			}
 		}
 	}
@@ -586,20 +635,32 @@ class LightBearer:Necromancer{
 		species "LightBearer";
 	}
 }
-class HDRaiser:Actor{
-	default{
-		+nointeraction
+class HDRaiser:Thinker{
+	actor corpse,raiser;
+	int ticker,friendplayer;
+	static HDRaiser Init(
+		actor cps,
+		actor rsr,
+		int time
+	){
+		let hdr=HDRaiser(new("HDRaiser"));
+		hdr.corpse=cps;
+		hdr.raiser=rsr;
+		hdr.ticker=time;
+		return hdr;
 	}
-	void A_RaiseThis(){
-		if(!master||master.health>0){destroy();return;}
-		A_RaiseMaster(RF_TRANSFERFRIENDLINESS|RF_NOCHECKPOSITION);
-		master.master=tracer;
-	}
-	states{
-	spawn:
-		TNT1 A 10 nodelay A_SetTics(stamina);
-		TNT1 A 0 A_RaiseThis();
-		stop;
+	override void Tick(){
+		if(!corpse||corpse.health>0){destroy();return;}
+		if(ticker>0)ticker--;
+		else{
+			if(!!raiser){
+				corpse.target=raiser.target;
+				corpse.master=raiser;
+				corpse.bfriendly=(raiser.bfriendly||!!raiser.player);
+				if(raiser.player)corpse.friendplayer=raiser.playernumber()+1;
+			}
+			corpse.RaiseActor(corpse,RF_NOCHECKPOSITION);
+		}
 	}
 }
 
