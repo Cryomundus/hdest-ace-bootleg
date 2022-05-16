@@ -715,8 +715,10 @@ class DistantQuaker:IdleDummy{
 			if(max(abs(pos.x),abs(pos.y),abs(pos.z))>32000)return;
 			if(wave){
 				A_StartSound("weapons/subfwoosh",CHAN_AUTO,volume:0.1*intensity);
-				if(target && target.pos.z<target.floorz+8)
-					A_QuakeEx(
+				if(
+					target
+					&&target.pos.z-target.floorz<256
+				)A_QuakeEx(
 						0,0,intensity,mass,0,16,deathsound,
 						QF_SCALEDOWN|QF_WAVE,0,0,frequency,0,int(mass*0.62)
 					);
