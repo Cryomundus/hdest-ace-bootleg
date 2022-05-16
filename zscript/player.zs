@@ -75,6 +75,7 @@ class HDPlayerPawn:PlayerPawn{
 		player.gruntspeed 9999999999.0;
 		player.displayname "Operator";
 		player.crouchsprite "PLYC";
+		player.aircapacity 4.5;
 
 		hdplayerpawn.loadout "";
 		hdplayerpawn.maxpocketspace HDCONST_MAXPOCKETSPACE;
