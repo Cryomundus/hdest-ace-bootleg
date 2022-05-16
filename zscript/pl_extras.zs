@@ -203,7 +203,7 @@ extend class HDPlayerPawn{
 			int mcc=MantleCheck();
 			if(
 				player.crouchoffset
-				&&!mcc
+				&&mcc<1
 			){
 				//roll instead of stand
 				double moveangle=absangle(angle,HDMath.AngleTo((0,0),vel.xy));
@@ -241,8 +241,7 @@ extend class HDPlayerPawn{
 					else rollamt=-20-sqrt(vxysq);
 					if(rollamt){
 						ForwardRoll(int(rollamt),FROLL_VOLUNTARY);
-						if(player.onground)
-							A_ChangeVelocity(rollamt*0.2,0,abs(rollamt)*0.1,CVF_RELATIVE);
+						A_ChangeVelocity(rollamt*0.2,0,player.onground?abs(rollamt)*0.1:0,CVF_RELATIVE);
 						return;
 					}
 				}else maxstepheight=mshbak;

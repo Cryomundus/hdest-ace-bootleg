@@ -372,6 +372,7 @@ extend class HDMobBase{
 		bool ckmv=true;
 		int ckrg=int(clamp(speed*speedmult*frandom(0.2,0.5),3,16));
 		maxdropoffheight=maxstepheight;
+		blockingline=null;
 		for(int i=0;i<ckrg;i++){
 			if(
 				!CheckMove(pathcheck+vectp*i,PCM_DROPOFF)
