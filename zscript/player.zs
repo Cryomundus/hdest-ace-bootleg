@@ -119,9 +119,9 @@ class HDPlayerPawn:PlayerPawn{
 		else if(
 			!barehanded
 			&&!gunbraced
-			&&zerk<1
 			&&floorz==pos.z
 			&&!countinv("IsMoving")
+			&&!countinv("HDZerk")
 		){
 			double zat2=(getzat(16*heightmult)-floorz-height);
 			if(zat2<0 && zat2>=-30*heightmult){
@@ -356,8 +356,6 @@ extend class HDPlayerPawn{
 		bloodpressure=0;beatcounter=0;
 		fatigue=0;
 		stunned=0;
-		stimcount=0;
-		zerk=0;
 
 		bloodloss=0;
 		healthcap=maxhealth();
@@ -378,14 +376,6 @@ extend class HDPlayerPawn{
 		oldwoundcount=min(90,oldwoundcount-1);
 		burncount=min(90,burncount-1);
 		if(!random(0,7))aggravateddamage--;
-
-		if(secondflesh>0){
-			int seconded=min(secondflesh,oldwoundcount);
-			secondflesh=0;
-			oldwoundcount-=seconded;
-			seconded=random(-100,seconded);
-			if(seconded>0)aggravateddamage+=seconded;
-		}
 
 		givebody(max(0,maxhealth()-health));
 

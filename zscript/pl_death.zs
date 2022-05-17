@@ -199,7 +199,6 @@ extend class HDPlayerPawn{
 		return 1;
 	}
 	void healthreset(){
-		regenblues=0;
 		woundcount=0;
 		oldwoundcount=0;
 		unstablewoundcount=0;
@@ -207,7 +206,6 @@ extend class HDPlayerPawn{
 		aggravateddamage=0;
 		stunned=0;
 		bloodloss=0;
-		secondflesh=0;
 	}
 }
 

@@ -69,15 +69,12 @@ class HDWeaponGrabber:HDWeapon{
 				)
 			)
 		);
-		bool zerk=(
-			hdplayerpawn(self)
-			&&hdplayerpawn(self).zerk>100
-		);
 		//chance to break away
 		if(resisting){
 			vel+=(frandom(-1,1),frandom(-1,1),frandom(-1,1));
 			let grabbedmass=grabbed.mass;
-			if(frandom(grabbedmass*0.1,grabbedmass)>frandom(mass*0.6,mass*(zerk?5:1))){
+			double strength=hdplayerpawn(self)?hdplayerpawn(self).strength:1.;
+			if(frandom(grabbedmass*0.1,grabbedmass)>frandom(mass*0.6,mass*strength)){
 				vector2 thrustforce=(cos(angle),sin(angle))*frandom(0.,2.);
 				grabbed.vel.xy+=thrustforce*min(mass/grabbed.mass,1.);
 				vel.xy-=thrustforce;
@@ -236,6 +233,7 @@ class HDFist:HDWeaponGrabber replaces Fist{
 		return null;
 	}
 	double strength;
+	bool zerk;
 	action void A_StrengthTics(int mintics,int maxtics=-1){
 		if(invoker.strength==1.)return;
 		if(maxtics<0)maxtics=tics;
@@ -251,7 +249,8 @@ class HDFist:HDWeaponGrabber replaces Fist{
 		}
 		let hdp=hdplayerpawn(owner);
 		strength=hdp?hdp.strength:1.;
-		if(owner.countinv("HDZerk")>HDZerk.HDZERK_COOLOFF){
+		zerk=HDZerk.IsZerk(owner);
+		if(zerk){
 			strength*=1.2;
 			if(!random[zrkbs](0,70)){
 				static const string zrkbs[]={"kill","k i l l","k I L L","K\n   I\n       L\n          L","Kill.","KILL","k i l l","Kill!","K  I  L  L","kill...","Kill...","k i l l . . .","      kill","  ... kill ...","kill,","kiiiilllll!!!","kill~","kill <3","kill uwu"};
@@ -396,7 +395,7 @@ class HDFist:HDWeaponGrabber replaces Fist{
 					punchee.bismonster
 					||!!punchee.player
 				)
-				&&countinv("HDZerk")>HDZerk.HDZERK_COOLOFF
+				&&invoker.zerk
 			){
 				if(
 					punchee.bcorpse
@@ -467,7 +466,6 @@ class HDFist:HDWeaponGrabber replaces Fist{
 			if(
 				hdp.fatigue>HDCONST_SPRINTFATIGUE
 				||hdp.stunned>0
-				||hdp.zerk<0
 				||hdp.strength<0.9
 				||(
 					!player.onground
@@ -480,7 +478,7 @@ class HDFist:HDWeaponGrabber replaces Fist{
 
 			hdp.fatigue+=4;
 			A_ChangeVelocity(
-				hdp.strength*(hdp.zerk>0?8:6)/max(1.,hdp.overloaded),
+				hdp.strength*(invoker.zerk?8:6)/max(1.,hdp.overloaded),
 				0,0,CVF_RELATIVE
 			);
 		}

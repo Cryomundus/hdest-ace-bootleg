@@ -268,25 +268,20 @@ extend class HDPlayerPawn{
 				&&notpredicting
 				&&!isfrozen()
 			){
+				bool zrk=HDZerk.IsZerk(self);
 				bool poscmd=leanmove>0;
-				bool zrk=zerk>0;
-				if(zrk&&!random(0,63)){
-					JumpCheck(0,poscmd?1024:-1024,true);
-					leaned=0;
-				}else{
-					let a = Angle - 90;
+				let a = Angle - 90;
+				leaned=clamp(poscmd?leaned+1:leaned-1,-8,8);
+				if(zrk){
 					leaned=clamp(poscmd?leaned+1:leaned-1,-8,8);
-					if(zrk){
-						leaned=clamp(poscmd?leaned+1:leaned-1,-8,8);
-						leanamt*=2;
-					}
-					if(!poscmd)leanamt=-leanamt;
-					if(abs(leaned)<8){
-						TryMove(
-							pos.xy+(cos(a),sin(a))*leanamt,
-							false
-						);
-					}
+					leanamt*=2;
+				}
+				if(!poscmd)leanamt=-leanamt;
+				if(abs(leaned)<8){
+					TryMove(
+						pos.xy+(cos(a),sin(a))*leanamt,
+						false
+					);
 				}
 			}
 

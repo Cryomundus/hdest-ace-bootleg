@@ -290,7 +290,7 @@ class HDStimpacker:HDWoundFixer{
 			}
 			if(c.countinv("IsMoving")>4){
 				bool chelptext=c.getcvar("hd_helptext");
-				if(c.stimcount){
+				if(c.countinv("HDStim")){
 					if(chelptext)c.A_Print(string.format("Run away!!!\n\n%s is trying to overdose you\n\n(and possibly bugger you)...",player.getusername()));
 					if(helptext)A_WeaponMessage("They seem a bit fidgety...");
 				}else{
@@ -305,11 +305,11 @@ class HDStimpacker:HDWoundFixer{
 				(
 					(
 						invoker.injecttype=="InjectStimDummy"
-						&& c.stimcount
+						&& c.countinv("HDStim")
 					)||
 					(
 						invoker.injecttype=="InjectZerkDummy"
-						&& c.zerk
+						&& HDZerk.IsZerk(c)
 					)
 				)
 			){
@@ -347,7 +347,7 @@ class InjectStimDummy:IdleDummy{
 		TNT1 A 6 nodelay{
 			tg=HDPlayerPawn(target);
 			if(!tg||tg.bkilled){destroy();return;}
-			if(tg.zerk)tg.aggravateddamage+=int(ceil(accuracy*0.01*random(1,3)));
+			if(HDZerk.IsZerk(tg))tg.aggravateddamage+=int(ceil(accuracy*0.01*random(1,3)));
 		}
 		TNT1 A 1{
 			if(!target||target.bkilled){destroy();return;}
@@ -463,7 +463,7 @@ class InjectZerkDummy:InjectStimDummy{
 		}
 		TNT1 A 1{
 			if(!tg||tg.bkilled){destroy();return;}
-			if(tg.zerk<666){
+			if(tg.countinv("HDZerk")>HDZerk.HDZERK_COOLOFF+666){
 				if(hdplayerpawn(tg))tg.A_StartSound(hdplayerpawn(tg).xdeathsound,CHAN_VOICE);
 				else tg.A_StartSound("*xdeath",CHAN_VOICE);
 				HDPlayerPawn.Disarm(self);
@@ -472,7 +472,7 @@ class InjectZerkDummy:InjectStimDummy{
 				if(hdplayerpawn(tg))tg.A_StartSound(hdplayerpawn(tg).painsound,CHAN_VOICE);
 				else tg.A_StartSound("*pain",CHAN_VOICE);
 			}
-			if(tg.stimcount)tg.aggravateddamage+=int(ceil(tg.stimcount*0.05*random(1,3)));
+			if(tg.countinv("HDStim"))tg.aggravateddamage+=int(ceil(tg.countinv("HDStim")*0.05*random(1,3)));
 			else tg.aggravateddamage++;
 
 			let zzz=tg.findinventory("HDZerk");
@@ -504,6 +504,9 @@ class HDZerk:HDDrug{
 				:color(min(100,(amount-HDZERK_COOLOFF)>>5)+(hpl.beatcount>>2),90,14,12),
 			0,0,screen.getwidth(),screen.getheight()
 		);
+	}
+	clearscope static bool IsZerk(actor zerker){
+		return zerker.countinv("HDZerk")>HDZerk.HDZERK_COOLOFF;
 	}
 	override void DoEffect(){
 		if(amount<1)return;

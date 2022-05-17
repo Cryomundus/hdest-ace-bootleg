@@ -83,10 +83,7 @@ extend class HDPlayerPawn{
 		itemenc=0;
 
 		//set the base max speed
-		double mspd=2.8
-			*(zerk>100?1.5:1.)
-			*player.crouchfactor
-		;
+		double mspd = 2.8 * player.crouchfactor;
 
 		//add everything up
 		double stacker=1.;

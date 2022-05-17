@@ -76,8 +76,12 @@ extend class HDPlayerPawn{
 			frame=clamp(6+abs(incapacitated>>2),6,11);
 
 			//update if in the process of getting up
-			if(incapacitated<0){
-				if(zerk>0&&incapacitated<0)incapacitated=min(0,incapacitated+4);
+			if (incapacitated < 0)
+			{
+				if (HDZerk.IsZerk(self))
+				{
+					incapacitated = min(0, incapacitated + 4);
+				}
 			}
 			incapacitated++;
 
@@ -129,7 +133,10 @@ extend class HDPlayerPawn{
 			&&(
 				player.cmd.buttons&BT_JUMP
 				||player.bot
-				||(zerk>500&&!random(0,255))
+				||(
+					HDZerk.IsZerk(self)
+					&&!random(0,255)
+				)
 			)
 		){
 			scale.y=skinscale.y*heightmult;
@@ -153,7 +160,7 @@ extend class HDPlayerPawn{
 
 		if(
 			!incapacitated
-			||zerk>4000
+			||HDZerk.IsZerk(self)
 		){
 			A_Capacitated();
 		}

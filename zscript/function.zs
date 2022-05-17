@@ -441,6 +441,9 @@ struct HDMath{
 			mod=="scratch"
 			||mod=="nails"
 		)mod="claws";
+		else if(
+			mod=="invisiblebleedout"
+		)mod="bleedout";
 	}
 
 	//returns a colour code from a given cvar int

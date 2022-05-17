@@ -11,11 +11,6 @@ extend class HDPlayerPawn{
 
 	int bloodpressure;
 
-	int stimcount;
-	int regenblues;
-	int secondflesh;
-	int zerk;
-
 	actor lastthingthatwoundedyou;
 
 	int woundcount;
@@ -41,7 +36,6 @@ extend class HDPlayerPawn{
 
 	int healthcap;
 	int maxhealth(){
-		if(regenblues<0)regenblues=0;
 		if(woundcount<0)woundcount=0;
 		if(oldwoundcount<0)oldwoundcount=0;
 		if(unstablewoundcount<0)unstablewoundcount=0;
@@ -69,10 +63,6 @@ extend class HDPlayerPawn{
 
 		if(deathmatch&&sv_nohealth){
 			//force sv_nohealth
-			zerk=0;
-			stimcount=0;
-			regenblues=0;
-			secondflesh=0;
 			A_TakeInventory("HDZerk");
 			A_TakeInventory("HDStim");
 			A_TakeInventory("HDBlues");
@@ -83,24 +73,12 @@ extend class HDPlayerPawn{
 				A_SetInventory("HDZerk",HDZerk.HDZERK_MAX);
 				A_TakeInventory("PowerStrength");
 			}
-			if(zerk)A_GiveInventory("HDZerk",zerk);
-			if(stimcount)A_GiveInventory("HDStim",stimcount);
-			if(regenblues)A_GiveInventory("HDBlues",regenblues);
-			if(secondflesh)A_GiveInventory("SecondFlesh",secondflesh);
 		}
-		zerk=0;
-		stimcount=0;
-		regenblues=0;
-		secondflesh=0;
-
-
 
 		//strength gravitates back to normal
 		double sss=basestrength();
 		if(strength>sss)strength=max(sss,strength-0.002);
 		else if(strength<sss)strength=min(sss,strength+0.002);
-
-
 
 		//on every beat
 		if(beatcount>0){

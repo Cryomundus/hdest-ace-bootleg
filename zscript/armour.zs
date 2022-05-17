@@ -325,7 +325,6 @@ class HDArmourWorn:HDDamageHandler{
 			||mod=="falling"
 			||mod=="slime"
 			||mod=="bleedout"
-			||mod=="invisiblebleedout"
 			||mod=="drowning"
 			||mod=="poison"
 			||mod=="electrical"

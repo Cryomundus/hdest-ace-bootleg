@@ -163,14 +163,9 @@ extend class HDPlayerPawn{
 			flags|=(DMG_NO_ARMOR|DMG_NO_PAIN|DMG_THRUSTLESS);
 			silentdeath=true;
 
-			if(regenblues>0&&health<=damage){
-				regenblues--;
-				damage=health-random(1,3);
-			}else{
-				damage=min(health,damage);
-				if(!random(0,127))oldwoundcount++;
-			}
-
+			damage=min(health,damage);
+			if(!random(0,127))burncount++;
+			
 			bool actuallybleeding=(mod!="internal");
 			if(actuallybleeding){
 				if(hd_nobleed){

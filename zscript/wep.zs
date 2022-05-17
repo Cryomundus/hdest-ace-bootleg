@@ -142,7 +142,7 @@ class HDWeapon:Weapon{
 	action void A_ZoomRecoil(double prop){
 		let hdp=hdplayerpawn(self);
 		if(hdp){
-			if(hdp.zerk)prop=(prop+1.)*0.5;
+			if(hdp.strength)prop/=hdp.strength;
 			if(hdp.gunbraced)prop=(prop+1.)*0.5;
 			hdp.recoilfov=(hdp.recoilfov+prop)*0.5;
 		}
@@ -157,11 +157,6 @@ class HDWeapon:Weapon{
 		let p=HDPlayerPawn(self);
 		if(!p)return;
 		p.movehijacked=false;
-		if(
-			player&&
-			p&&!p.beatcount&&p.zerk>900
-			&&!random(0,(invoker is "HDFist")?20:100)
-		)player.cmd.buttons|=BT_ATTACK;
 
 		if(
 			player.bot&&
@@ -212,7 +207,7 @@ class HDWeapon:Weapon{
 		let onr=hdplayerpawn(owner);
 		bool throw=(
 			onr&&(
-				onr.zerk
+				HDZerk.IsZerk(onr)
 				||(
 					onr.player
 					&&onr.player.cmd.buttons&BT_ZOOM
@@ -250,7 +245,7 @@ class HDWeapon:Weapon{
 				vel=target.vel+
 					(cp*(cos(target.angle),sin(target.angle)),-sin(target.pitch))
 					*min(20,800/weaponbulk())
-					*((hdplayerpawn(target)&&hdplayerpawn(target).zerk>0)?frandom(1,4):1
+					*(HDZerk.IsZerk(target)?frandom(1,4):1
 				);
 			}else vel=target.vel+(cp*(cos(target.angle),sin(target.angle)),-sin(target.pitch))*4;
 			throwvel=vel dot vel;
@@ -285,30 +280,6 @@ class HDWeapon:Weapon{
 					if(spw.weapontype[i]==gcn)actualamount++;
 				}
 			}
-		}
-		let onr=hdplayerpawn(owner);
-		if(
-			!bwimpy_weapon
-			&&!hdfist(self)
-			&&onr
-			&&onr.player
-			&&onr.player.readyweapon==self
-			&&!onr.barehanded
-			&&onr.zerk
-			&&(
-				onr.player.cmd.buttons&(
-					BT_ATTACK
-					|BT_ALTATTACK
-					|BT_ZOOM
-				)
-				||bweaponbusy
-				||onr.vel.xy==(0,0)
-			)
-			&&!random(0,511)
-		){
-			onr.A_StartSound(random(0,5)?onr.xdeathsound:onr.tauntsound,CHAN_VOICE);
-			onr.A_AlertMonsters();
-			onr.dropinventory(self);
 		}
 	}
 	action void A_GunBounce(){invoker.GunBounce();}
@@ -1222,8 +1193,7 @@ extend class HDWeapon{
 		let hdp=hdplayerpawn(newowner);
 		if(hdp){
 			if(
-				(wbulk+hdp.enc)*hdmath.getencumbrancemult()
-				>((hdp.zerk>0)?4000:2000)
+				(wbulk+hdp.enc)*hdmath.getencumbrancemult()>2000
 			){
 				if(hdp.getage()>10)hdp.A_Log("You can't even move to put away your weapon. Throw something out!",true);
 				return false;

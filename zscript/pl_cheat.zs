@@ -35,9 +35,6 @@ extend class HDPlayerPawn{
 		if(name~=="stun"){
 			stunned+=amount;return true;
 		}
-		if(name~=="zerk"){
-			zerk+=amount;return true;
-		}
 		if(name~=="forwardroll"||name~=="fallroll"){
 			ForwardRoll(amount,hdplayerpawn.FROLL_VOLUNTARY);return true;
 		}
