@@ -174,6 +174,7 @@ class HDFist:HDWeaponGrabber replaces Fist{
 		+hdweapon.dontdisarm
 		+hdweapon.dontnull
 		+nointeraction
+		+WEAPON.NOAUTOFIRE
 		obituary "%o was knocked out by %k.";
 		weapon.selectionorder 100;
 		weapon.kickback 120;
