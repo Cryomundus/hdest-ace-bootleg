@@ -16,7 +16,8 @@ For the most part this build is the same as the master branch at any given time.
 - Various optimizations. More to come as more bottlenecks are spotted.
 - Various modding support:
 	- Pressing* can now be called from weapon context such as Tick overrides on the weapon itself rather than being locked to states;
-	- Radsuits can be used by NPCs now;
+	- Radsuits can be used by NPCs;
+	- A_Immolate can check sight;
 - Various bugfixes:
 	- Fixed extremely rare desync that happens if one player has CRLF line endings while the other has only LF;
 	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless;
@@ -33,7 +34,9 @@ For the most part this build is the same as the master branch at any given time.
 	- Invisibility does not hide NVGs' effect, only the overlay;
 	- NVGs don't fuck with your FOV.
 	- Standard Commander Keen sprites;
-	- Archviles take less time on average to reappear;
+	- Archviles take less time on average to reappear and they die faster;
 	- Reduced jetpack volume;
+	- Increased .355 spawn rate;
+	- Fists don't punch if you switch to them while holding fire;
 - Miscellaneous:
 	- Corruption Cards support. Somewhat. Removes cards that do not mix well with CC.
