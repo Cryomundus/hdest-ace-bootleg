@@ -44,39 +44,42 @@ class HDLoadoutMenu:GenericMenu{
 		int jw=0;int jp=0;
 		for(int i=0;i<allactorclasses.size();i++){
 			class<actor> reff=allactorclasses[i];
-			if(reff is "HDPickup"||reff is "HDWeapon"){
-				if(reff is "HDPickup"){
-					let ref=getdefaultbytype((class<hdpickup>)(reff));
-					if(ref.refid!=""){
-						string lrefid=ref.refid.makelower();
-						refids.push(lrefid);
-						nicenames.push(ref.gettag());
-						if(!(jp%5))reflist=reflist.."\n";jp++;
-						reflist=reflist.."\n\cy"..ref.refid.."\cj   "..ref.gettag();
-					}
-				}else{
-					let ref=getdefaultbytype((class<hdweapon>)(reff));
-					if(
-						ref.refid!=""
-						&&(
-							!ref.bdebugonly
-							||hd_debug>0
-						)
-					){
-						string lrefid=ref.refid.makelower();
-						refids.push(lrefid);
-						nicenames.push(ref.gettag());
-						if(!(jw%5))reflist="\n"..reflist;jw++;
+			if(reff is "HDPickup"){
+				let ref=getdefaultbytype((class<hdpickup>)(reff));
+				if(ref.refid!=""){
+					string lrefid=ref.refid.makelower();
+					refids.push(lrefid);
+					nicenames.push(ref.gettag());
+					if(!(jp%5))reflist=reflist.."\n";jp++;
+					reflist=reflist.."\n\cy"..ref.refid.."\cj   "..ref.gettag();
+				}
+			}else if(reff is "HDWeapon"){
+				let ref=getdefaultbytype((class<hdweapon>)(reff));
+				if(
+					ref.refid!=""
+					&&(
+						!ref.bdebugonly
+						||hd_debug>0
+					)
+				){
+					string lrefid=ref.refid.makelower();
+					refids.push(lrefid);
+					nicenames.push(ref.gettag());
+					if(!(jw%5))reflist="\n"..reflist;jw++;
 
-						//determine colour
-						string refidcol="\n\c"..(ref.bdebugonly?"u":(ref.bwimpy_weapon?"y":"x"));
+					//determine colour
+					string refidcol="\n\c"..(ref.bdebugonly?"u":(ref.bwimpy_weapon?"y":"x"));
 
-						//treat wimpy weapons as inventory items
-						if(ref.bwimpy_weapon)
-							reflist=reflist..refidcol..ref.refid.."\cj   "..ref.gettag();
-						else
-							reflist=refidcol..ref.refid.."\cj   "..ref.gettag()..reflist;
-					}
+					//if there are loadout codes, add them
+					string rgt=ref.gettag();
+					string loc=ref.loadoutcodes;
+					if(loc!="")rgt=rgt..loc;
+
+					//treat wimpy weapons as inventory items
+					if(ref.bwimpy_weapon)
+						reflist=reflist..refidcol..ref.refid.."\cj   "..rgt;
+					else
+						reflist=refidcol..ref.refid.."\cj   "..rgt..reflist;
 				}
 			}
 		}
@@ -206,6 +209,7 @@ class HDLoadoutMenu:GenericMenu{
 					}else if(inp~=="f"){
 						if(viewlist)viewlist=false;else viewlist=true;
 						tlcursy=0;
+						maxtextwidth=0;
 					}
 					else if(inp~=="n"){
 						if(
@@ -225,6 +229,10 @@ class HDLoadoutMenu:GenericMenu{
 		}else if(ev.Type==UIEvent.Type_Char){
 			workingstring=workingstring.left(cursx)..ev.KeyString..workingstring.mid(cursx);
 			cursx++;
+		}else if(ev.type == UIEvent.Type_WheelUp){
+			tlcursy=max(0,tlcursy-1);
+		}else if (ev.type == UIEvent.Type_WheelDown){
+			tlcursy++;
 		}
 		checkdifferent();
 		translatedloadout=gettranslatedloadout(workingstring);
@@ -463,12 +471,14 @@ class HDLoadoutMenu:GenericMenu{
 		vcurs+=SmallFont.GetHeight()*2;
 
 		s=translatedloadout;
+		maxtextwidth=max(maxtextwidth,NewSmallFont.StringWidth(s));
 		screen.DrawText(NewSmallFont,OptionMenuSettings.mFontColorValue,
-			(screen.GetWidth() - NewSmallFont.StringWidth (s) * CleanXfac_1) / 2,
+			(screen.GetWidth() - maxtextwidth * CleanXfac_1) / 2,
 			vcurs*CleanYfac_1,
 			s,DTA_CleanNoMove_1, true
 		);
 	}
+	int maxtextwidth;
 }
 
 

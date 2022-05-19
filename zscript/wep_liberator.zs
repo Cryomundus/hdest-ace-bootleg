@@ -227,6 +227,17 @@ class LiberatorRifle:AutoReloadingThingy{
 		hdweapon.refid HDLD_LIB;
 		tag "Liberator battle rifle";
 		inventory.icon "BRFLB0";
+		hdweapon.loadoutcodes "
+			\cunogl - 0/1, whether it has a launcher
+			\cunobp - 0/1, whether it is bullpup
+			\cusemi - 0/1, whether it is limited to semi
+			\culefty - 0/1, whether brass comes out on left
+			\cualtreticle - 0/1, whether to use the glowing crosshair
+			\cufrontreticle - 0/1, whether crosshair scales with zoom
+			\cufiremode - 0/1, whether you start in full auto
+			\cubulletdrop - 0-600, amount of compensation for bullet drop
+			\cuzoom - ??-70, 10x the resulting FOV in degrees
+			\cudot - 0-5";
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
 	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}

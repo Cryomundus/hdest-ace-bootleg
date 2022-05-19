@@ -55,6 +55,9 @@ class HDPistol:HDHandgun replaces Pistol{
 		tag "pistol";
 		hdweapon.refid HDLD_PISTOL;
 		hdweapon.barrelsize 10,0.3,0.5;
+		hdweapon.loadoutcodes "
+			\cuselectfire - 0/1, whether it has a fire selector
+			\cufiremode - 0/1, semi/auto, subject to the above";
 	}
 	override double weaponbulk(){
 		int mgg=weaponstatus[PISS_MAG];

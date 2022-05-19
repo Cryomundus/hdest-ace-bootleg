@@ -50,6 +50,10 @@ class Vulcanette:ZM66ScopeHaver{
 		hdweapon.barrelsize 30,3,4;
 		hdweapon.refid HDLD_VULCETT;
 		tag "Vulcanette";
+		hdweapon.loadoutcodes"
+			\cufast - 0/1, whether to start in \"fuller auto\" mode
+			\cuzoom - 16-70, 10x the resulting FOV in degrees
+			\cudot - 0-5";
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
 	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}

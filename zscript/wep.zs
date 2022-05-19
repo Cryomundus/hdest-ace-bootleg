@@ -34,6 +34,8 @@ class HDWeapon:Weapon{
 
 	string refid;
 	property refid:refid;
+	string loadoutcodes;
+	property loadoutcodes:loadoutcodes;
 
 	int wornlayer;property wornlayer:wornlayer;
 
@@ -63,6 +65,7 @@ class HDWeapon:Weapon{
 		weapon.bobrangey 0.8;
 		hdweapon.barrelsize 0,0,0;
 		hdweapon.refid "";
+		hdweapon.loadoutcodes "";
 		hdweapon.wornlayer 0;
 		tag "";
 	}

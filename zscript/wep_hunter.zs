@@ -18,6 +18,10 @@ class Hunter:HDShotgun{
 		hdweapon.refid HDLD_HUNTER;
 		tag "hunter";
 		obituary "$OB_MPSHOTGUN";
+		hdweapon.loadoutcodes "
+			\cutype - 0-2, export/regular/hacked
+			\cufiremode - 0-2, pump/semi/auto, subject to the above
+			\cuchoke - 0-7, 0 skeet, 7 full";
 	}
 	//returns the power of the load just fired
 	static double Fire(actor caller,int choke=1){

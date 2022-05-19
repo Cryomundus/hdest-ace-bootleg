@@ -29,6 +29,11 @@ class BossRifle:HDWeapon{
 		hdweapon.barrelsize 40,1,2;
 		hdweapon.refid HDLD_BOSS;
 		tag "Boss rifle";
+		hdweapon.loadoutcodes "
+			\cucustomchamber - 0/1, whether to reduce jam for less power
+			\cufrontreticle - 0/1, whether crosshair scales with zoom
+			\cubulletdrop - 0-600, amount of compensation for bullet drop
+			\cuzoom - 5-60, 10x the resulting FOV in degrees";
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
 	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}

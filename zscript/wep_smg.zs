@@ -22,6 +22,11 @@ class HDSMG:HDWeapon{
 		hdweapon.refid HDLD_SMG;
 		tag "SMG";
 		inventory.icon "SMGNA0";
+		hdweapon.loadoutcodes "
+			\cufiremode - 0-2, semi/burst/auto
+			\cufireswitch - 0-4, default/semi/auto/full/all
+			\cureflexsight - 0-1, no/yes
+			\cudot - 0-5";
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
 	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}

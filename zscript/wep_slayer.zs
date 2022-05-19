@@ -19,6 +19,8 @@ class Slayer:HDShotgun replaces HDShotgun{
 		hdweapon.barrelsize 26,1,1;
 		tag "slayer";
 		hdweapon.refid HDLD_SLAYER;
+		hdweapon.loadoutcodes "
+			\culchoke, rchoke - 0-7, 0 skeet, 7 full";
 	}
 	static void Fire(actor caller,bool right,int choke=7){
 		double shotpower=getshotpower();

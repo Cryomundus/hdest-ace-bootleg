@@ -17,6 +17,9 @@ class HDRL:HDWeapon{
 		hdweapon.barrelsize 32,3.1,5;
 		hdweapon.refid HDLD_LAUNCHR;
 		tag "rocket launcher";
+		hdweapon.loadoutcodes"
+			\cuheat - 0/1, whether you start with a H.E.A.T. loaded
+			\cugrenade - 0/1, whether you start in grenade mode";
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
 	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}

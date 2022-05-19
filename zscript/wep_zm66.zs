@@ -79,6 +79,12 @@ class ZM66AssaultRifle:ZM66ScopeHaver{
 		hdweapon.refid HDLD_ZM66;
 		tag "ZM66 assault rifle";
 		inventory.icon "RIGLA0";
+		hdweapon.loadoutcodes "
+			\cunogl - 0/1, whether it has a launcher
+			\cusemi - 0/1, whether it has a fire selector enabled
+			\cufiremode - 0-2, semi/auto/burst
+			\cuzoom - 16-70, 10x the resulting FOV in degrees
+			\cudot - 0-5";
 	}
 	override void tick(){
 		super.tick();

@@ -18,6 +18,8 @@ class ThunderBuster:HDCellWeapon{
 		hdweapon.barrelsize 28,1.6,3;
 		hdweapon.refid HDLD_THUNDER;
 		tag "Thunder Buster";
+		hdweapon.loadoutcodes "
+			\cualt - 0/1, whether to start in spray fire mode";
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
 	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}
