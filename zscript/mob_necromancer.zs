@@ -433,7 +433,7 @@ class Necromancer:HDMobBase replaces ArchVile{
 				A_Quake(3,36,0,360);
 				A_AlertMonsters();
 				A_Vocalize(painsound);
-				for(int i=0;i<3;i++)A_SpawnItemEx("BFGNecroShard",
+				for(int i=0;i<4;i++)A_SpawnItemEx("BFGNecroShard",
 					0,0,42,flags:SXF_SETMASTER|SXF_TRANSFERPOINTERS
 				);
 			}else return actor.damagemobj(
