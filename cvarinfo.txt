@@ -17,6 +17,7 @@ server noarchive bool hd_disintegrator=false;
 server noarchive bool hd_flagpole=false;
 server noarchive bool hd_dropeverythingondeath=false;
 server noarchive bool hd_persistentlives=false;
+server bool hd_invulinvuln = false;
 
 //difficulty
 server float hd_encumbrance=1.;
