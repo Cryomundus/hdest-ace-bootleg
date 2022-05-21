@@ -190,7 +190,7 @@ class HERPBot:HDUPK{
 				&&!hitactor.bnevertarget
 				&&(hitactor.bismonster||hitactor.player)
 				&&(!hitactor.player||!(hitactor.player.cheats&CF_NOTARGET))
-				&&hitactor.health>random((hitactor.vel==(0,0,0)&&random(0,99))?0:-2,5)
+				&&hitactor.health>random((hitactor.vel==(0,0,0))?0:-10,5)
 				&&hitactor.checksight(self)
 			){
 				target=hitactor;
@@ -332,7 +332,10 @@ class HERPBot:HDUPK{
 		HERP A 0{
 			if(ammo[0]<1){
 				setstatelabel("swapmag");
-			}else if(target && target.health>random(-10,10)){
+			}else if(
+				target
+				&&target.health>random(-10,5)
+			){
 				flinetracedata herpline;
 				linetrace(
 					angle,4096,pitch,
@@ -421,7 +424,7 @@ class HERPBot:HDUPK{
 		HERP A 1 A_StartSound("weapons/bigcrack",15);
 		HERP A 1 A_StartSound("weapons/bigcrack",16);
 		HERP A 1 A_StartSound("weapons/bigcrack",17);
-		HERP AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0 A_SpawnItemEx("HugeWallChunk",random(-6,6),random(-6,6),random(0,6), vel.x+random(-6,6),vel.y+random(-6,6),vel.z+random(1,8),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
+		HERP AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0 A_SpawnItemEx("HugeWallChunk",frandom(-6,6),frandom(-6,6),frandom(0,6), vel.x+frandom(-6,6),vel.y+frandom(-6,6),vel.z+frandom(1,8),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
 		HERP A 0{
 			A_StartSound("weapons/vulcandown",CHAN_WEAPON,CHANF_OVERLAP);
 			string yay="";
@@ -448,9 +451,9 @@ class HERPBot:HDUPK{
 			if(!random(0,3))yay="\cg"..yay;
 			message(yay);
 		}
-		HERP AAA 1 A_SpawnItemEx("HDSmoke",random(-2,2),random(-2,2),random(-2,2), vel.x+random(-2,2),vel.y+random(-2,2),vel.z+random(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
-		HERP AAA 3 A_SpawnItemEx("HDSmoke",random(-2,2),random(-2,2),random(-2,2), vel.x+random(-2,2),vel.y+random(-2,2),vel.z+random(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
-		HERP AAA 9 A_SpawnItemEx("HDSmoke",random(-2,2),random(-2,2),random(-2,2), vel.x+random(-2,2),vel.y+random(-2,2),vel.z+random(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
+		HERP AAA 1 A_SpawnItemEx("HDSmoke",frandom(-2,2),frandom(-2,2),frandom(-2,2), vel.x+frandom(-2,2),vel.y+frandom(-2,2),vel.z+frandom(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
+		HERP AAA 3 A_SpawnItemEx("HDSmoke",frandom(-2,2),frandom(-2,2),frandom(-2,2), vel.x+frandom(-2,2),vel.y+frandom(-2,2),vel.z+frandom(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
+		HERP AAA 9 A_SpawnItemEx("HDSmoke",frandom(-2,2),frandom(-2,2),frandom(-2,2), vel.x+frandom(-2,2),vel.y+frandom(-2,2),vel.z+frandom(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
 	dead:
 		HERP A -1 A_SpawnPickup();
 		stop;
