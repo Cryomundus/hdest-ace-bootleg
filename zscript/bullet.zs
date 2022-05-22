@@ -1239,7 +1239,8 @@ class HDBulletActor:HDActor{
 				)?0.0005:0.00025
 			)*stamina
 			*frandom(20.,20+pushfactor-hardness)
-			+stamina*frandom(0.0005,0.005)
+			+frandom(0.0005,0.005)*stamina
+			+frandom(0,0.05)*shockbash
 		;
 
 		//reduce momentum, increase tumbling, etc.

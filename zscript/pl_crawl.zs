@@ -30,7 +30,7 @@ extend class HDPlayerPawn{
 		if(incaptimer>0){
 			incaptimer--;
 			muzzleclimb1.y+=(level.time&1)?-1:1;
-			if(incaptimer>TICRATE*360){
+			if(incaptimer>TICRATE*60*5){
 				damagemobj(null,null,1,"maxhpdrain");
 				incaptimer-=(incaptimer>>4);
 			}

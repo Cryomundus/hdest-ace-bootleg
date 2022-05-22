@@ -381,8 +381,8 @@ extend class HDPlayerPawn{
 				mod!="internal"
 				&&mod!="bleedout"
 				&&mod!="invisiblebleedout"
-				&&damage<random(12,70)
-				&&random(0,3)
+				&&damage<random(10,100)
+				&&random(0,5)
 			){
 				int wnddmg=random(0,max(0,damage>>2));
 				if(mod=="bashing")wnddmg>>=1;
@@ -501,7 +501,7 @@ extend class HDPlayerPawn{
 				mod!="bleedout"
 				||bloodloss>random(2048,3072)
 			)
-		)A_Incapacitated((originaldamage>10)?HDINCAP_SCREAM:0,originaldamage<<3);
+		)A_Incapacitated((originaldamage>10)?HDINCAP_SCREAM:0,min(finaldmg<<5,originaldamage<<3));
 
 
 		return finaldmg;
@@ -539,7 +539,12 @@ extend class HDPlayerPawn{
 			}
 			if(incapacitated)frame=clamp(6+abs(incapacitated>>2),6,11);
 		}
-		---- A 3 A_StartSound(painsound,CHAN_VOICE);
+		---- A 3{
+			if(
+				!incapacitated
+				||!random(0,3)
+			)A_StartSound(painsound,CHAN_VOICE);
+		}
 		---- A 0 setstatelabel("spawn");
 	pain.slime:
 		#### G 3{
