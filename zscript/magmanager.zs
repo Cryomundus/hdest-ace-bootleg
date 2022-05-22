@@ -226,7 +226,7 @@ class MagManager:HDWeapon{
 		if(!bp)return;
 		StorageItem si=bp.Storage.Find(type);
 		if(!si||si.HaveNone())return;
-		bp.Storage.RemoveItem(si,self,self);
+		bp.Storage.RemoveItem(si,self,self, flags: BF_FROMMANAGER);
 		bp.weaponbulk();
 	}
 	action void PutIntoBackpack(name type){
@@ -234,7 +234,7 @@ class MagManager:HDWeapon{
 		if(!bp)return;
 		let iv=inventory(findinventory(type));
 		if(!iv)return;
-		bp.Storage.TryInsertItem(iv,self);
+		bp.Storage.TryInsertItem(iv,self, flags: BF_FROMMANAGER);
 	}
 }
 

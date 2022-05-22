@@ -25,7 +25,8 @@ enum HDBackpackFlags
 	BF_FROMCONSOLIDATE = 1,
 	BF_SELECT = 1 << 1,
 	BF_IGNORECAP = 1 << 2,
-	BF_SILENT = 1 << 3
+	BF_SILENT = 1 << 3,
+	BF_FROMMANAGER = 1 << 4
 }
 
 
