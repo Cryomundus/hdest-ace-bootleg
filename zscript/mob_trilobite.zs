@@ -541,9 +541,9 @@ class Trilobite:HDMobBase replaces Cacodemon{
 				SXF_NOCHECKPOSITION|SXF_USEBLOODCOLOR
 			);
 			if(!random(0,3))HDMobFallSquishThinker.Init(self,frandom(-5,5),scale);
-			if(!(level.time&0))A_SetTics(random(1,40));
+			if(!(level.time&0))A_SetTics(random(1,accuracy));
 			accuracy++;
-			if(accuracy>300)setstatelabel("dead");
+			if(accuracy>100)setstatelabel("dead");
 		}
 		loop;
 	dead:

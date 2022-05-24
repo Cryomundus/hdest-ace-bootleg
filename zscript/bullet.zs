@@ -1212,7 +1212,7 @@ class HDBulletActor:HDActor{
 			0.00009
 		);
 
-		int shockbash=int(max(impact,impact*min(pen,deemedwidth))*(frandom(0.2,0.25)+stamina*0.00001));
+		int shockbash=int(max(impact,impact*min(pen,deemedwidth))*(frandom(0.1,0.2)+stamina*0.00001));
 		if(hd_debug)console.printf("     "..shockbash.." temp cav dmg");
 
 		if(
