@@ -414,7 +414,6 @@ struct HDMath{
 		)mod="hot";
 		else if(
 			mod=="ice"
-			||mod=="cold"
 			||mod=="freeze"
 			||mod=="cryo"
 		)mod="cold";
