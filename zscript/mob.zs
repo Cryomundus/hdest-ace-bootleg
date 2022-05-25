@@ -57,7 +57,7 @@ class HDMobBase : HDActor{
 
 		super.postbeginplay();
 
-		resetdamagecounters();bloodloss=0;
+		resetdamagecounters();
 		bplayingid=(Wads.CheckNumForName("id",0)!=-1);
 
 		movepos=pos;
