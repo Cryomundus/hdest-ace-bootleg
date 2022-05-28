@@ -8,6 +8,7 @@ For the most part this build is the same as the master branch at any given time.
 - 7.76 recasts;
 - New archviles;
 - New bronto;
+- New wound system;
 - Breakable windows;
 - Woke shit. Keep your politics and personal views out of games and mods.
 
