@@ -241,7 +241,6 @@ extend class HDPlayerPawn{
 					else rollamt=-20-sqrt(vxysq);
 					if(rollamt){
 						ForwardRoll(int(rollamt),FROLL_VOLUNTARY);
-						A_ChangeVelocity(rollamt*0.2,0,player.onground?abs(rollamt)*0.1:0,CVF_RELATIVE);
 						return;
 					}
 				}else maxstepheight=mshbak;
@@ -421,6 +420,7 @@ extend class HDPlayerPawn{
 			else fallroll=min(fallroll,amt);
 		}
 		realpitch=pitch;
+		A_ChangeVelocity(0.2*amt,0,player.onground?abs(amt)*0.1:0,CVF_RELATIVE);
 	}
 
 
@@ -607,8 +607,6 @@ extend class HDHandlers{
 		if(ppp.player){
 			int rollamt=clamp(amt,-20,20);
 			ppp.ForwardRoll(rollamt,ppp.FROLL_VOLUNTARY);
-			if(ppp.player.onground)
-				ppp.A_ChangeVelocity(0.2*rollamt,0,0.1*abs(rollamt),CVF_RELATIVE);
 		}
 	}
 }
