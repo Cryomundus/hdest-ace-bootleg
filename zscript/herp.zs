@@ -732,7 +732,7 @@ class HERPUsable:HDWeapon{
 	readytorepair:
 		TNT1 A 1{
 			if(!pressingfire())setweaponstate("nope");
-			else if(justpressed(BT_RELOAD)){
+			else if(PressingReload()){
 				if(invoker.weaponstatus[HERP_BATTERY]>=0){
 					message("Damaged beyond function. Remove battery before attempting repairs.");
 				}else setweaponstate("repairbash");
@@ -740,7 +740,7 @@ class HERPUsable:HDWeapon{
 		}
 		wait;
 	repairbash:
-		TNT1 A 5 A_RepairAttempt();
+		TNT1 A 10 A_RepairAttempt();
 		TNT1 A 0 A_JumpIf(!(invoker.weaponstatus[0]&HERPF_BROKEN),"nope");
 		goto readytorepair;
 	}
@@ -914,7 +914,7 @@ class HERPUsable:HDWeapon{
 	override string gethelptext(){
 		return
 		((weaponstatus[0]&HERPF_BROKEN)?
-		(WEPHELP_FIRE.."+"..WEPHELP_RELOAD.."  Repair\n"):(WEPHELP_FIRE.."  Deploy\n"))
+		(WEPHELP_FIRE.."+"..WEPHELP_RELOAD.." (hold)  Repair\n"):(WEPHELP_FIRE.."  Deploy\n"))
 		..WEPHELP_ALTFIRE.."  Cycle modes\n"
 		..WEPHELP_FIREMODE.."+"..WEPHELP_UPDOWN.."  Set BotID\n"
 		..WEPHELP_RELOAD.."  Reload mag\n"

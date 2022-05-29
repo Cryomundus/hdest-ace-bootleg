@@ -474,7 +474,7 @@ class DERPUsable:HDWeapon{
 	override string gethelptext(){
 		return
 		((weaponstatus[0]&DERPF_BROKEN)?
-		(WEPHELP_FIRE.."+"..WEPHELP_RELOAD.."  Repair\n"):(WEPHELP_FIRE.."  Deploy\n"))
+		(WEPHELP_FIRE.."+"..WEPHELP_RELOAD.." (hold)  Repair\n"):(WEPHELP_FIRE.."  Deploy\n"))
 		..WEPHELP_ALTFIRE.."  Cycle modes\n"
 		..WEPHELP_FIREMODE.."+"..WEPHELP_UPDOWN.."  Set BotID\n"
 		..WEPHELP_RELOADRELOAD
@@ -683,7 +683,7 @@ class DERPUsable:HDWeapon{
 	readytorepair:
 		TNT1 A 1{
 			if(!pressingfire())setweaponstate("nope");
-			else if(justpressed(BT_RELOAD)){
+			else if(PressingReload()){
 				if(invoker.weaponstatus[DERPS_AMMO]>=0){
 					A_Log("Remove magazine before attempting repairs.",true);
 				}else setweaponstate("repairbash");
@@ -691,7 +691,7 @@ class DERPUsable:HDWeapon{
 		}
 		wait;
 	repairbash:
-		TNT1 A 5{
+		TNT1 A 10{
 			int failchance=40;
 			int spareindex=-1;
 			//find spares, whether to cannibalize or copy
