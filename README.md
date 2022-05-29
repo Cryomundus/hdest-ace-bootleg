@@ -42,5 +42,6 @@ For the most part this build is the same as the master branch at any given time.
 	- Increased .355 spawn rate;
 	- Fists don't punch if you switch to them while holding fire;
 	- You don't need to bash reload to repair *ERPs;
+	- Inventory icons are forcefully scaled to fit.
 - Miscellaneous:
 	- Corruption Cards support. Somewhat. Removes cards that do not mix well with CC.

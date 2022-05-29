@@ -779,7 +779,7 @@ class HDStatusBar:DoomStatusBar{
 				|((
 					(ivsh&&ivsh.bdroptranslation)
 					||(ivsw&&ivsw.bdroptranslation)
-				)?DI_TRANSLATABLE:0)
+				)?DI_TRANSLATABLE:0),boxsize:(30, 30)
 			);
 
 			let pivs=HDPickup(ivs);
@@ -840,7 +840,7 @@ class HDStatusBar:DoomStatusBar{
 						(ivsh&&ivsh.bdroptranslation)
 						||(ivsw&&ivsw.bdroptranslation)
 					)?DI_TRANSLATABLE:0),
-					alpha:isthis?1.:0.6,scale:applyscale*(isthis?1.:0.6)
+					alpha:isthis?1.:0.6,box:(16, 16),scale:applyscale*(isthis?1.:0.6)
 				);
 			}
 
@@ -868,7 +868,7 @@ class HDStatusBar:DoomStatusBar{
 						(ivsh&&ivsh.bdroptranslation)
 						||(ivsw&&ivsw.bdroptranslation)
 					)?DI_TRANSLATABLE:0),
-				alpha:0.6,scale:applyscale*0.6
+				alpha:0.6,box:(16, 16),scale:applyscale*0.6
 			);
 		}
 	}
