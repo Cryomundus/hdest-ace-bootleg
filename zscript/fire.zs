@@ -297,7 +297,10 @@ class Heat:Inventory{
 		{
 			heatlight=HDFireLight(spawn("HDFireLight",pos,ALLOW_REPLACE));
 			heatlight.target=owner;hdfirelight(heatlight).heattarget=self;
-			BarrelQueue.LightCount++;
+			if (BarrelQueue)
+			{
+				BarrelQueue.LightCount++;
+			}
 		}
 	}
 	override void DoEffect(){
