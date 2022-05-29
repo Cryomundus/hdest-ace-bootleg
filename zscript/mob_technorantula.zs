@@ -179,7 +179,7 @@ class Technorantula:HDMobBase replaces SpiderMastermind{
 	death:
 		SPID J 2{
 			bnodropoff=false;
-			A_Scream();
+			A_HDBossScream();
 		}
 		SPID JJ 4 A_SpawnItemEx("HDSmokeChunk", frandom(-10,10), frandom(-10,10), frandom(38,50), vel.x+frandom(-6,6),vel.y+frandom(-6,6),vel.z+frandom(3,12),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
 

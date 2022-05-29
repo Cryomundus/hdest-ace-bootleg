@@ -65,6 +65,7 @@ skull/activescream  dssklatk
 
 baron/ballhum    dsplsidl
 baron/bigballx   dsbarexp
+baron/bigballf   dssklatk
 baron/attack     dsfirsht
 baron/shotx      dsfirxpl
 

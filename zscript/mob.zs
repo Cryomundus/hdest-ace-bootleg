@@ -81,7 +81,8 @@ class HDMobBase : HDActor{
 		}
 		//do some effects if fallen from a height
 		else if(
-			floorz<pos.z
+			bsolid
+			&&floorz<pos.z
 		){
 			double fallheight=floorz-pos.z;
 			if(
@@ -137,6 +138,9 @@ class HDMobBase : HDActor{
 	double voicepitch;
 	void A_Vocalize(sound soundname,int flags=0,double attenuation=ATTN_NORM){
 		A_StartSound(soundname,CHAN_VOICE,flags,attenuation:attenuation,pitch:hd_monstervoicepitch?voicepitch:1.);
+	}
+	void A_HDBossScream(){
+		DistantNoise.Make(self,deathsound,pitch:hd_monstervoicepitch?voicepitch:1.);
 	}
 
 

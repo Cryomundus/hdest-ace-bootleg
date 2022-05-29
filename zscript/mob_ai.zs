@@ -142,7 +142,20 @@ extend class HDMobBase{
 
 		//play active and alert noises
 		if(!(flags&CHF_NOPLAYACTIVE)){
-			if(!random(0,127))A_Vocalize(activesound);
+			if(
+				stunned>40
+				&&random(0,4095)<painchance+(stunned>>8)
+			){
+				HDMobFallSquishThinker.Init(self,frandom(0,2),scale);
+				A_Vocalize(
+					randompick(
+						painsound,painsound,painsound,painsound,painsound,
+						seesound,seesound,
+						deathsound
+					)
+				);
+			}
+			else if(!random(0,127))A_Vocalize(activesound);
 			else if(
 				bchasealert
 				&&target
@@ -192,33 +205,45 @@ extend class HDMobBase{
 			}else if(!blookallaround)didntsee+=(int(aatt)>>5);
 
 			//check sight and distance
-			if(!random(0,didntsee)){
-				targsight=
-					!bBOUNCELIKEHERETIC
-					&&(
-						blookallaround
-						||target.bspawnsoundsource
-						||aatt<
-							(seefov?seefov:180)
-							*frandom(
-								0.4,  //"within X degrees" implies fov of 2X
-								max(abs(lasttargetpos.x-target.pos.x),abs(lasttargetpos.y-target.pos.y))<(10*HDCONST_ONEMETRE)?1.:0.6
-							)
-					)
-					&&checksight(target)
-				;
-				if(targsight){
-					lasttargetpos=target.pos;
-					targdist=d3t-target.radius;
-				}else{
-					if(target.bSPAWNSOUNDSOURCE)lasttargetpos=(
-						target.pos.x+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
-						target.pos.y+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
-						target.pos.z
-					);
-					targdist=(level.vec3offset(lasttargetpos,pos)).length();
-				}
+			targsight=
+				!bBOUNCELIKEHERETIC
+				&&!random(0,didntsee)
+				&&(
+					blookallaround
+					||target.bspawnsoundsource
+					||aatt<
+						(seefov?seefov:180)
+						*frandom(
+							0.4,  //"within X degrees" implies fov of 2X
+							max(abs(lasttargetpos.x-target.pos.x),abs(lasttargetpos.y-target.pos.y))<(10*HDCONST_ONEMETRE)?1.:0.6
+						)
+				)
+				&&checksight(target)
+			;
+			if(targsight){
+				lasttargetpos=target.pos;
+				targdist=d3t-target.radius;
+			}else{
+				if(target.bSPAWNSOUNDSOURCE)lasttargetpos=(
+					target.pos.x+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
+					target.pos.y+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
+					target.pos.z
+				);
+				targdist=(level.vec3offset(lasttargetpos,pos)).length();
 			}
+		}
+
+		//strain to attack
+		//basically turns stun into DoT
+		if(
+			stunned>1000
+			&&(
+				targsight
+				||targdist<height*6.
+			)
+		){
+			stunned-=(stunned>>3);
+			bodydamage+=(stunned>>6);
 		}
 
 		//randomly lose track of target

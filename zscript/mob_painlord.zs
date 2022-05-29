@@ -12,7 +12,10 @@ class PainMonster:HDMobBase{
 		super.postbeginplay();
 		bsmallhead=bplayingid;
 
-		if(!bplayingid){
+		if(
+			!bplayingid
+			&&getclassname()!="PainLord"  //2022-05-28 FD's sprite still uses green blood in death anim
+		){
 			for(int i=0;i<MAXPLAYERS;i++){
 				let hdp=hdplayerpawn(players[i].mo);
 				if(hdp)CopyBloodColor(hdp);
@@ -115,7 +118,7 @@ class PainLord:PainMonster replaces BaronofHell{
 		BOSS E 0 A_Jump(256,"MissileSkull","MissileMissile");
 	MissileSkull:
 		BOSS H 12 A_FaceTarget(0,0);
-		BOSS H 12 bright A_SpawnProjectile("BelphBall",28,0,0,2,pitch);
+		BOSS H 12 bright A_SpawnProjectile("BelphBall",34,0,0,2,pitch);
 		BOSS H 18;
 		goto MissileSweep;
 	MissileMissile:
@@ -175,8 +178,10 @@ class PainLord:PainMonster replaces BaronofHell{
 		TNT1 A 0 A_BossDeath();
 		stop;
 	death:
-		---- A 0{bodydamage+=666*5;}
-		---- A 0 A_Quake(2,64,0,600);
+		---- A 0{
+			bodydamage+=666*5;
+			A_QuakeEx(1,1,2,64,0,512,flags:QF_SCALEDOWN,falloff:32);
+		}
 		BOSS I 2 A_SpawnItemEx("BFGNecroShard",0,0,20,10,0,8,45,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
 		BOSS I 2 A_SpawnItemEx("BFGNecroShard",0,0,35,10,0,8,135,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
 		BOSS I 2 A_SpawnItemEx("BFGNecroShard",0,0,50,10,0,8,225,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
@@ -206,12 +211,11 @@ class BelphBall:FastProjectile{
 		decal "bigscorch";
 		renderstyle "add";
 		alpha 0.05;
-		scale 0.6;
-		radius 12;
-		height 13;
+		radius 4;
+		height 4;
 		speed 2;
 		damage 8;
-		seesound "skull/melee";
+		seesound "baron/bigballf";
 		deathsound "baron/bigballx";
 	}
 	override void postbeginplay(){
@@ -222,10 +226,10 @@ class BelphBall:FastProjectile{
 	}
 	states{
 	spawn:
-		MISL DCCBBA 1 bright A_FadeIn(0.2);
-		MISL A 0 bright A_ScaleVelocity(32);
+		MISL DCCBB 1 bright A_FadeIn(0.2);
+		BAL1 A 0 bright A_ScaleVelocity(32);
 	see:
-		MISL A -1;
+		BAL1 AB 1;
 		loop;
 	death:
 		MISL BBBBBB 0 A_SpawnItemEx("HDSmoke",0,0,random(-2,4),frandom(-2,2),frandom(-2,2),random(3,5),0,SXF_NOCHECKPOSITION);

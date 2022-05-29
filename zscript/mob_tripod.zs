@@ -575,7 +575,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR EEEEEE 1 A_SpawnItemEx("HDSmoke",44,launcheroffset,52,
 			frandom(1,4),frandom(-1,1),frandom(4,8)
 		);
-		CYBR H 0 A_Scream();
+		CYBR H 0 A_HDBossScream();
 		CYBR HHHH 2 bright A_SpawnItemEx("HDExplosion",
 			frandom(-26,26),frandom(-26,26),frandom(56,64),
 			frandom(-1,1),frandom(-1,1),frandom(1,3)

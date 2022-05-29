@@ -8,7 +8,7 @@ class Yokai:HDMobBase{
 		//$Sprite "YOKAA0"
 
 		monster;
-		+nodamagethrust +noblooddecals +nogravity +floatbob -solid
+		+nodamagethrust +noblooddecals +nogravity +floatbob +float -solid
 		+forcexybillboard
 		+notrigger
 		+hdmobbase.noshootablecorpse
@@ -16,10 +16,13 @@ class Yokai:HDMobBase{
 		height 42;radius 10;
 		renderstyle "Add";
 		tag "yokai";
-		maxtargetrange 666;health 66;
+		maxtargetrange 666;
 		bloodtype "NullPuff";
 		obituary "%o watched a yokai.";
-		speed 4;
+		speed 1;
+		scale 0.6;
+		health 66;
+		painchance 240;
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
@@ -27,97 +30,65 @@ class Yokai:HDMobBase{
 	}
 	override void tick(){
 		super.tick();
-		if(alpha<0.4&&!random(0,3)){
-			a_setrenderstyle(alpha,STYLE_Fuzzy);
+		if(isfrozen())return;
+		if(!(level.time&(1|2|4))){
+			A_Trail();
+			A_HurtTarget();
 		}else{
-			a_setrenderstyle(alpha,STYLE_Add);
+			scale.x=frandom(0.660,0.672);
+			scale.y=scale.x;
+			alpha=clamp(alpha+frandom(-0.05,0.04),0,0.01*health);
 		}
+	}
+	void A_HurtTarget(){
+		if(SquadGhost(target)){
+			A_Die();
+			return;
+		}
+		if(
+			!target
+			||target.health<1
+			||distance3dsquared(target)>(300*300)
+			||!checksight(target)
+		)return;
+
+		alpha=min(alpha+0.06,max(frandom(0.6,0.9),alpha-0.05));
+		GiveBody(4);
+
+		target.A_StartSound("yokai/sight",666,CHANF_OVERLAP,volume:0.4,pitch:0.5);
+		A_GiveToTarget("IsMoving",2);
+		target.damagemobj(
+			self,self,
+			1,!random(0,63)?"balefire":"internal",
+			DMG_NO_ARMOR
+		);
+		if(target&&target.health>0&&!random(0,3))target.givebody(1);
 	}
 	states{
 	spawn:
-		YOKA ABCD 6 A_Look();
+		YOKA ABCD 6 A_HDLook();
 		loop;
 	see:
 		#### ABCD 4{
 			vel.z+=frandom(-0.1,0.1);
-			alpha=clamp(alpha+frandom(-0.1,0.06),0.1,0.6);
-			scale.x=frandom(0.660,0.672);
-			scale.y=scale.x;
 			A_HDChase();
 		}loop;
-	melee:
-	missile:
-		#### AB 3{
-			alpha+=0.1;
-			scale*=frandom(0.9,1.15);
-		}
-		#### CDA 2{
-			alpha+=0.1;
-			scale*=frandom(0.95,1.08);
-		}
-	missile2:
-		#### B 1 bright A_JumpIfInTargetLOS("hurt");
-		goto posthurt;
-	hurt:
-		#### A 2{
-			bfrightened=false;
-			A_SetShootable();
-			alpha=frandom(0.8,0.9);
-			if(target is ("SquadGhost")){
-				A_Die();
-				return;
-			}
-
-			A_StartSound("yokai/sight",CHAN_AUTO,0,1.,0.9);
-			A_SetScale(0.666);
-			GiveBody(4);
-			if(!target)return;
-			A_GiveToTarget("IsMoving",2);
-			target.damagemobj(
-				self,self,
-				1,!random(0,63)?"balefire":"internal",
-				DMG_NO_ARMOR
-			);
-			if(target&&target.health>0&&!random(0,3))target.givebody(1);
-		}
-		#### B 1 bright{
-			A_SetScale(0.680);
-		}
-	posthurt:
-		#### C 0 A_JumpIfCloser(random(600,666),1);
-		---- A 0 setstatelabel("see");
-		#### C 0 A_MonsterRefire(0,"see");
-		#### C 0 A_JumpIfInTargetLOS("hurt",40);
-		#### C 0 A_SetScale(0.666);
-		#### CDA 1 bright;
-		#### C 0 A_JumpIfInTargetLOS("missile2",80);
-		---- A 0 setstatelabel("see");
 	pain:
-		---- A 1;
 		---- A 0{
+			if(!target)return;
+			alpha=0;
+			setorigin((target.pos.xy-(cos(target.angle),sin(target.angle)),target.pos.z+target.height-height),false);
+			angle=target.angle+180;
+			speed*=10.;
 			bfrightened=true;
-			A_StartSound("yokai/sight");
-			A_SetTranslucent(1,1);
-			A_UnsetShootable();
-		}
-		#### DABCD 1{alpha-=0.18;}
-		#### A 1{
+			for(int i=0;i<40;i++)A_Chase(null,null);
 			bfrightened=false;
-			binvisible=true;
-			A_Chase(null,null,CHF_NOPLAYACTIVE);
-			if(!random(0,99))setstatelabel("unspook");
+			for(int i=0;i<40;i++)A_Wander();
+			speed*=0.1;
 		}
-		wait;
-	unspook:
-		#### A 0{
-			bfrightened=false;
-			binvisible=false;
-			A_SetShootable();
-		}
-		#### DABCD 1{alpha+=0.18;}
-		---- A 0 setstatelabel("see");
+		goto see;
 	death:
-		#### DABCD 1{alpha-=0.18;}
+		TNT1 A 1;
 		stop;
 	}
 }
@@ -159,4 +130,3 @@ class YokaiSpawner:HDActor{
 		stop;
 	}
 }
-
