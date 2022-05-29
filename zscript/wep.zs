@@ -147,21 +147,16 @@ class HDWeapon:Weapon{
 		let hdp = HDPlayerPawn(self);
 		if (hdp)
 		{
-			Console.Printf("Original: %.4f", prop);
 			prop = 1.0 - prop;
-			Console.Printf("Diff: %.4f", prop);
 			if (hdp.strength)
 			{
 				prop /= hdp.strength;
-				Console.Printf("After strength: %.4f", prop);
 			}
 			if (hdp.gunbraced)
 			{
 				prop /= 2.0;
 			}
-			Console.Printf("Final: %.4f", prop);
 			hdp.recoilfov -= prop;
-			Console.Printf("Result: %.4f", hdp.recoilfov);
 		}
 	}
 	//do these whenever the gun is ready
