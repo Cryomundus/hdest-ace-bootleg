@@ -142,12 +142,26 @@ class HDWeapon:Weapon{
 			A_SetAngle(angle+mc0.x,SPF_INTERPOLATE);
 		}
 	}
-	action void A_ZoomRecoil(double prop){
-		let hdp=hdplayerpawn(self);
-		if(hdp){
-			if(hdp.strength)prop/=hdp.strength;
-			if(hdp.gunbraced)prop=(prop+1.)*0.5;
-			hdp.recoilfov=(hdp.recoilfov+prop)*0.5;
+	action void A_ZoomRecoil(double prop)
+	{
+		let hdp = HDPlayerPawn(self);
+		if (hdp)
+		{
+			Console.Printf("Original: %.4f", prop);
+			prop = 1.0 - prop;
+			Console.Printf("Diff: %.4f", prop);
+			if (hdp.strength)
+			{
+				prop /= hdp.strength;
+				Console.Printf("After strength: %.4f", prop);
+			}
+			if (hdp.gunbraced)
+			{
+				prop /= 2.0;
+			}
+			Console.Printf("Final: %.4f", prop);
+			hdp.recoilfov -= prop;
+			Console.Printf("Result: %.4f", hdp.recoilfov);
 		}
 	}
 	//do these whenever the gun is ready

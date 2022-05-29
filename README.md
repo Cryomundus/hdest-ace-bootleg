@@ -27,6 +27,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Bloodbags don't immediately come off if another player puts one on you while you're incapped;
 	- BossBrain does not cause a VM abort with followers sometimes when loading save games;
 	- Checkin names are not multiplied in co-op;
+	- Firing weapons while zerked does not zoom in/out so much;
 - Various tweaks:
 	- Archviles only need 4 times to be pained in order to die instead of 6.
 	- You can pick stuff up while incapped;
