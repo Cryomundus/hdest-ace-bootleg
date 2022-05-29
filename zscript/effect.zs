@@ -416,7 +416,13 @@ class HDFlameRed:HDPuff{
 	}
 	states{
 	spawn:
-		BAL1 A 0 nodelay A_SpawnItemEx("HDRedFireLight",flags:SXF_SETTARGET);
+		BAL1 A 0 NoDelay
+		{
+			if (ReactionTime < HDBarrel.MaxBarrelLights)
+			{
+				A_SpawnItemEx("HDRedFireLight",flags:SXF_SETTARGET);
+			}
+		}
 		BAL1 ABCDE 1;
 		TNT1 A 0
 		{
@@ -487,8 +493,11 @@ class HDFlameRedBig:HDActor{
 		,true);
 	}
 	void A_SmokeFade(){
-		actor sss=spawn("HDSmoke",(pos.x,pos.y,pos.z+36*scale.y),ALLOW_REPLACE);
-		sss.scale=scale;
+		if (!random(0, ReactionTime / 2))
+		{
+			actor sss=spawn("HDSmoke",(pos.x,pos.y,pos.z+36*scale.y),ALLOW_REPLACE);
+			sss.scale=scale;
+		}
 	}
 	states{
 	spawn:

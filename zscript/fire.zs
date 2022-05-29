@@ -262,6 +262,7 @@ class Heat:Inventory{
 	int burnouttimer;
 	actor heatfield;
 	actor heatlight;
+	BarrelExplodeMarker BarrelQueue; // [Ace] Not making a new thinker just for this. It's only used for barrels anyway.
 	enum HeatNumbers{
 		HEATNUM_DEFAULTVOLUME=12*12*48*4,
 	}
@@ -286,8 +287,18 @@ class Heat:Inventory{
 		volumeratio=1/baseinversevolumeratio;
 		burnoutthreshold=max(40,((int(user.mass*(user.radius+user.height))+(user.gibhealth))>>5)+300);
 		A_SetSize(owner.radius,owner.height);
-		heatlight=HDFireLight(spawn("HDFireLight",pos,ALLOW_REPLACE));
-		heatlight.target=owner;hdfirelight(heatlight).heattarget=self;
+
+		if (owner is 'HDBarrel')
+		{
+			BarrelQueue = BarrelExplodeMarker.Get();
+		}
+
+		if (!BarrelQueue || BarrelQueue.LightCount < HDBarrel.MaxBarrelLights)
+		{
+			heatlight=HDFireLight(spawn("HDFireLight",pos,ALLOW_REPLACE));
+			heatlight.target=owner;hdfirelight(heatlight).heattarget=self;
+			BarrelQueue.LightCount++;
+		}
 	}
 	override void DoEffect(){
 		if(!owner){destroy();return;}
@@ -352,6 +363,7 @@ class Heat:Inventory{
 						frandom(-radius,radius),
 						frandom(0.1,owner.height*0.6)
 					),ALLOW_REPLACE);
+					aaa.ReactionTime = BarrelQueue ? BarrelQueue.LightCount : 0;
 				}else{
 					burnouttimer+=2;
 					aaa=spawn("HDFlameRedBig",owner.pos+(
@@ -360,12 +372,15 @@ class Heat:Inventory{
 						frandom(5,owner.height*0.2)
 					),ALLOW_REPLACE);
 					aaa.scale=(randompick(-1,1)*frandom(0.9,1.2),frandom(0.9,1.1))*clamp((realamount-600)*0.0003,0.6,2.);
-					if(!heatlight)heatlight=HDFireLight(spawn("HDFireLight",pos,ALLOW_REPLACE));
-					heatlight.target=owner;hdfirelight(heatlight).heattarget=self;
-					heatlight.args[0]=200;
-					heatlight.args[1]=150;
-					heatlight.args[2]=90;
-					heatlight.args[3]=int(min(realamount*0.1,256));
+					aaa.ReactionTime = BarrelQueue ? BarrelQueue.LightCount : 0;
+					
+					if (heatlight)
+					{
+						heatlight.args[0]=200;
+						heatlight.args[1]=150;
+						heatlight.args[2]=90;
+						heatlight.args[3]=int(min(realamount*0.1,256));
+					}
 				}
 				aaa.target=owner;
 				aaa.A_StartSound("misc/firecrkl",CHAN_BODY,CHANF_OVERLAP,volume:clamp(realamount*0.001,0,0.2));

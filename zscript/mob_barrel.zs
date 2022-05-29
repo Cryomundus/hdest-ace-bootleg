@@ -2,10 +2,13 @@
 // Killer(?) Barrel
 // ------------------------------------------------------------
 class HDBarrel:HDMobBase replaces ExplosiveBarrel{
+	const MaxBarrelLights = 8;
+
 	int musthavegremlin;
 	property musthavegremlin:musthavegremlin;
 	class<actor> lighttype;
 	property lighttype:lighttype;
+	BarrelExplodeMarker Queue;
 	default{
 		//$Category "Monsters/Hideous Destructor"
 		//$Title "Killer Barrel"
@@ -65,6 +68,7 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 		}
 		let lll=spawn(lighttype,pos,ALLOW_REPLACE);
 		lll.target=self;
+		Queue = BarrelExplodeMarker.Get();
 	}
 	void A_BarrelMove(){
 		if(floorz!=pos.z)return;
@@ -84,18 +88,6 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 		}
 		setstatelabel("inertjiggle");
 	}
-	void A_BarrelCheckCrowd(){
-		int bcc=0;
-		barrelexplodemarker bpm;
-		thinkeriterator bexpm=ThinkerIterator.create("BarrelExplodeMarker", STAT_USER + 1);
-		while(bpm=barrelexplodemarker(bexpm.next(true))){
-			bcc++;
-			if(bcc>random(1,12)){
-				setstatelabel("waittoexplode");
-				break;
-			}
-		}
-	}
 	states{
 	spawn:
 		BAR1 AB 10;
@@ -114,7 +106,7 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 		---- A 0 A_SetSolid();
 		---- A 0 A_SetShootable();
 		#### ABABAB random(1,3);
-		#### B random(1,3) A_BarrelCheckCrowd();
+		#### B random(1,3) A_JumpIf(Queue.ExplodedBarrels > random(1, 5), 'waittoexplode');
 	reallyexplode:
 		BEXP C 0{
 			A_UnsetSolid();
@@ -122,15 +114,12 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 			A_NoBlocking();
 			A_SetSize(-1,deathheight);
 			bsolid=false;
-			Thinker t = new("BarrelExplodeMarker");
-			t.ChangeStatNum(STAT_USER + 1);
-			actor xpl=spawn("HDExplosionLight",pos,ALLOW_REPLACE);
-			xpl.target=self;xpl.stamina=256;
+			Queue.ExplodedBarrels++;
 		}
 		BEXP CCC 1 bright{
 			if(stamina<3){
-				for(int i=0;i<16;i++){
-					actor aaa=spawn("HugeWallChunk",(pos.xy,pos.z+frandom(0,height)),ALLOW_REPLACE);
+				for(int i=0;i<4;i++){
+					actor aaa=spawn("HugeWallChunk",(pos.xy + (frandom(-radius, radius), frandom(-radius, radius)),pos.z+frandom(0,height)),ALLOW_REPLACE);
 					aaa.vel=(frandom(-10,10),frandom(-10,10),frandom(4,20));
 					if(aaa.vel dot aaa.vel < 100)
 						aaa.A_SetTranslation((KillerFireCan(self)||random(0,2))?"Charred":"Booger");
@@ -149,7 +138,7 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 			A_StartSound("world/explode");
 			DistantNoise.Make(self,"world/rocketfar");
 		}
-		BEXP EEEEEEE 0 A_SpawnItemEx ("HDSmoke", random(-6,6),random(-6,6),random(12,32), vel.x+random(-1,1),vel.y+random(-1,1),vel.z+random(1,2), 0,168);
+		BEXP EEEEE 0 A_SpawnItemEx ("HDSmoke", random(-6,6),random(-6,6),random(12,32), vel.x+random(-1,1),vel.y+random(-1,1),vel.z+random(1,2), 0,168);
 		BEXP EEE 2 bright A_FadeOut(0.3);
 		POB1 A 0{
 			A_SetSize(-1,8);
@@ -168,7 +157,7 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 		}
 		POB1 A -1{
 			A_StartSound("vile/firestrt",CHAN_AUTO,volume:0.4);
-			A_SpawnChunks("HDSmoke",8,0,3);
+			A_SpawnChunks("HDSmoke",4,0,3);
 		}stop;
 	}
 	virtual void A_BarrelBlast(){
@@ -181,7 +170,7 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 		A_BarrelFrags();
 	}
 	void A_BarrelFrags(){
-		for(int i=0;i<100;i++){
+		for(int i=0;i<80;i++){
 			let aaa=spawn("HDB_scrap",(pos.xy,pos.z+frandom(0,height)));
 			aaa.target=self;
 			aaa.vel=(angletovector(frandom(0,360),frandom(80,600)),frandom(-20,100));
@@ -189,12 +178,43 @@ class HDBarrel:HDMobBase replaces ExplosiveBarrel{
 		}
 	}
 }
-class BarrelExplodeMarker:Thinker{
-	int timer;
-	override void Tick(){
-		if(level.isfrozen())return;
-		timer++;
-		if(timer>200)destroy();
+class BarrelExplodeMarker : Thinker
+{
+	static BarrelExplodeMarker Get()
+	{
+		ThinkerIterator it = ThinkerIterator.Create('BarrelExplodeMarker', STAT_DEFAULT);
+		BarrelExplodeMarker queue = null;
+		while (queue = BarrelExplodeMarker(it.Next()))
+		{
+			return queue;
+		}
+		return new('BarrelExplodeMarker');
+	}
+
+	int LightTimer;
+	int LightCount;
+
+	int ExplodedBarrels;
+	int ClearTimer;
+
+	override void Tick()
+	{
+		if (level.IsFrozen())
+		{
+			return;
+		}
+
+		if (LightCount > 0 && ++LightTimer >= 200)
+		{
+			LightCount--;
+			LightTimer = 0;
+		}
+
+		if (ExplodedBarrels > 0 && ++ClearTimer >= 20)
+		{
+			ExplodedBarrels = max(0, ExplodedBarrels - random(1, 3));
+			ClearTimer = 0;
+		}
 	}
 }
 class BarrelGibs:IdleDummy{
@@ -313,7 +333,7 @@ class HDFireCan:HDBarrel replaces BurningBarrel{
 			if(!random(0,4))A_HDBlast(
 				random(12,128),random(2,4),64,"Balefire"
 			);
-			A_SpawnChunks("HDSmoke",8,4,12);
+			A_SpawnChunks("HDSmoke",4,4,12);
 		}
 	}
 }
