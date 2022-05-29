@@ -1,12 +1,39 @@
 // ------------------------------------------------------------
 // Because sometimes, things get caught in map geometry.
 // ------------------------------------------------------------
-class SectorDamageCounter:IdleDummy{
-	double counter;
-	override void tick(){
-		super.tick();
-		if(!isfrozen()&&accuracy>0)accuracy--;
+
+class SectorDamageCounter : Thinker
+{
+	static SectorDamageCounter Get(int index)
+	{
+		ThinkerIterator it = ThinkerIterator.Create('SectorDamageCounter', STAT_USER + 3);
+		SectorDamageCounter counter = null;
+		while (counter = SectorDamageCounter(it.Next()))
+		{
+			if (counter.Index == index)
+			{
+				return counter;
+			}
+		}
+		counter = new('SectorDamageCounter');
+		counter.Index = index;
+		counter.ChangeStatNum(STAT_USER + 3);
+		return counter;
 	}
+
+	override void Tick()
+	{
+		if (Cooldown > 0)
+		{
+			Cooldown--;
+		}
+
+		Super.Tick();
+	}
+
+	int Index;
+	double Counter;
+	int Cooldown;
 }
 class doordestroyer:hdactor{
 	vector2 v1pos;
@@ -21,9 +48,6 @@ class doordestroyer:hdactor{
 		vector2 vvv=(v2pos-v1pos);
 		llit=int(max(1,llength/10)); //see chunkspeed
 		vfrac=vvv/llit;
-	}
-	enum doorbusternums{
-		SECTORDAMAGE_TID=4440,
 	}
 	void DoorChunk(class<actor>chunktype,int numpercolumn=1,double chunkspeed=10){
 		chunkspeed*=0.1; //see vfrac
@@ -254,38 +278,26 @@ class doordestroyer:hdactor{
 
 		//add to damage
 		//look for an existing damage counter and create one if none found
-		actor buttesec=null;
-		sectordamagecounter buttecracked=null;
-		int checktid=SECTORDAMAGE_TID+othersector.index();
-		actoriterator buttesecs=level.createactoriterator(checktid,"SectorDamageCounter");
-		while(buttesec=buttesecs.next()){
-			if(buttesec.cursector==othersector){
-				buttecracked=sectordamagecounter(buttesec);
-				break;
-			}
-		}
-		if(!buttecracked){
-			buttecracked=sectordamagecounter(
-				spawn("SectorDamageCounter",(justoverthere,dlt.hitlocation.z),ALLOW_REPLACE)
-			);
-			buttecracked.changetid(checktid);
-			buttecracked.counter=0;
-		}
-
+		SectorDamageCounter buttecracked = SectorDamageCounter.Get(othersector.Index());
 
 		//see if we're going to kill or damage
-		bool blowitup=false;
-		if(buttecracked.counter+damageinflicted>2.)blowitup=true;
-		else if(
-			damageinflicted>(buttecracked.accuracy>0?0.02:0.1)  //must deal at least x% damage to count
-		){
-			buttecracked.counter+=damageinflicted*0.1;
-			if(buttecracked.counter>1.)blowitup=true;
+		bool blowitup = false;
+		if (buttecracked.Counter + damageinflicted > 2.0)
+		{
+			blowitup = true;
 		}
-		buttecracked.accuracy=3;
+		else if (damageinflicted > (buttecracked.Cooldown > 0 ? 0.02 : 0.1))  //must deal at least x% damage to count
+		{
+			buttecracked.Counter += damageinflicted * 0.1;
+			if (buttecracked.Counter > 1.0)
+			{
+				blowitup = true;
+			}
+		}
+		buttecracked.Cooldown = 3;
 
-		if(hd_debug)caller.A_Log("Sector damage factor:  "..buttecracked.counter);
-		double damagesofar=buttecracked.counter;
+		if(hd_debug)caller.A_Log("Sector damage factor:  "..Buttecracked.counter);
+		double damagesofar=buttecracked.Counter;
 
 
 		if(!blowitup){
