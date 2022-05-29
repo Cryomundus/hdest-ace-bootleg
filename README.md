@@ -19,6 +19,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Pressing* can now be called from weapon context such as Tick overrides on the weapon itself rather than being locked to states;
 	- Radsuits can be used by NPCs;
 	- A_Immolate can check sight;
+	- HDAmBoxList::RemoveClass (static) and HDBackpack::RemoveClass for quick removal of items.
 - Various bugfixes:
 	- Fixed extremely rare desync that happens if one player has CRLF line endings while the other has only LF;
 	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless;

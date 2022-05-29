@@ -859,7 +859,7 @@ class HDBackpack : HDWeapon{
 	override void LoadoutConfigure(string input)
 	{
 		input.Replace(".", ",");
-		if(hd_debug)
+		if (hd_debug)
 		{
 			console.printf("Backpack Loadout: "..input);
 		}
@@ -964,6 +964,55 @@ class HDBackpack : HDWeapon{
 		}
 
 		return Spawned;
+	}
+
+	void RemoveClass(class<Inventory> cls, bool replace = false)
+	{
+		if (!cls)
+		{
+			return;
+		}
+
+		if (Storage.DestroyItem(cls) && replace)
+		{
+			Array<class<Inventory> > validItems;
+			for (int i = 0; i < AllActorClasses.Size(); ++i)
+			{
+				let itemCls = (class<Inventory>)(AllActorClasses[i]);
+				if (!itemCls || itemCls == cls)
+				{
+					continue;
+				}
+
+				if (Storage.CheckConditions(null, itemCls) != IType_Invalid)
+				{
+					validItems.Push(itemCls);
+				}
+			}
+
+			int index = random(0, validItems.Size() - 1);
+			if (index > -1)
+			{
+				let wepDef = (class<HDWeapon>)(validItems[index]) ? GetDefaultByType((class<HDWeapon>)(validItems[index])) : null;
+				let pkpDef = (class<HDPickup>)(validItems[index]) ? GetDefaultByType((class<HDPickup>)(validItems[index])) : null;
+
+				if (wepDef)
+				{
+					Storage.AddAmount(wepDef.GetClass(), 1);
+				}
+				else if (pkpDef)
+				{
+					int amt = int(min(random(1, pkpDef.bMULTIPICKUP ? random(1, 80) : random(1, random(1, 20))), pkpDef.MaxAmount, MaxCapacity / (max(1.0, pkpDef.Bulk) * 5.0)));
+					
+					// [Ace] I have no idea what this is for but let's keep it because it's obviously something I intended to do.
+					if (pkpDef.RefId == "")
+					{
+						amt = random(-2, amt);
+					}
+					Storage.AddAmount(pkpDef.GetClass(), amt);
+				}
+			}
+		}
 	}
 
 	virtual void InitializeAmount(string loadlist)

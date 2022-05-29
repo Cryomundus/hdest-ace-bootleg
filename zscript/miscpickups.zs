@@ -182,6 +182,25 @@ class HDAmBoxList:Thinker{
 			)invclasses.push(iic.getclassname());
 		}
 	}
+
+	static void RemoveClass(class<HDAmmo> cls)
+	{
+		let list = HDAmBoxList.Get();
+		for (int i = 0; i < list.InvClasses.Size();)
+		{
+			if (list.InvClasses[i] == cls)
+			{
+				int index = list.InvClasses.Find(cls.GetClassName());
+				if (index != list.InvClasses.Size())
+				{
+					list.InvClasses.Delete(index);
+					continue;
+				}
+			}
+			i++;
+		}
+	}
+
 }
 class HDAmBox:HDUPK{
 	default{
