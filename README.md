@@ -28,6 +28,7 @@ For the most part this build is the same as the master branch at any given time.
 	- BossBrain does not cause a VM abort with followers sometimes when loading save games;
 	- Checkin names are not multiplied in co-op;
 	- Firing weapons while zerked does not zoom in/out so much;
+	- Scopes aren't tiny on WADs that supply their own CONFONT (1) lump.
 - Various tweaks:
 	- Archviles only need 4 times to be pained in order to die instead of 6.
 	- You can pick stuff up while incapped;
@@ -45,3 +46,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Inventory icons are forcefully scaled to fit.
 - Miscellaneous:
 	- Corruption Cards support. Somewhat. Removes cards that do not mix well with CC.
+
+### Clarifications
+---
+(1) HDest uses the existence of the CONFONT lump to check for the now-deprecated LZDoom, but it just so happens that anything that provides a CONFONT will make HD think you're running LZDoom. The solution? Remove that code because nobody fucking uses LZDoom anymore.

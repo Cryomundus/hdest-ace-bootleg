@@ -140,29 +140,16 @@ class Brontornis:HDWeapon{
 				sb.DI_SCREEN_CENTER
 			);
 
-			if(HDMath.Pre460()){
-				//the old square view code - kept until LZDoom supports Shape2D
-				texman.setcameratotexture(hpc,"HDXHCAM3",degree);
-				sb.drawimage(
-					"HDXHCAM3",(0,scaledyoffset)+bob,
-					sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-					scale:(0.5,0.5)
-				);
-				sb.drawimage(
-					"scophole",(0,scaledyoffset)+bob*5,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-					scale:(0.95,0.95)
-				);
-			}else{
-				//the new circular view code that doesn't work with LZDoom 3.87c
-				sb.fill(color(255,0,0,0),
-					bob.x-27,scaledyoffset+bob.y-27,
-					54,54,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
-				);
-				texman.setcameratotexture(hpc,"HDXCAM_BRON",degree);
-				let cam=texman.CheckForTexture("HDXCAM_BRON",TexMan.Type_Any);
-				double camSize=texman.GetSize(cam);
-				sb.DrawCircle(cam,(0,scaledyoffset)+ bob*5, .085,usePixelRatio:true);
-			}
+			//the new circular view code that doesn't work with LZDoom 3.87c
+			sb.fill(color(255,0,0,0),
+				bob.x-27,scaledyoffset+bob.y-27,
+				54,54,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+			);
+			texman.setcameratotexture(hpc,"HDXCAM_BRON",degree);
+			let cam=texman.CheckForTexture("HDXCAM_BRON",TexMan.Type_Any);
+			double camSize=texman.GetSize(cam);
+			sb.DrawCircle(cam,(0,scaledyoffset)+ bob*5, .085,usePixelRatio:true);
+			
 			screen.SetClipRect(cx,cy,cw,ch);
 
 			sb.drawimage(

@@ -20,33 +20,20 @@ class ZM66ScopeHaver:HDWeapon{
 			sb.DI_SCREEN_CENTER
 		);
 
-		if(HDMath.Pre460()){
-			//the old square view code - kept until LZDoom supports Shape2D
-			texman.setcameratotexture(hpc,"HDXHCAM3",degree);
-			sb.drawimage(
-				"HDXHCAM3",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-				scale:(0.31,0.31)  //breaks in 4.6.0: https://forum.zdoom.org/viewtopic.php?f=2&t=72366
-			);
-			sb.drawimage(
-				"scophole",(0,scaledyoffset)+bob*3,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-				scale:(0.78,0.78)
-			);
-		}else{
-			//the new circular view code that doesn't work with LZDoom 3.87c
-			sb.fill(color(255,0,0,0),
-				bob.x-27,scaledyoffset+bob.y-27,
-				54,54,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
-			);
-			texman.setcameratotexture(hpc,"HDXCAM_ZM66",degree);
-			let cam  = texman.CheckForTexture("HDXCAM_ZM66",TexMan.Type_Any);
-			sb.DrawCircle(cam,(0,scaledyoffset)+bob*3,.075,usePixelRatio:true);
+		sb.fill(color(255,0,0,0),
+			bob.x-27,scaledyoffset+bob.y-27,
+			54,54,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+		);
+		texman.setcameratotexture(hpc,"HDXCAM_ZM66",degree);
+		let cam  = texman.CheckForTexture("HDXCAM_ZM66",TexMan.Type_Any);
+		sb.DrawCircle(cam,(0,scaledyoffset)+bob*3,.075,usePixelRatio:true);
 
-			//This can only work if the hole texture could be offset,
-			//and even then the scope picture would not be looking in the right direction.
-			//let hole = texman.CheckForTexture("scophole",TexMan.Type_Any);
-			//let holeScale = double(texman.GetSize(cam)) / double(texman.GetSize(hole));
-			//sb.DrawCircle(hole, (0, scaledyoffset)+bob, .31*holeScale, bob*2, .78);
-		}
+		//This can only work if the hole texture could be offset,
+		//and even then the scope picture would not be looking in the right direction.
+		//let hole = texman.CheckForTexture("scophole",TexMan.Type_Any);
+		//let holeScale = double(texman.GetSize(cam)) / double(texman.GetSize(hole));
+		//sb.DrawCircle(hole, (0, scaledyoffset)+bob, .31*holeScale, bob*2, .78);
+			
 		sb.SetClipRect(cx,cy,cw,ch);
 
 		sb.drawimage(

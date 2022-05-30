@@ -273,11 +273,6 @@ struct HDMath{
 		return aaa>=0;
 	}
 
-	//return if using a version that predates 4.6.0 cameratexture scaling
-	//as of 2021-07-02 looks for CONFONT lump which is in LZDoom 3.87c
-	static bool Pre460(){
-		return Wads.CheckNumForName("CONFONT",wads.ns_global,-1,false)>=0;
-	}
 	//checks encumbrance multiplier
 	//hdmath.getencumbrancemult()
 	static double GetEncumbranceMult(){

@@ -1300,12 +1300,11 @@ class HERPController:HDWeapon{
 		bool dead=herpcam.health<1;
 		bool nobat=dead||!herpcam.bmissilemore||herpcam.battery<1;
 		int scaledyoffset=46;
-		bool lz=HDMath.Pre460();
-		name ctex=nobat?"HDXHCAM1BLANK":lz?"HDXHCAM7":"HDXCAM_HERP";
+		name ctex=nobat?"HDXHCAM1BLANK":"HDXCAM_HERP";
 		if(!nobat)texman.setcameratotexture(herpcam,ctex,60);
 		sb.drawimage(
 			ctex,(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-			scale:nobat?(1,1):((lz||nobat)?0.25:(0.25/1.2),0.25)
+			scale:nobat?(1,1):((0.25/1.2),0.25)
 		);
 		sb.drawimage(
 			"tbwindow",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER

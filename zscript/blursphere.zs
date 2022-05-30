@@ -308,10 +308,9 @@ class HDBlurSphere:HDDamageHandler{
 	override void DisplayOverlay(hdstatusbar sb,hdplayerpawn hpl){
 		if(!sb.blurred)return;
 
-		bool lz=HDMath.Pre460();
-		double sclx=lz?2:(2/1.2);
+		double sclx=(2/1.2);
 		double scly=2.;
-		name ctex=lz?"HDXHCAM4":"HDXCAM_BLUR";
+		name ctex="HDXCAM_BLUR";
 		sb.SetSize(0,300,200);
 		sb.BeginHUD(forcescaled:true);
 		texman.setcameratotexture(hpl,ctex,sb.cplayer.fov*(1.3+0.03*(sin(owner.level.time))));
@@ -331,13 +330,6 @@ class HDBlurSphere:HDDamageHandler{
 			dif,
 			alpha:camalpha*0.6,
 			scale:(sclx,scly)
-		);
-		if(
-			lz
-			&&worn
-		)sb.fill(
-			color(15,256,256,256),
-			0,0,screen.getwidth(),screen.getheight()
 		);
 	}
 }

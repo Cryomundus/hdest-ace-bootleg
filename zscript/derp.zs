@@ -1052,12 +1052,11 @@ class DERPController:HDWeapon{
 
 		bool dead=(derpcam.health<1);
 		int scaledyoffset=46;
-		bool lz=HDMath.Pre460();
-		name ctex=lz?"HDXHCAM1":"HDXCAM_DERP";
+		name ctex="HDXCAM_DERP";
 		texman.setcameratotexture(derpcam,ctex,60);
 		sb.drawimage(
 			ctex,(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-			alpha:dead?frandom[derpyderp](0.6,0.9):1.,scale:(lz?0.25:(0.25/1.2),0.25)
+			alpha:dead?frandom[derpyderp](0.6,0.9):1.,scale:((0.25/1.2),0.25)
 		);
 		sb.drawimage(
 			"tbwindow",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,

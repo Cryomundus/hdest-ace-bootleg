@@ -148,59 +148,30 @@ class BossRifle:HDWeapon{
 				sb.DI_SCREEN_CENTER
 			);
 
-			if(HDMath.Pre460()){
-				texman.setcameratotexture(hpc,"HDXHCAM3",degree);
-				//the old square view code - kept until LZDoom supports Shape2D
-				vector2 sclhalf=(0.5,0.5);
-				sb.drawimage(
-					"HDXHCAM3",(0,scaledyoffset)+bob,
-					sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-					scale:sclhalf
-				);
-				if(hdw.weaponstatus[0]&BOSSF_FRONTRETICLE){
-					sb.drawimage(
-						"reticle1",(0,scaledyoffset)+bob*deg*5,
-						sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-						scale:(1.6,1.6)*deg
-					);
-				}else{
-					sb.drawimage(
-						"reticle1",(0,scaledyoffset)+bob,
-						sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-						scale:sclhalf
-					);
-				}
-				sb.drawimage(
-					"scophole",(0,scaledyoffset)+bob*5,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-					scale:(1.5,1.5)
-				);
+			sb.fill(color(255,0,0,0),
+				bob.x-44,scaledyoffset+bob.y-44,
+				88,88,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+			);
+
+			texman.setcameratotexture(hpc,"HDXCAM_BOSS",degree);
+			let cam     = texman.CheckForTexture("HDXCAM_BOSS",TexMan.Type_Any);
+			let reticle = texman.CheckForTexture("reticle1",TexMan.Type_Any);
+
+			vector2 frontoffs=(0,scaledyoffset)+bob*3;
+
+			double camSize  = texman.GetSize(cam);
+			sb.DrawCircle(cam, frontoffs, 0.125,usePixelRatio:true);
+
+			let reticleScale = camSize / texman.GetSize(reticle);
+			if(hdw.weaponstatus[0]&BOSSF_FRONTRETICLE){
+				sb.DrawCircle(reticle, frontoffs, .5*reticleScale, bob*deg*5-bob, 1.6*deg);
 			}else{
-				//the new circular view code that doesn't work with LZDoom 3.87c
-				sb.fill(color(255,0,0,0),
-					bob.x-44,scaledyoffset+bob.y-44,
-					88,88,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
-				);
-
-				texman.setcameratotexture(hpc,"HDXCAM_BOSS",degree);
-				let cam     = texman.CheckForTexture("HDXCAM_BOSS",TexMan.Type_Any);
-				let reticle = texman.CheckForTexture("reticle1",TexMan.Type_Any);
-
-				vector2 frontoffs=(0,scaledyoffset)+bob*3;
-
-				double camSize  = texman.GetSize(cam);
-				sb.DrawCircle(cam, frontoffs, 0.125,usePixelRatio:true);
-
-				let reticleScale = camSize / texman.GetSize(reticle);
-				if(hdw.weaponstatus[0]&BOSSF_FRONTRETICLE){
-					sb.DrawCircle(reticle, frontoffs, .5*reticleScale, bob*deg*5-bob, 1.6*deg);
-				}else{
-					sb.DrawCircle(reticle, (0,scaledyoffset)+bob, .5*reticleScale,uvScale:.5);
-				}
-
-				//let holeScale    = camSize / texman.GetSize(hole);
-				//let hole    = texman.CheckForTexture("scophole",TexMan.Type_Any);
-				//sb.DrawCircle(hole, (0, scaledyoffset) + bob, .5 * holeScale, bob * 5, 1.5);
+				sb.DrawCircle(reticle, (0,scaledyoffset)+bob, .5*reticleScale,uvScale:.5);
 			}
+
+			//let holeScale    = camSize / texman.GetSize(hole);
+			//let hole    = texman.CheckForTexture("scophole",TexMan.Type_Any);
+			//sb.DrawCircle(hole, (0, scaledyoffset) + bob, .5 * holeScale, bob * 5, 1.5);
 			screen.SetClipRect(cx,cy,cw,ch);
 
 			sb.drawimage(
