@@ -907,6 +907,11 @@ class HDBackpack : HDWeapon{
 	// [Ace] This static should probably be moved elsewhere.
 	static class<Inventory> FindByRefId(string id)
 	{
+		if (id == "")
+		{
+			return null;
+		}
+
 		for (int i = 0; i < AllActorClasses.Size(); ++i)
 		{
 			let wpn = (class<HDWeapon>)(AllActorClasses[i]);
