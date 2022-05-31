@@ -17,10 +17,10 @@ class HDShellAmmo:HDRoundAmmo{
 		itemsthatusethis.push("Slayer");
 	}
 	override void SplitPickup(){
-		SplitPickupBoxableRound(4,20,"ShellBoxPickup","SHELA0","SHL1A0");
+		SplitPickupBoxableRound(4, 20, "ShellBoxPickup", "SHELA0", "SHL1A0");
 	}
 	override string pickupmessage(){
-		if(amount>1)return "Picked up some shotgun shells.";
+		if (amount > 1)return "Picked up some shotgun shells.";
 		return super.pickupmessage();
 	}
 	states{
@@ -29,25 +29,25 @@ class HDShellAmmo:HDRoundAmmo{
 		stop;
 	death:
 		ESHL A -1{
-			if(Wads.CheckNumForName("id",0)==-1)A_SetTranslation("FreeShell");
-			frame=randompick(0,0,0,0,4,4,4,4,2,2,5);
+			if (Wads.CheckNumForName("id", 0)==-1)A_SetTranslation("FreeShell");
+			frame = randompick(0, 0, 0, 0, 4, 4, 4, 4, 2, 2, 5);
 		}stop;
 	}
 }
 class HDSpentShell:HDDebris{
 	default{
 		-noteleport +forcexybillboard
-		seesound "misc/casing2";scale 0.3;height 2;radius 2;
+		seesound "misc / casing2";scale 0.3;height 2;radius 2;
 		bouncefactor 0.5;
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
-		if(Wads.CheckNumForName("id",0)==-1)A_SetTranslation("FreeShell");
-		if(vel==(0,0,0))A_ChangeVelocity(0.0001,0,-0.1,CVF_RELATIVE);
+		if (Wads.CheckNumForName("id", 0)==-1)A_SetTranslation("FreeShell");
+		if (vel==(0, 0, 0))A_ChangeVelocity(0.0001, 0, -0.1, CVF_RELATIVE);
 	}
 	vector3 lastvel;
 	override void Tick(){
-		if(!isFrozen())lastvel=vel;
+		if (!isFrozen())lastvel = vel;
 		super.Tick();
 	}
 	states{
@@ -56,7 +56,7 @@ class HDSpentShell:HDDebris{
 		loop;
 	death:
 		ESHL A -1{
-			frame=randompick(0,0,0,0,4,4,4,4,2,2,5);
+			frame = randompick(0, 0, 0, 0, 4, 4, 4, 4, 2, 2, 5);
 		}stop;
 	}
 }
@@ -66,11 +66,11 @@ class HDUnSpentShell:HDSpentShell{
 	spawn:
 		ESHL ABCDE 2;
 		TNT1 A 0{
-			if(A_JumpIfInTargetInventory("HDShellAmmo",0,"null"))
-			A_SpawnItemEx("HDFumblingShell",
-				0,0,0,vel.x+frandom(-1,1),vel.y+frandom(-1,1),vel.z,
-				0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM
-			);else A_GiveToTarget("HDShellAmmo",1);
+			if (A_JumpIfInTargetInventory("HDShellAmmo", 0, "null"))
+			A_SpawnItemEx("HDFumblingShell", 
+				0, 0, 0, vel.x + frandom(-1, 1), vel.y + frandom(-1, 1), vel.z, 
+				0, SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM
+			);else A_GiveToTarget("HDShellAmmo", 1);
 		}
 		stop;
 	}
@@ -86,15 +86,15 @@ class HDFumblingShell:HDSpentShell{
 		loop;
 	death:
 		TNT1 A 0{
-			let sss=spawn("HDShellAmmo",pos);
-			sss.vel.xy=lastvel.xy+lastvel.xy.unit()*abs(lastvel.z);
+			let sss = spawn("HDShellAmmo", pos);
+			sss.vel.xy = lastvel.xy + lastvel.xy.unit()*abs(lastvel.z);
 			sss.setstatelabel("death");
-			if(sss.vel.x||sss.vel.y){
+			if (sss.vel.x||sss.vel.y){
 				sss.A_FaceMovementDirection();
-				sss.angle+=90;
-				sss.frame=randompick(0,4);
-			}else sss.frame=randompick(0,0,0,4,4,4,2,2,5);
-			inventory(sss).amount=1;
+				sss.angle += 90;
+				sss.frame = randompick(0, 4);
+			}else sss.frame = randompick(0, 0, 0, 4, 4, 4, 2, 2, 5);
+			inventory(sss).Amount = 1;
 		}stop;
 	}
 }
@@ -102,36 +102,36 @@ class HDFumblingShell:HDSpentShell{
 
 class ShellBoxPickup:HDUPK{
 	default{
-		//$Category "Ammo/Hideous Destructor/"
+		//$Category "Ammo / Hideous Destructor/"
 		//$Title "Box of Shotgun Shells"
 		//$Sprite "SBOXA0"
 		scale 0.4;
-		hdupk.amount 20;
-		hdupk.pickupsound "weapons/pocket";
+		hdupk.Amount 20;
+		hdupk.pickupsound "weapons / pocket";
 		hdupk.pickupmessage "Picked up some shotgun shells.";
 		hdupk.pickuptype "HDShellAmmo";
-		translation "160:167=80:105";
+		translation "160:167 = 80:105";
 	}
 	states{
 	spawn:
 		SBOX A -1 nodelay{
-			if(Wads.CheckNumForName("id",0)==-1)scale=(0.25,0.25);
+			if (Wads.CheckNumForName("id", 0)==-1)scale=(0.25, 0.25);
 		}
 	}
 }
 class ShellPickup:IdleDummy{
 	default{
-		//$Category "Ammo/Hideous Destructor/"
+		//$Category "Ammo / Hideous Destructor/"
 		//$Title "Four Shotgun Shells"
 		//$Sprite "SHELA0"
 	}
 	states{
 	spawn:
 		SHEL A 0 nodelay{
-			let iii=hdpickup(spawn("HDShellAmmo",pos,ALLOW_REPLACE));
-			if(iii){
-				hdf.transferspecials(self,iii,hdf.TS_ALL);
-				iii.amount=4;
+			let iii = hdpickup(spawn("HDShellAmmo", pos, ALLOW_REPLACE));
+			if (iii){
+				hdf.transferspecials(self, iii, hdf.TS_ALL);
+				iii.Amount = 4;
 			}
 		}stop;
 	}

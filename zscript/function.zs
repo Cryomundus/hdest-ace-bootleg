@@ -4,26 +4,26 @@
 
 //event handler
 class HDHandlers:EventHandler{
-	array<double> invposx;
-	array<double> invposy;
-	array<double> invposz;
+	array < double> invposx;
+	array < double> invposy;
+	array < double> invposz;
 
 	override void RenderOverlay(renderevent e){
 		hdlivescounter.RenderEndgameText(e.camera);
 	}
 	override void WorldLoaded(WorldEvent e){
 		//seed a few more spawnpoints
-		for (int i=0;i<5;i++){
-			vector3 ip=level.PickDeathmatchStart();
+		for (int i = 0;i < 5;i++){
+			vector3 ip = level.PickDeathmatchStart();
 			invposx.push(ip.x);
 			invposy.push(ip.y);
 			invposz.push(ip.z);
 		}
 
-		if(hd_flagpole)spawnflagpole();
+		if (hd_flagpole)spawnflagpole();
 
 		//reset some player stuff
-		for(int i=0;i<MAXPLAYERS;i++){
+		for(int i = 0;i < MAXPLAYERS;i++){
 			flagcaps[i]=0;
 		}
 
@@ -39,32 +39,32 @@ class HDActor:Actor{
 		gravity HDCONST_GRAVITY;
 	}
 
-	//for frags: A_SpawnChunks("HDB_frag",42,100,700);
+	//for frags: A_SpawnChunks("HDB_frag", 42, 100, 700);
 	void A_SpawnChunks(
-		class<actor> chunk,
-		int number=12,
-		double minvel=10,
-		double maxvel=20,
-		double anglespread=180,
-		double pitchspread=90
+		class < actor> chunk, 
+		int number = 12, 
+		double minvel = 10, 
+		double maxvel = 20, 
+		double anglespread = 180, 
+		double pitchspread = 90
 	){
-		double burstz=pos.z+height*0.5;
-		double minpch=burstz-floorz<16?9:min(pitch+pitchspread,90);
-		double maxpch=ceilingz-burstz<16?-9:max(pitch-pitchspread,-90);
+		double burstz = pos.z + height * 0.5;
+		double minpch = burstz - floorz < 16?9:min(pitch + pitchspread, 90);
+		double maxpch = ceilingz - burstz < 16?-9:max(pitch - pitchspread, -90);
 
-		for(int i=0;i<number;i++){
-			actor frg=spawn(chunk,(pos.xy,burstz),ALLOW_REPLACE);
-			if(HDBulletActor(frg))frg.bincombat=true; //shouldn't be happening inside shooter
+		for(int i = 0;i < number;i++){
+			actor frg = spawn(chunk, (pos.xy, burstz), ALLOW_REPLACE);
+			if (HDBulletActor(frg))frg.bincombat = true; //shouldn't be happening inside shooter
 
-			frg.target=target;
-			frg.master=master;
-			frg.tracer=tracer;
+			frg.target = target;
+			frg.master = master;
+			frg.tracer = tracer;
 
-			frg.pitch=frandom(minpch,maxpch);
-			frg.angle=angle+frandom(-anglespread,anglespread);
+			frg.pitch = frandom(minpch, maxpch);
+			frg.angle = angle + frandom(-anglespread, anglespread);
 
-			double cp=cos(frg.pitch);
-			frg.vel=vel+(cp*cos(frg.angle),cp*sin(frg.angle),-sin(frg.pitch))*frandom(minvel,maxvel);
+			double cp = cos(frg.pitch);
+			frg.vel = vel+(cp * cos(frg.angle), cp * sin(frg.angle), -sin(frg.pitch))*frandom(minvel, maxvel);
 		}
 	}
 
@@ -72,14 +72,14 @@ class HDActor:Actor{
 	void NextTic()
 	{
 		//reached end of state sequence
-		if(!CurState){
+		if (!CurState){
 			Destroy();
 			return;
 		}
 
 		//advance to next state
-		//automatically goes through all 0-tick states
-		if(CheckNoDelay() && tics != -1 && --tics <= 0)
+		//automatically goes through all 0 - tick states
+		if (CheckNoDelay() && tics != -1 && --tics <= 0)
 			SetState(CurState.NextState);
 	}
 }
@@ -97,7 +97,7 @@ class HDArcPuff:HDActor{
 	}
 	states{
 	spawn:
-		TNT1 A 5 A_StartSound("misc/arczap",CHAN_ARCZAP,CHANF_OVERLAP,volume:0.1,attenuation:0.4);
+		TNT1 A 5 A_StartSound("misc / arczap", CHAN_ARCZAP, CHANF_OVERLAP, volume:0.1, attenuation:0.4);
 		stop;
 	}
 }
@@ -111,45 +111,45 @@ class ThinkerFlag:Thinker{
 	double amount;
 
 	//finds a flag
-	clearscope static ThinkerFlag Find(actor owner,class<ThinkerFlag> type){
+	clearscope static ThinkerFlag Find(actor owner, class < ThinkerFlag> type){
 		ThinkerFlag ttt;
-		ThinkerIterator finder=ThinkerIterator.Create(type);
-		while(ttt=ThinkerFlag(finder.Next())){
-			if(ttt.owner==owner)return ttt;
+		ThinkerIterator finder = ThinkerIterator.Create(type);
+		while(ttt = ThinkerFlag(finder.Next())){
+			if (ttt.owner==owner)return ttt;
 		}
 		return null;
 	}
 	//returns the amount for this owner
-	clearscope static double Count(actor owner,class<ThinkerFlag> type){
-		let ttt=ThinkerFlag.Find(owner,type);
-		if(ttt)return ttt.amount;
+	clearscope static double Count(actor owner, class < ThinkerFlag> type){
+		let ttt = ThinkerFlag.Find(owner, type);
+		if (ttt)return ttt.Amount;
 		return 0;
 	}
 	//finds a flag and creates one if none found
-	static ThinkerFlag Get(actor owner,class<ThinkerFlag> type){
-		let ttt=ThinkerFlag.Find(owner,type);
-		if(ttt)return ttt;
-		ttt=ThinkerFlag(new(type));
-		ttt.owner=owner;
-		ttt.amount=0;
+	static ThinkerFlag Get(actor owner, class < ThinkerFlag> type){
+		let ttt = ThinkerFlag.Find(owner, type);
+		if (ttt)return ttt;
+		ttt = ThinkerFlag(new(type));
+		ttt.owner = owner;
+		ttt.Amount = 0;
 		return ttt;
 	}
-	static double Set(actor owner,class<ThinkerFlag> type,double amount){
-		let ttt=ThinkerFlag.Get(owner,type);
-		ttt.amount=amount;
-		return ttt.amount;
+	static double Set(actor owner, class < ThinkerFlag> type, double amount){
+		let ttt = ThinkerFlag.Get(owner, type);
+		ttt.Amount = amount;
+		return ttt.Amount;
 	}
-	static double Give(actor owner,class<ThinkerFlag> type,double amount){
-		let ttt=ThinkerFlag.Get(owner,type);
-		ttt.amount+=amount;
-		return ttt.amount;
+	static double Give(actor owner, class < ThinkerFlag> type, double amount){
+		let ttt = ThinkerFlag.Get(owner, type);
+		ttt.Amount += amount;
+		return ttt.Amount;
 	}
 	//removes all of this flag for this owner
-	static void Remove(actor owner,class<ThinkerFlag> type){
+	static void Remove(actor owner, class < ThinkerFlag> type){
 		ThinkerFlag ttt;
-		ThinkerIterator finder=ThinkerIterator.Create(type);
-		while(ttt=ThinkerFlag(finder.Next())){
-			if(ttt.owner==owner)ttt.destroy();
+		ThinkerIterator finder = ThinkerIterator.Create(type);
+		while(ttt = ThinkerFlag(finder.Next())){
+			if (ttt.owner==owner)ttt.destroy();
 		}
 	}
 }
@@ -158,10 +158,10 @@ class ThinkerFlag:Thinker{
 class InventoryFlag:Inventory{
 	default{
 		+inventory.untossable;+nointeraction;+noblockmap;
-		inventory.maxamount 1;inventory.amount 1;
+		inventory.maxamount 1;inventory.Amount 1;
 	}
 	override void tick(){
-		if(!owner){destroy();return;}
+		if (!owner){destroy();return;}
 	}
 	states{
 	spawn:
@@ -177,22 +177,22 @@ class ActionItem:CustomInventory{
 	//remember: LEFT and DOWN
 	//would use vector2s but lol bracketing errors I don't need that kind of negativity in my life
 	action void A_MuzzleClimb(
-		double mc10=0,double mc11=0,
-		double mc20=0,double mc21=0,
-		double mc30=0,double mc31=0,
-		double mc40=0,double mc41=0
+		double mc10 = 0, double mc11 = 0, 
+		double mc20 = 0, double mc21 = 0, 
+		double mc30 = 0, double mc31 = 0, 
+		double mc40 = 0, double mc41 = 0
 	){
-		let hdp=HDPlayerPawn(self);
-		if(hdp){
-			hdp.A_MuzzleClimb((mc10,mc11),(mc20,mc21),(mc30,mc31),(mc40,mc41));
+		let hdp = HDPlayerPawn(self);
+		if (hdp){
+			hdp.A_MuzzleClimb((mc10, mc11), (mc20, mc21), (mc30, mc31), (mc40, mc41));
 		}else{ //I don't even know why
-			vector2 mc0=(mc10,mc11)+(mc20,mc21)+(mc30,mc31)+(mc40,mc41);
-			A_SetPitch(pitch+mc0.y,SPF_INTERPOLATE);
-			A_SetAngle(angle+mc0.x,SPF_INTERPOLATE);
+			vector2 mc0=(mc10, mc11) + (mc20, mc21) + (mc30, mc31) + (mc40, mc41);
+			A_SetPitch(pitch + mc0.y, SPF_INTERPOLATE);
+			A_SetAngle(angle + mc0.x, SPF_INTERPOLATE);
 		}
 	}
 	override void tick(){
-		if(!owner){destroy();return;}
+		if (!owner){destroy();return;}
 	}
 	states{
 	nope:
@@ -207,15 +207,15 @@ class IdleDummy:HDActor{
 		height 0;radius 0;
 	}
 	override void Tick(){
-		if(isfrozen())return;
+		if (isfrozen())return;
 		clearinterpolation();
-		setorigin(pos+vel,true);
-		vel*=friction;
+		setorigin(pos + vel, true);
+		vel *= friction;
 		nexttic();
 	}
 	states{
 	spawn:
-		TNT1 A -1 nodelay{if(stamina>0)A_SetTics(stamina);}
+		TNT1 A -1 nodelay{if (stamina > 0)A_SetTics(stamina);}
 		stop;
 	}
 }
@@ -236,24 +236,24 @@ class tempshield:HDActor{
 		stamina 16;
 	}
 	static actor spawnshield(
-		actor caller,class<actor> type="tempshield",
-		bool deathheight=false,int shieldlength=16
+		actor caller, class < actor> type="tempshield", 
+		bool deathheight = false, int shieldlength = 16
 	){
-		actor sss=caller.spawn(type,caller.pos,ALLOW_REPLACE);
-		if(!sss)return null;
-		sss.master=caller;
+		actor sss = caller.spawn(type, caller.pos, ALLOW_REPLACE);
+		if (!sss)return null;
+		sss.master = caller;
 		sss.A_SetSize(
-			caller.radius,
+			caller.radius, 
 			deathheight?getdefaultbytype(caller.getclass()).deathheight
 			:getdefaultbytype(caller.getclass()).height
 		);
-		sss.bnoblood=caller.bnoblood;
-		sss.stamina=shieldlength;
+		sss.bnoblood = caller.bnoblood;
+		sss.stamina = shieldlength;
 		return sss;
 	}
 	override void Tick(){
-		if(!master||stamina<1){destroy();return;}
-		setorigin(master.pos,false);
+		if (!master||stamina < 1){destroy();return;}
+		setorigin(master.pos, false);
 		stamina--;
 	}
 	states{
@@ -268,117 +268,117 @@ class tempshield:HDActor{
 struct HDMath{
 	//check if there is more than one of this lump loaded
 	static bool CheckLumpReplaced(name lmpnm){
-		let aaa=Wads.FindLump(lmpnm);
-		aaa=Wads.FindLump(lmpnm,aaa+1);
-		return aaa>=0;
+		let aaa = Wads.FindLump(lmpnm);
+		aaa = Wads.FindLump(lmpnm, aaa + 1);
+		return aaa >= 0;
 	}
 
 	//checks encumbrance multiplier
 	//hdmath.getencumbrancemult()
 	static double GetEncumbranceMult(){
-		return max(hd_encumbrance,0.);
+		return max(hd_encumbrance, 0.);
 	}
 
 	//get the opposite sector of a line
-	static sector OppositeSector(line hitline,sector hitsector){
-		if(!hitline||!hitline.backsector)return null;
-		if(hitline.backsector==hitsector)return hitline.frontsector;
+	static sector OppositeSector(line hitline, sector hitsector){
+		if (!hitline||!hitline.backsector)return null;
+		if (hitline.backsector==hitsector)return hitline.frontsector;
 		return hitline.backsector;
 	}
 
 	//calculate whether 2 actors are approaching each other
-	static double IsApproaching(actor a1,actor a2){
-		vector3 veldif=a1.vel-a2.vel;
-		vector3 posdif=a1.pos-a2.pos;
+	static double IsApproaching(actor a1, actor a2){
+		vector3 veldif = a1.vel - a2.vel;
+		vector3 posdif = a1.pos - a2.pos;
 		return (veldif dot posdif)<0;
 	}
 	//calculate the speed at which 2 actors are moving towards each other
 	static double TowardsEachOther(actor a1, actor a2){
-		vector3 oldpos1=a1.pos;
-		vector3 oldpos2=a2.pos;
-		vector3 newpos1=oldpos1+a1.vel;
-		vector3 newpos2=oldpos2+a2.vel;
-		double l1=(oldpos1-oldpos2).length();
-		double l2=(newpos1-newpos2).length();
-		return l1-l2;
+		vector3 oldpos1 = a1.pos;
+		vector3 oldpos2 = a2.pos;
+		vector3 newpos1 = oldpos1 + a1.vel;
+		vector3 newpos2 = oldpos2 + a2.vel;
+		double l1=(oldpos1 - oldpos2).length();
+		double l2=(newpos1 - newpos2).length();
+		return l1 - l2;
 	}
 
 	//angle between any two vec2s
-	static double angleto(vector2 v1,vector2 v2,bool absolute=false){
-		let diff=absolute?v2-v1:level.Vec2Diff(v1,v2);
-		return atan2(diff.y,diff.x);
+	static double angleto(vector2 v1, vector2 v2, bool absolute = false){
+		let diff = absolute?v2 - v1:level.Vec2Diff(v1, v2);
+		return atan2(diff.y, diff.x);
 	}
 	//kind of like angleto
-	static double pitchto(vector3 this,vector3 that){
-		return atan2(this.z-that.z,(this.xy-that.xy).length());
+	static double pitchto(vector3 this, vector3 that){
+		return atan2(this.z - that.z, (this.xy - that.xy).length());
 	}
 	//return a string indicating a rough cardinal direction
 	static string CardinalDirection(double angle){
-		angle=actor.deltaangle(0,angle);
-		if(angle>=22&&angle<=66)return("northeast");
-		else if(angle>=67&&angle<=113)return("north");
-		else if(angle>=114&&angle<=158)return("northwest");
-		else if(angle>=159&&angle<=203)return("west");
-		else if(angle>=204&&angle<=248)return("southwest");
-		else if(angle>=249&&angle<=292)return("south");
-		else if(angle>=293&&angle<=338)return("southeast");
+		angle = actor.deltaangle(0, angle);
+		if (angle >= 22&&angle <= 66)return("northeast");
+		else if (angle >= 67&&angle <= 113)return("north");
+		else if (angle >= 114&&angle <= 158)return("northwest");
+		else if (angle >= 159&&angle <= 203)return("west");
+		else if (angle >= 204&&angle <= 248)return("southwest");
+		else if (angle >= 249&&angle <= 292)return("south");
+		else if (angle >= 293&&angle <= 338)return("southeast");
 		return("east");
 	}
 
 
 	//return a loadout and its name, icon and description, e.g. "Robber: pis, bak~Just grab and run."
-	static string,string,string,string GetLoadoutStrings(string input,bool keepspaces=false){
-		int pnd=input.indexof("#");
-		int col=input.indexof(":");
-		int sls=input.indexof("/");
+	static string, string, string, string GetLoadoutStrings(string input, bool keepspaces = false){
+		int pnd = input.indexof("#");
+		int col = input.indexof(":");
+		int sls = input.indexof("/");
 
-		//"STFEVL0#Voorhees:saw/Chainsaw: Your #1 communicator!"
-		if(sls>0){
-			if(sls<pnd)pnd=-1;
-			if(sls<col)col=-1;
+		//"STFEVL0#Voorhees:saw / Chainsaw: Your #1 communicator!"
+		if (sls > 0){
+			if (sls < pnd)pnd=-1;
+			if (sls < col)col=-1;
 		}
 
-		string pic=""; if(pnd>-1)pic=input.left(pnd);
-		string nam=""; if(col>-1)nam=input.left(col);
-		string lod=input;
+		string pic=""; if (pnd>-1)pic = input.left(pnd);
+		string nam=""; if (col>-1)nam = input.left(col);
+		string lod = input;
 		string desc="";
 
-		if(sls>-1){
-			desc=input.mid(sls+1);
-			lod.remove(sls,int.Max);
+		if (sls>-1){
+			desc = input.mid(sls + 1);
+			lod.remove(sls, int.Max);
 		}
 
-		if(col>-1){
-			if(pnd>-1)nam.remove(0,pnd+1);
-			lod.remove(0,col+1);
-		}else if(pnd>-1)lod.remove(0,pnd+1);
+		if (col>-1){
+			if (pnd>-1)nam.remove(0, pnd + 1);
+			lod.remove(0, col + 1);
+		}else if (pnd>-1)lod.remove(0, pnd + 1);
 
-		if(!keepspaces)lod.replace(" ","");
-		lod=lod.makelower();
+		if (!keepspaces)lod.replace(" ", "");
+		lod = lod.makelower();
 
-		if(hd_debug>1)console.printf(
+		if (hd_debug > 1)console.printf(
 			pic.."   "..
 			nam.."   "..
 			lod.."   "..
 			desc
 		);
-		return lod,nam,pic,desc;
+		return lod, nam, pic, desc;
 	}
 
-	//basically storing a 5-bit int array in a single 32-bit int.
-	//every 32 is a 1 in the second entry, every 32*32 a 1 in the third, etc.
-	static int GetFromBase32FakeArray(int input,int slot){
-		input=(input>>(5*slot));
+	//basically storing a 5 - bit int array in a single 32 - bit int.
+	//every 32 is a 1 in the second entry, every 32 * 32 a 1 in the third, etc.
+	static int GetFromBase32FakeArray(int input, int slot){
+		input=(input>>(5 * slot));
 		return input&(1|2|4|8|16);
 	}
 
 	//get a nice name for any actor
 	//mostly for exceptions for players and monsters
 	static string GetName(actor named){
-		if(named.player)return named.player.getusername();
-		if(HDOperator(named))return HDOperator(named).nickname;
-		string tagname=named.gettag();
-		if(tagname!="")return tagname;
+		if (named.player)return named.player.getusername();
+		if (HDOperator(named))return HDOperator(named).nickname;
+		string tagname = named.gettag();
+		if (tagname!="")return tagname;
 		return named.getclassname();
 	}
 
@@ -394,62 +394,62 @@ struct HDMath{
 
 	//treat certain damage types as equivalent
 	static void ProcessSynonyms(out name mod){
-		if(
+		if (
 			mod=="electro"
 			||mod=="electricity"
 			||mod=="lightning"
 			||mod=="bolt"
 		)mod="electrical";
-		else if(
+		else if (
 			mod=="fire"
 			||mod=="heat"
 			||mod=="plasma"
 			||mod=="burning"
 			||mod=="thermal"
 		)mod="hot";
-		else if(
+		else if (
 			mod=="ice"
 			||mod=="freeze"
 			||mod=="cryo"
 		)mod="cold";
-		else if(
+		else if (
 			mod=="hellfire"
 			||mod=="unholy"
 		)mod="balefire";
-		else if(
+		else if (
 			mod=="cutting"
 			||mod=="lacerating"
 		)mod="slashing";
-		else if(
+		else if (
 			mod=="unholy"
 			||mod=="hellfire"
 		)mod="balefire";
-		else if(
+		else if (
 			mod=="stabbing"
 		)mod="piercing";
-		else if(
+		else if (
 			mod=="bite"
 			||mod=="fangs"
 		)mod="teeth";
-		else if(
+		else if (
 			mod=="scratch"
 			||mod=="nails"
 		)mod="claws";
-		else if(
+		else if (
 			mod=="invisiblebleedout"
 		)mod="bleedout";
 	}
 
 	//returns a colour code from a given cvar int
 	static clearscope string MessageColour(
-		actor caller,
-		name cvarname,
-		playerinfo pl=null
+		actor caller, 
+		name cvarname, 
+		playerinfo pl = null
 	){
-		if(!pl)pl=caller.player;
-		if(!pl)return TEXTCOLOR_UNTRANSLATED;
-		let ccc=CVar.GetCVar(cvarname,pl);
-		int which=ccc.GetInt();
+		if (!pl)pl = caller.player;
+		if (!pl)return TEXTCOLOR_UNTRANSLATED;
+		let ccc = CVar.GetCVar(cvarname, pl);
+		int which = ccc.GetInt();
 		switch(which){
 			case 0: return TEXTCOLOR_BRICK;
 			case 1: return TEXTCOLOR_TAN;
@@ -481,7 +481,7 @@ struct HDMath{
 		}
 	}
 
-	// Caligari's variable-substring maker
+	// Caligari's variable - substring maker
 	// some input example strings:
 	// "an empty {beer|soda|wine|champagne} bottle. {It is {cracked|broken|unlabeled}.}"
 	// "{an action figure|a doll}. {|||||||||||||It is naked.}");
@@ -492,22 +492,22 @@ struct HDMath{
 		while(true){
 			int LeftBrace, RightBrace;
 			LeftBrace = msg.RightIndexOf("{"); // find the rightmost {
-			RightBrace = msg.IndexOf("}",LeftBrace+1); // find the innermost matching }
+			RightBrace = msg.IndexOf("}", LeftBrace + 1); // find the innermost matching }
 			if (LeftBrace == -1 || RightBrace == -1) { break; } // stop looping if no more { }
 
-			string substring = msg.Mid(LeftBrace+1, (RightBrace-LeftBrace)-1); // get the inner text string
-			msg.Remove(LeftBrace+1, (RightBrace-LeftBrace)-1); // remove the inside text string
+			string substring = msg.Mid(LeftBrace + 1, (RightBrace - LeftBrace)-1); // get the inner text string
+			msg.Remove(LeftBrace + 1, (RightBrace - LeftBrace)-1); // remove the inside text string
 
 			// build an array of substrings from the extracted string, separated by |
-			array<string> substrings;
-			substring.Split(substrings,"|"); 
+			array < string> substrings;
+			substring.Split(substrings, "|"); 
 
-			// pick a random sub-string from the { | | | } set
+			// pick a random sub - string from the { | | | } set
 			// replace the leftover {} with the picked substring
-			msg.Replace("{}", substrings[random(0,substrings.Size()-1)]);
+			msg.Replace("{}", substrings[random(0, substrings.Size()-1)]);
 		}
 
-		// Remove double-spaces, repeat until no more
+		// Remove double - spaces, repeat until no more
 		while (true) {
 			if (msg.IndexOf("  ", 0) > -1) { msg.Replace("  ", " "); }
 			else { break; }
@@ -518,37 +518,37 @@ struct HDMath{
 }
 struct HDF play{
 	//because this is 10 times faster than A_GiveInventory
-	static void Give(actor whom,class<inventory> what,int howmany=1){
-		whom.A_SetInventory(what,whom.countinv(what)+howmany);
+	static void Give(actor whom, class < inventory> what, int howmany = 1){
+		whom.A_SetInventory(what, whom.CountInv(what) + howmany);
 	}
 	//transfer special, args, TID and maybe orientation and velocity
-	static void TransferSpecials(actor source,actor dest,int flags=0){
+	static void TransferSpecials(actor source, actor dest, int flags = 0){
 		dest.changetid(source.tid);
-		dest.bCountSecret=source.bCountSecret;
-		dest.special=source.special;
-		for(int i=0;i<5;i++){
+		dest.bCountSecret = source.bCountSecret;
+		dest.special = source.special;
+		for(int i = 0;i < 5;i++){
 			dest.args[i]=source.args[i];
 		}
-		if(flags&TS_ANGLE){
-			dest.angle=source.angle;
-			dest.pitch=source.pitch;
+		if (flags&TS_ANGLE){
+			dest.angle = source.angle;
+			dest.pitch = source.pitch;
 		}
-		if(flags&TS_VEL)dest.vel=source.vel;
+		if (flags&TS_VEL)dest.vel = source.vel;
 	}
 	enum TransferSpecialsFlags{
-		TS_ANGLE=1,
-		TS_VEL=2,
-		TS_ALL=TS_ANGLE|TS_VEL,
+		TS_ANGLE = 1, 
+		TS_VEL = 2, 
+		TS_ALL = TS_ANGLE|TS_VEL, 
 	}
 	//transfer fire. returns # of fire actors affected.
-	static int TransferFire(actor ror,actor ree,int maxfires=-1){
-		actoriterator it=level.createactoriterator(-7677,"HDFire");
-		actor fff;int counter=0;
-		while(maxfires && (fff=it.next())){
+	static int TransferFire(actor ror, actor ree, int maxfires=-1){
+		actoriterator it = level.createactoriterator(-7677, "HDFire");
+		actor fff;int counter = 0;
+		while(maxfires && (fff = it.next())){
 			maxfires--;
-			if(fff.target==ror){
-				counter+=fff.stamina;
-				if(ree)fff.target=ree;
+			if (fff.target==ror){
+				counter += fff.stamina;
+				if (ree)fff.target = ree;
 				else fff.destroy();
 			}
 		}
@@ -557,7 +557,7 @@ struct HDF play{
 	//figure out if something hit some map geometry that isn't (i.e., "sky").
 	//why is GetTexture play!?
 	static bool linetracehitsky(flinetracedata llt){
-		if(
+		if (
 			(
 				llt.hittype==Trace_HitCeiling
 				&&llt.hitsector.gettexture(1)==skyflatnum
@@ -569,8 +569,8 @@ struct HDF play{
 				&&llt.hitline.special==Line_Horizon
 			)
 		)return true;
-		let othersector=hdmath.oppositesector(llt.hitline,llt.hitsector);
-		if(!othersector)return false;
+		let othersector = hdmath.oppositesector(llt.hitline, llt.hitsector);
+		if (!othersector)return false;
 		return(
 			llt.hittype==Trace_HitWall
 			&&(
@@ -589,7 +589,7 @@ struct HDF play{
 //reads data that only exists at load time
 class HDLoadTimeReader : LevelPostProcessor {
 	void Apply(Name checksum, String mapName) {
-		Array<Line> polyLines;
+		Array < Line> polyLines;
 
 		let handler = HDHandlers(EventHandler.Find('HDHandlers'));
 		if (!handler) return;
@@ -604,7 +604,7 @@ class HDLoadTimeReader : LevelPostProcessor {
 		}
 
 		int highestTag;
-		Array<HDPolyObjectInfo> pendingMirror;
+		Array < HDPolyObjectInfo> pendingMirror;
 		for (int thing = 0; thing < GetThingCount(); thing++) {
 			//for each polyobject start spot...
 			let thingType = GetThingEdNum(thing);
@@ -652,16 +652,16 @@ class HDLoadTimeReader : LevelPostProcessor {
 
 	//polyobject map spot ednums
 	enum PolyObjMapSpots {
-		PolyAnchor = 9300,
-		PolyStartSafe,
-		PolyStartCrush,
+		PolyAnchor = 9300, 
+		PolyStartSafe, 
+		PolyStartCrush, 
 		PolyStartHurt
 	}
 }
 
 extend class HDHandlers {
 	//list of polyobjects by tag
-	Array<HDPolyObjectInfo> polyobjects;
+	Array < HDPolyObjectInfo> polyobjects;
 
 	//find the polyobject checkLine belongs to
 	HDPolyObjectInfo FindPolyByLine(Line checkLine) {
@@ -675,7 +675,7 @@ extend class HDHandlers {
 
 class HDPolyObjectInfo {
 	//the lines belonging to this polyobject
-	Array<Line> lines;
+	Array < Line> lines;
 	//the offset between the polyobject and its first line's first vertex
 	vector2 offset;
 	//the starting angle of the first line
@@ -700,7 +700,7 @@ class HDPolyObjectInfo {
 		return handler.polyobjects[mirrorTag];
 	}
 
-	static play HDPolyObjectInfo Create(Array<Line> polyLines, int tag, vector3 pos) {
+	static play HDPolyObjectInfo Create(Array < Line> polyLines, int tag, vector3 pos) {
 		let this = new('HDPolyObjectInfo');
 
 		this.tag = tag;
@@ -717,7 +717,7 @@ class HDPolyObjectInfo {
 		return this;
 	}
 
-	play void FindLines(Array<Line> polyLines) {
+	play void FindLines(Array < Line> polyLines) {
 		//find polyobject start lines
 		for (int i = 0; i < polyLines.Size(); i++) {
 			let ln = polyLines[i];
@@ -794,15 +794,15 @@ class HDRaiseWep:HDCheatWep{
 		TNT1 A 0{
 			flinetracedata rlt;
 			LineTrace(
-				angle,128,pitch,
-				TRF_ALLACTORS,
-				offsetz:height-6,
+				angle, 128, pitch, 
+				TRF_ALLACTORS, 
+				offsetz:height - 6, 
 				data:rlt
 			);
-			if(rlt.hitactor){
-				a_weaponmessage(rlt.hitactor.getclassname().." raised!",30);
-				RaiseActor(rlt.hitactor,RF_NOCHECKPOSITION);
-			}else a_weaponmessage("click on something\nto raise it.",25);
+			if (rlt.hitactor){
+				a_weaponmessage(rlt.hitactor.getclassname().." raised!", 30);
+				RaiseActor(rlt.hitactor, RF_NOCHECKPOSITION);
+			}else a_weaponmessage("click on something\nto raise it.", 25);
 		}goto nope;
 	}
 }

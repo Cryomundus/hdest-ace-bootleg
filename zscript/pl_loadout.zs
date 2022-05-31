@@ -1,10 +1,10 @@
 // ------------------------------------------------------------
-// Loadout-related stuff!
+// Loadout - related stuff!
 // ------------------------------------------------------------
 extend class HDPlayerPawn{
 	//basic stuff every player should have
 	virtual void GiveBasics(){
-		if(!player)return;
+		if (!player)return;
 		A_GiveInventory("HDFist");
 		A_GiveInventory("SelfBandage");
 		A_GiveInventory("HDFragGrenades");
@@ -23,16 +23,16 @@ class SoldierExtras:HDPickup{
 	states{
 	pickup:
 		TNT1 A 0{
-			A_SetInventory("PortableMedikit",max(1,countinv("PortableMedikit")));
-			A_SetInventory("PortableStimpack",max(2,countinv("PortableStimpack")));
-			A_SetInventory("GarrisonArmourWorn",1);
+			A_SetInventory("PortableMedikit", max(1, CountInv("PortableMedikit")));
+			A_SetInventory("PortableStimpack", max(2, CountInv("PortableStimpack")));
+			A_SetInventory("GarrisonArmourWorn", 1);
 
-			A_SetInventory("HDPistol",max(countinv("HDPistol"),1));
-			A_SetInventory("HD9mMag15",max(3,countinv("HD9mMag15")));
+			A_SetInventory("HDPistol", max(CountInv("HDPistol"), 1));
+			A_SetInventory("HD9mMag15", max(3, CountInv("HD9mMag15")));
 
-			A_SetInventory("HDFragGrenadeAmmo",max(3,countinv("HDFragGrenadeAmmo")));
-			A_SetInventory("DERPUsable",max(1,countinv("DERPUsable")));
-			A_SetInventory("PortableLadder",max(1,countinv("PortableLadder")));
+			A_SetInventory("HDFragGrenadeAmmo", max(3, CountInv("HDFragGrenadeAmmo")));
+			A_SetInventory("DERPUsable", max(1, CountInv("DERPUsable")));
+			A_SetInventory("PortableLadder", max(1, CountInv("PortableLadder")));
 		}fail;
 	}
 }
@@ -41,24 +41,24 @@ class SoldierExtras:HDPickup{
 
 //reset inventory
 class InvReset:Inventory{
-	static void ReallyClearInventory(actor resetee,bool keepkeys=false){
-		inventory item=resetee.inv;
+	static void ReallyClearInventory(actor resetee, bool keepkeys = false){
+		inventory item = resetee.inv;
 		while(item){
-			if(
+			if (
 				(!keepkeys||!(item is "Key"))
 			){
 				item.destroy();
-				item=resetee.inv;
+				item = resetee.inv;
 			}
 		}
 	}
 	static void GiveStartItems(actor resetee){
 		//now get all the "dropitems" (i.e. player's startitems) and give them
-		let drop=resetee.default.getdropitems();
-		if(drop){
-			for(dropitem di=drop;di;di=di.Next){
-				if(di.Name=='None')continue;
-				resetee.A_GiveInventory(di.Name,di.Amount);
+		let drop = resetee.default.getdropitems();
+		if (drop){
+			for(dropitem di = drop;di;di = di.Next){
+				if (di.Name=='None')continue;
+				resetee.A_GiveInventory(di.Name, di.Amount);
 			}
 		}
 	}
@@ -70,13 +70,13 @@ class InvReset:Inventory{
 }
 class DoomguyLoadout:InvReset{
 	override void attachtoowner(actor other){
-		reallyclearinventory(other,true);
-		let d=HDPlayerPawn(other);
-		if(d)d.GiveBasics();
+		reallyclearinventory(other, true);
+		let d = HDPlayerPawn(other);
+		if (d)d.GiveBasics();
 		other.A_GiveInventory("HDPistol");
-		other.A_GiveInventory("HD9mMag15",2);
-		other.A_GiveInventory("HDPistolAmmo",4);
-		HDWeaponSelector.Select(other,"HDPistol",1);
+		other.A_GiveInventory("HD9mMag15", 2);
+		other.A_GiveInventory("HDPistolAmmo", 4);
+		HDWeaponSelector.Select(other, "HDPistol", 1);
 		destroy();
 	}
 }
@@ -84,18 +84,18 @@ class DoomguyLoadout:InvReset{
 //used to override default to fist on weapon removal
 class HDWeaponSelector:Thinker{
 	actor other;
-	class<Weapon> weptype;
-	static void Select(actor caller,class<Weapon> weptype,int waittime=10){
-		let thth=new("HDWeaponSelector");
-		thth.weptype=weptype;
-		thth.other=caller;
-		thth.ticker=waittime;
+	class < Weapon> weptype;
+	static void Select(actor caller, class < Weapon> weptype, int waittime = 10){
+		let thth = new("HDWeaponSelector");
+		thth.weptype = weptype;
+		thth.other = caller;
+		thth.ticker = waittime;
 	}
 	int ticker;
 	override void Tick(){
 		ticker--;
-		if(ticker>0)return;
-		if(other)other.A_SelectWeapon(weptype);
+		if (ticker > 0)return;
+		if (other)other.A_SelectWeapon(weptype);
 		destroy();
 	}
 }
@@ -186,7 +186,7 @@ class LoadoutMenuHackToken:ThinkerFlag{
 
 //used for loadout configurations and custom spawns
 class HDPickupGiver:HDPickup{
-	class<hdpickup> pickuptogive;
+	class < hdpickup> pickuptogive;
 	property pickuptogive:pickuptogive;
 	hdpickup actualitem;
 	virtual void configureactualpickup(){}
@@ -196,24 +196,24 @@ class HDPickupGiver:HDPickup{
 	}
 	void spawnactualitem(){
 		//check if the owner already has this pickup
-		if(owner)actualitem=hdpickup(owner.findinventory(pickuptogive));
+		if (owner)actualitem = hdpickup(owner.FindInventory(pickuptogive));
 
 		//spawn or give the pickup
-		if(actualitem){
+		if (actualitem){
 			//if actor present, just give more
 			owner.A_GiveInventory(pickuptogive, amount);
 		}else{
-			actualitem=hdpickup(spawn(pickuptogive,pos));
-			actualitem.amount=amount;
-			HDF.TransferSpecials(self,actualitem);
-			if(owner)actualitem.attachtoowner(owner);
+			actualitem = hdpickup(spawn(pickuptogive, pos));
+			actualitem.Amount = amount;
+			HDF.TransferSpecials(self, actualitem);
+			if (owner)actualitem.attachtoowner(owner);
 		}
 
 		//now apply the changes this pickupgiver is for
 		configureactualpickup();
 		destroy();
 	}
-	//this stuff must be done after the first tick,
+	//this stuff must be done after the first tick, 
 	//as the loadout configurator needs time to read the actualpickup
 	override void tick(){
 		super.tick();
@@ -221,7 +221,7 @@ class HDPickupGiver:HDPickup{
 	}
 }
 class HDWeaponGiver:Inventory{
-	class<hdweapon> weapontogive;
+	class < hdweapon> weapontogive;
 	property weapontogive:weapontogive;
 	string weprefid;
 	property weprefid:weprefid;
@@ -242,19 +242,19 @@ class HDWeaponGiver:Inventory{
 	}
 	virtual void spawnactualweapon(){
 		//check blacklist for the target weapon
-		if(hdpickup.checkblacklist(self,weprefid))return;
+		if (hdpickup.checkblacklist(self, weprefid))return;
 
 		//check if the owner already has this weapon
 		bool hasprevious=(
 			owner
-			&&owner.findinventory(weapontogive)
+			&&owner.FindInventory(weapontogive)
 		);
 
 		//spawn the weapon
-		actualweapon=hdweapon(spawn(weapontogive,pos));
-		actualweapon.special=special;
+		actualweapon = hdweapon(spawn(weapontogive, pos));
+		actualweapon.special = special;
 		actualweapon.changetid(tid);
-		if(owner){
+		if (owner){
 			actualweapon.attachtoowner(owner);
 
 			//apply defaults from owner
@@ -265,20 +265,20 @@ class HDWeaponGiver:Inventory{
 		actualweapon.loadoutconfigure(config);
 
 		//if there was a previous weapon, bring this one down to the spares
-		if(hasprevious&&owner.getage()>5){
+		if (hasprevious&&owner.getage()>5){
 			actualweapon.AddSpareWeaponRegular(owner);
 		}
 	}
-	//this stuff must be done after the first tick,
+	//this stuff must be done after the first tick, 
 	//as the loadout configurator needs time to read the actualweapon
 	override void tick(){
 		super.tick();
-		if(
+		if (
 			owner
 			&&owner.player
 			&&actualweapon is "HDWeapon"
 		){
-			let wp=actualweapon.getclassname();
+			let wp = actualweapon.getclassname();
 			owner.A_SelectWeapon(wp);
 		}
 		destroy();
@@ -289,99 +289,99 @@ class HDWeaponGiver:Inventory{
 class CustomLoadoutGiver:Inventory{
 	//must be DoEffect as AttachToOwner and Pickup are not called during a range reset!
 	override void doeffect(){
-		let hdp=HDPlayerPawn(owner);
-		if(hdp)hdp.GiveCustomItems(hdp.classloadout);
+		let hdp = HDPlayerPawn(owner);
+		if (hdp)hdp.GiveCustomItems(hdp.classloadout);
 		destroy();
 	}
 }
 extend class HDPlayerPawn{
 	string startingloadout;property startingloadout:startingloadout;
 	void GiveCustomItems(string loadinput){
-		if(!player)return;
-		if(HDPlayerPawn(self))HDPlayerPawn(self).GiveBasics();
+		if (!player)return;
+		if (HDPlayerPawn(self))HDPlayerPawn(self).GiveBasics();
 
-		string weapondefaults=hdweapon.getdefaultcvar(player);
+		string weapondefaults = hdweapon.getdefaultcvar(player);
 
 		//special conditions that completely overwrite the loadout giving
-		if(
+		if (
 			hd_forceloadout!=""
 			&&hd_forceloadout!="0"
 			&&hd_forceloadout!="false"
 			&&hd_forceloadout!="none"
 			&&hd_forceloadout!="''"
 		){
-			loadinput=hd_forceloadout;
-			A_Log("Loadout settings forced by administrator:  "..hd_forceloadout,true);
+			loadinput = hd_forceloadout;
+			A_Log("Loadout settings forced by administrator:  "..hd_forceloadout, true);
 		}else{
-			string myloadout=cvar.getcvar("hd_myloadout",player).getstring();
-			if(
+			string myloadout = cvar.getcvar("hd_myloadout", player).getstring();
+			if (
 			myloadout!=""
 			&&myloadout!="0"
 			&&myloadout!="false"
 			&&myloadout!="none"
 			&&myloadout!="''"
 			){
-				loadinput=myloadout;
-				A_Log("Temporary loadout set through myloadout:  "..myloadout,true);
+				loadinput = myloadout;
+				A_Log("Temporary loadout set through myloadout:  "..myloadout, true);
 			}
 		}
-		if(loadinput.left(3)~=="hd_"){
-			loadinput=cvar.getcvar(loadinput,player).getstring();
+		if (loadinput.left(3)~=="hd_"){
+			loadinput = cvar.getcvar(loadinput, player).getstring();
 		}
 		string loadoutname;
-		[loadinput,loadoutname]=HDMath.GetLoadoutStrings(loadinput);
-		if(loadoutname!="")A_Log("Starting Loadout: "..loadoutname,true);
-		if(loadinput=="")return;
-		if(loadinput~=="doomguy")loadinput="pis,9152,9mm4";
-		if(loadinput~=="insurgent"){
+		[loadinput, loadoutname]=HDMath.GetLoadoutStrings(loadinput);
+		if (loadoutname!="")A_Log("Starting Loadout: "..loadoutname, true);
+		if (loadinput=="")return;
+		if (loadinput~=="doomguy")loadinput="pis, 9152, 9mm4";
+		if (loadinput~=="insurgent"){
 			A_GiveInventory("InsurgentLoadout");
 			return;
 		}
 
-		string blacklist=hd_blacklist;
-		if(blacklist!=""){
-			blacklist=blacklist.makelower();
-			blacklist.replace(" ","");
-			array<string>blist;blist.clear();
-			A_Log("Some items in your loadout may have been blacklisted from this game and removed or substituted at start: "..blacklist,true);
-			blacklist.split(blist,",");
-			for(int i=0;i<blist.size();i++){
-				string blisti=blist[i];
-				if(blisti.length()>=3){
-					if(blisti.indexof("=")>0){
-						string replacement=blisti.mid(blisti.indexof("=")+1);
-						loadinput.replace(blisti.left(3),replacement);
-					}else loadinput.replace(blisti.left(3),"fis");
+		string blacklist = hd_blacklist;
+		if (blacklist!=""){
+			blacklist = blacklist.makelower();
+			blacklist.replace(" ", "");
+			array < string > blist;blist.clear();
+			A_Log("Some items in your loadout may have been blacklisted from this game and removed or substituted at start: "..blacklist, true);
+			blacklist.split(blist, ", ");
+			for(int i = 0;i < blist.size();i++){
+				string blisti = blist[i];
+				if (blisti.length()>=3){
+					if (blisti.indexof("=")>0){
+						string replacement = blisti.mid(blisti.indexof("=") + 1);
+						loadinput.replace(blisti.left(3), replacement);
+					}else loadinput.replace(blisti.left(3), "fis");
 				}
 			}
 		}
 
 
-		array<string> whichitem;whichitem.clear();
-		array<int> whichitemclass;whichitemclass.clear();
-		array<string> howmany;howmany.clear();
-		array<string> loadlist;loadlist.clear();
+		array < string> whichitem;whichitem.clear();
+		array < int> whichitemclass;whichitemclass.clear();
+		array < string> howmany;howmany.clear();
+		array < string> loadlist;loadlist.clear();
 
 		string firstwep="";
 
 
-		loadinput.split(loadlist,"-");
-		loadlist[0].split(whichitem,",");
-		if(hd_debug)A_Log("Loadout: "..loadlist[0]);
-		for(int i=0;i<whichitem.size();i++){
+		loadinput.split(loadlist, "-");
+		loadlist[0].split(whichitem, ", ");
+		if (hd_debug)A_Log("Loadout: "..loadlist[0]);
+		for(int i = 0;i < whichitem.size();i++){
 			whichitemclass.push(-1);
-			howmany.push(whichitem[i].mid(3,whichitem[i].length()));
+			howmany.push(whichitem[i].mid(3, whichitem[i].length()));
 			whichitem[i]=whichitem[i].left(3);
 		}
-		for(int i=0;i<allactorclasses.size();i++){
-			class<actor> reff=allactorclasses[i];
-			if(reff is "HDPickup"||reff is "HDWeapon"){
+		for(int i = 0;i < allactorclasses.size();i++){
+			class < actor> reff = allactorclasses[i];
+			if (reff is "HDPickup"||reff is "HDWeapon"){
 				string ref;
-				if(reff is "HDPickup")ref=getdefaultbytype((class<hdpickup>)(reff)).refid;
-				else ref=getdefaultbytype((class<hdweapon>)(reff)).refid;
-				if(ref=="")continue;
-				for(int j=0;j<whichitem.size();j++){
-					if(
+				if (reff is "HDPickup")ref = getdefaultbytype((class < hdpickup>)(reff)).refid;
+				else ref = getdefaultbytype((class < hdweapon>)(reff)).refid;
+				if (ref=="")continue;
+				for(int j = 0;j < whichitem.size();j++){
+					if (
 						whichitemclass[j]<0
 						&&whichitem[j]~==ref
 					)whichitemclass[j]=i;
@@ -389,56 +389,56 @@ extend class HDPlayerPawn{
 			}
 		}
 		hdweapon firstwepactor;
-		for(int i=whichitemclass.size()-1;i>=0;i--){
-			if(whichitemclass[i]<0){
-				A_Log("\ca*** Unknown loadout code:  \"\cx"..whichitem[i].."\ca\"",true);
+		for(int i = whichitemclass.size()-1;i >= 0;i--){
+			if (whichitemclass[i]<0){
+				A_Log("\ca*** Unknown loadout code:  \"\cx"..whichitem[i].."\ca\"", true);
 				continue;
 			}
-			class<actor> reff=allactorclasses[whichitemclass[i]];
+			class < actor> reff = allactorclasses[whichitemclass[i]];
 
 			//don't spawn if certain dmflags
-			if(
-				deathmatch  //sv_noarmor/health normally does nothing outside dm
+			if (
+				deathmatch  //sv_noarmor / health normally does nothing outside dm
 				&&(
-					(sv_noarmor&&getdefaultbytype((class<inventory>)(reff)).bisarmor)
-					||(sv_nohealth&&getdefaultbytype((class<inventory>)(reff)).bishealth)
+					(sv_noarmor&&getdefaultbytype((class < inventory>)(reff)).bisarmor)
+					||(sv_nohealth&&getdefaultbytype((class < inventory>)(reff)).bishealth)
 				)
 			)continue;
 
-			if(reff is "HDWeapon"){
-				if(
-					getdefaultbytype((class<HDWeapon>)(reff)).bdebugonly
-					&&hd_debug<=0
+			if (reff is "HDWeapon"){
+				if (
+					getdefaultbytype((class < HDWeapon>)(reff)).bdebugonly
+					&&hd_debug <= 0
 				){
-					A_Log("\caLoadout code \"\cx"..whichitem[i].."\ca\" ("..getdefaultbytype(reff).gettag()..") can only be used in debug mode.",true);
+					A_Log("\caLoadout code \"\cx"..whichitem[i].."\ca\" ("..getdefaultbytype(reff).gettag()..") can only be used in debug mode.", true);
 					continue;
 				}
-				if(!i){
-					if(reff is "HDWeaponGiver"){
-						let greff=getdefaultbytype((class<HDWeaponGiver>)(reff)).weapontogive;
-						if(greff)firstwep=greff.getclassname();
+				if (!i){
+					if (reff is "HDWeaponGiver"){
+						let greff = getdefaultbytype((class < HDWeaponGiver>)(reff)).weapontogive;
+						if (greff)firstwep = greff.getclassname();
 					}else{
-						firstwep=reff.getclassname();
+						firstwep = reff.getclassname();
 					}
 				}
 
 				int thismany;
-				if(getdefaultbytype((class<hdweapon>)(reff)).bignoreloadoutamount)thismany=1;
-				else thismany=clamp(howmany[i].toint(),1,40);
+				if (getdefaultbytype((class < hdweapon>)(reff)).bignoreloadoutamount)thismany = 1;
+				else thismany = clamp(howmany[i].toint(), 1, 40);
 
-				while(thismany>0){
+				while(thismany > 0){
 					thismany--;
 					hdweapon newwep;
-					if(reff is "HDWeaponGiver"){
-						let newgiver=hdweapongiver(spawn(reff,pos));
+					if (reff is "HDWeaponGiver"){
+						let newgiver = hdweapongiver(spawn(reff, pos));
 						newgiver.spawnactualweapon();
-						newwep=newgiver.actualweapon;
+						newwep = newgiver.actualweapon;
 						newgiver.destroy();
-						if(newwep&&hdpickup.checkblacklist(newwep,newwep.refid,true))return;
+						if (newwep&&hdpickup.checkblacklist(newwep, newwep.refid, true))return;
 					}else{
-						newwep=hdweapon(spawn(reff,pos));
+						newwep = hdweapon(spawn(reff, pos));
 					}
-					if(newwep){
+					if (newwep){
 						//clear any randomized garbage
 						newwep.weaponstatus[0]=0;
 
@@ -446,51 +446,51 @@ extend class HDPlayerPawn{
 						newwep.defaultconfigure(player);
 
 						//now apply the loadout input to overwrite the defaults
-						string wepinput=howmany[i];
-						wepinput.replace(" ","");
-						wepinput=wepinput.makelower();
+						string wepinput = howmany[i];
+						wepinput.replace(" ", "");
+						wepinput = wepinput.makelower();
 						newwep.loadoutconfigure(wepinput);
 
 						//the only way I know to force the weapongiver to go last: make it go again
-						if(reff is "HDWeaponGiver"){
-							let hdwgreff=(class<hdweapongiver>)(reff);
-							let gdhdwgreff=getdefaultbytype(hdwgreff);
+						if (reff is "HDWeaponGiver"){
+							let hdwgreff=(class < hdweapongiver>)(reff);
+							let gdhdwgreff = getdefaultbytype(hdwgreff);
 							newwep.loadoutconfigure(gdhdwgreff.config);
 						}
 
-						newwep.actualpickup(self,true);
+						newwep.actualpickup(self, true);
 					}
 				}
 			}else{
 				A_GiveInventory(
-					reff.getclassname(),
-					clamp(howmany[i].toint(),1,int.MAX)
+					reff.getclassname(), 
+					clamp(howmany[i].toint(), 1, int.MAX)
 				);
-				let iii=hdpickup(findinventory(reff.getclassname()));
-				if(iii){
-					iii.amount=min(iii.amount,iii.maxamount);
-					if(hdmagammo(iii))hdmagammo(iii).syncamount();
+				let iii = hdpickup(FindInventory(reff.getclassname()));
+				if (iii){
+					iii.Amount = min(iii.Amount, iii.maxamount);
+					if (hdmagammo(iii))hdmagammo(iii).syncamount();
 
 					//(as copypasted from the weapon)
 					//now apply the loadout input to overwrite the defaults
-					string wepinput=howmany[i];
-					wepinput.replace(" ","");
-					wepinput=wepinput.makelower();
+					string wepinput = howmany[i];
+					wepinput.replace(" ", "");
+					wepinput = wepinput.makelower();
 					iii.loadoutconfigure(wepinput);
 				}
 			}
 		}
 
 		//attend to backpack and contents
-		if(loadinput.indexof("-")>=0){
-			A_Log("Warning: deprecated loadout code for backpack. This may not be supported in future versions of Hideous Destructor.",true);
-			if(hd_debug)A_Log("Backpack Loadout: "..loadlist[1]);
+		if (loadinput.indexof("-")>=0){
+			A_Log("Warning: deprecated loadout code for backpack. This may not be supported in future versions of Hideous Destructor.", true);
+			if (hd_debug)A_Log("Backpack Loadout: "..loadlist[1]);
 			A_GiveInventory("HDBackpack");
-			hdbackpack(FindInventory("HDBackpack",true)).initializeamount(loadlist[1]);
+			hdbackpack(FindInventory("HDBackpack", true)).initializeamount(loadlist[1]);
 		}
 
 		//select the correct weapon
-		HDWeaponSelector.Select(self,firstwep);
+		HDWeaponSelector.Select(self, firstwep);
 	}
 }
 
@@ -503,65 +503,65 @@ class LoadoutCode:custominventory{
 	states{
 	pickup:
 		TNT1 A 0{
-			array<hdbackpack> backpacks;backpacks.clear();
+			array < hdbackpack> backpacks;backpacks.clear();
 
 			string lll="";
-			bool first=true;
-			for(inventory hdppp=inv;hdppp!=null;hdppp=hdppp.inv){
-				let hdw=hdweapon(hdppp);
-				let hdp=hdpickup(hdppp);
-				let bp=hdbackpack(hdppp);
+			bool first = true;
+			for(inventory hdppp = inv;hdppp != null;hdppp = hdppp.inv){
+				let hdw = hdweapon(hdppp);
+				let hdp = hdpickup(hdppp);
+				let bp = hdbackpack(hdppp);
 				string refid=(hdw?hdw.refid:hdp?hdp.refid:"");
-				if(refid=="")continue;
-				if(first){
-					lll=refid.." "..hdppp.amount;
-					first=false;
-				}else if(
+				if (refid=="")continue;
+				if (first){
+					lll = refid.." "..hdppp.Amount;
+					first = false;
+				}else if (
 					hdw
 					&&hdw==player.readyweapon
 				){
 					//readyweapon gets first position
-					lll=hdw.refid.." 1, "..lll;
+					lll = hdw.refid.." 1, "..lll;
 				}else{
 					//append all items to end
-					lll=lll..", "..refid;
-					if(!bp)lll=lll.." "..hdppp.amount;
+					lll = lll..", "..refid;
+					if (!bp)lll = lll.." "..hdppp.Amount;
 				}
 
-				if(
+				if (
 					bp
-					&&bp.Storage.TotalBulk>0
+					&&bp.Storage.TotalBulk > 0
 				){
-					bp.Storage.UpdateStorage(bp,self); // [Ace] Just to make sure it's all correct.
-					lll=lll..". ";
-					int smax=bp.Storage.Items.Size();
-					for(int i=0;i<smax;i++){
-						StorageItem curItem=bp.Storage.Items[i];
-						if(
+					bp.Storage.UpdateStorage(bp, self); // [Ace] Just to make sure it's all correct.
+					lll = lll..". ";
+					int smax = bp.Storage.Items.Size();
+					for(int i = 0;i < smax;i++){
+						StorageItem curItem = bp.Storage.Items[i];
+						if (
 							curItem.HaveNone()
 							||curItem.refid==""
 						)continue;
-						lll=lll..curItem.ToLoadoutCode();
-						if(i<smax-1)lll=lll..". ";
+						lll = lll..curItem.ToLoadoutCode();
+						if (i < smax - 1)lll = lll..". ";
 					}
 				}
 			}
 
-			int havekey=0;
-			if(countinv("BlueCard"))havekey|=1;
-			if(countinv("YellowCard"))havekey|=2;
-			if(countinv("RedCard"))havekey|=4;
-			if(havekey)lll=lll..", key "..havekey;
+			int havekey = 0;
+			if (CountInv("BlueCard"))havekey|=1;
+			if (CountInv("YellowCard"))havekey|=2;
+			if (CountInv("RedCard"))havekey|=4;
+			if (havekey)lll = lll..", key "..havekey;
 
 
 
 			string outstring="The loadout code for your current gear is:\n"..(lll==""?"nothing, you're naked.":"\cy"..lll);
-			A_Log(outstring,true);
-			if(invoker.amount>900){
+			A_Log(outstring, true);
+			if (invoker.Amount > 900){
 				string warning="\cxYour \cyhd_loadout1\cx has been automatically updated.";
-				A_Log(warning,true);
-				let lodstor=loadoutmenuhacktoken(ThinkerFlag.Get(self,"loadoutmenuhacktoken"));
-				lodstor.loadout=lll;
+				A_Log(warning, true);
+				let lodstor = loadoutmenuhacktoken(ThinkerFlag.Get(self, "loadoutmenuhacktoken"));
+				lodstor.loadout = lll;
 			}
 		}fail;
 	}
@@ -574,24 +574,24 @@ class LoadoutItemList:CustomInventory{
 	pickup:
 		TNT1 A 0{
 			string blah="All loadout codes for all items including loaded mods:";
-			for(int i=0;i<allactorclasses.size();i++){
-				class<actor> reff=allactorclasses[i];
+			for(int i = 0;i < allactorclasses.size();i++){
+				class < actor> reff = allactorclasses[i];
 				string ref="";
 				string nnm="";
-				if(reff is "HDPickup"){
-					let gdb=getdefaultbytype((class<hdpickup>)(reff));
-					nnm=gdb.gettag();if(nnm=="")nnm=gdb.getclassname();
-					ref=gdb.refid;
-				}else if(reff is "HDWeapon"){
-					let gdb=getdefaultbytype((class<hdweapon>)(reff));
-					nnm=gdb.gettag();if(nnm=="")nnm=gdb.getclassname();
-					ref=gdb.refid;
+				if (reff is "HDPickup"){
+					let gdb = getdefaultbytype((class < hdpickup>)(reff));
+					nnm = gdb.gettag();if (nnm=="")nnm = gdb.getclassname();
+					ref = gdb.refid;
+				}else if (reff is "HDWeapon"){
+					let gdb = getdefaultbytype((class < hdweapon>)(reff));
+					nnm = gdb.gettag();if (nnm=="")nnm = gdb.getclassname();
+					ref = gdb.refid;
 				}
-				if(ref!=""){
-					blah=blah.."\n"..ref.."   "..nnm;
+				if (ref!=""){
+					blah = blah.."\n"..ref.."   "..nnm;
 				}
 			}
-			A_Log(blah,true);
+			A_Log(blah, true);
 		}fail;
 	}
 }
@@ -603,12 +603,12 @@ class LoadoutItemList:CustomInventory{
 
 class InsurgentLoadout:Inventory{
 	override void Tick(){
-		if(!owner){destroy();return;}
+		if (!owner){destroy();return;}
 		//pick one or two random weapons
-		class<inventory> ammoforwep=null;
-		for(int i=0;i<randompick(1,1,1,1,1,1,1,1,1,2,2,2,3);i++){
+		class < inventory> ammoforwep = null;
+		for(int i = 0;i < randompick(1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3);i++){
 			string thiswep="";
-			switch(4+random(0,13)){
+			switch(4 + random(0, 13)){
 			case 0:
 				thiswep="HDPistol";
 				owner.A_GiveInventory(thiswep);
@@ -641,12 +641,12 @@ class InsurgentLoadout:Inventory{
 				break;
 			case 5:
 				owner.A_GiveInventory("LiberatorNoGL");
-				HDWeaponSelector.Select(owner,"LiberatorRifle");
+				HDWeaponSelector.Select(owner, "LiberatorRifle");
 				ammoforwep="HD7mMag";
 				break;
 			case 6:
 				owner.A_GiveInventory("ZM66Regular");
-				HDWeaponSelector.Select(owner,"ZM66AssaultRifle");
+				HDWeaponSelector.Select(owner, "ZM66AssaultRifle");
 				ammoforwep="HD4mMag";
 				break;
 			case 7:
@@ -663,7 +663,7 @@ class InsurgentLoadout:Inventory{
 				break;
 			case 9:
 				owner.A_GiveInventory("HDAutoPistol");
-				HDWeaponSelector.Select(owner,"HDPistol");
+				HDWeaponSelector.Select(owner, "HDPistol");
 				ammoforwep="HD9mMag15";
 				break;
 			case 10:
@@ -671,21 +671,21 @@ class InsurgentLoadout:Inventory{
 				owner.A_GiveInventory(thiswep);
 				owner.A_SelectWeapon(thiswep);
 				ammoforwep="HD4mMag";
-				owner.A_SetInventory("HDRocketAmmo",max(owner.countinv("HDRocketAmmo"),random(0,4)));
+				owner.A_SetInventory("HDRocketAmmo", max(owner.CountInv("HDRocketAmmo"), random(0, 4)));
 				break;
 			case 11:
 				thiswep="LiberatorRifle";
 				owner.A_GiveInventory(thiswep);
 				owner.A_SelectWeapon(thiswep);
 				ammoforwep="HD7mMag";
-				owner.A_SetInventory("HDRocketAmmo",max(owner.countinv("HDRocketAmmo"),random(0,4)));
+				owner.A_SetInventory("HDRocketAmmo", max(owner.CountInv("HDRocketAmmo"), random(0, 4)));
 				break;
 			case 12:
 				thiswep="Vulcanette";
 				owner.A_GiveInventory(thiswep);
 				owner.A_SelectWeapon(thiswep);
 				ammoforwep="HD4mMag";
-				owner.A_SetInventory("HDBattery",max(owner.countinv("HDBattery"),random(0,1)));
+				owner.A_SetInventory("HDBattery", max(owner.CountInv("HDBattery"), random(0, 1)));
 				break;
 			case 13:
 				thiswep="Blooper";
@@ -721,30 +721,30 @@ class InsurgentLoadout:Inventory{
 				break;
 			}
 			//give some random ammo for the new weapon
-			if(ammoforwep){
-				let thisinv=hdpickup(owner.giveinventorytype(ammoforwep));
+			if (ammoforwep){
+				let thisinv = hdpickup(owner.giveinventorytype(ammoforwep));
 
-				let thismag=hdmagammo(thisinv);
-				if(thismag)thismag.syncamount();
+				let thismag = hdmagammo(thisinv);
+				if (thismag)thismag.syncamount();
 
-				int thismax=max(1,HDPickup.MaxGive(owner,thisinv.getclass(),
+				int thismax = max(1, HDPickup.MaxGive(owner, thisinv.getclass(), 
 					thismag?thismag.getbulk():thisinv.bulk
 				));
 
-				thisinv.amount=random(1,max(1,thismax>>2));
-				if(thismag)thismag.syncamount();
+				thisinv.Amount = random(1, max(1, thismax >> 2));
+				if (thismag)thismag.syncamount();
 			}
 		}
 		//give random other gear
-		array<string> supplies;supplies.clear();
-		for(int i=0;i<allactorclasses.size();i++){
-			let thisclass=((class<hdpickup>)(allactorclasses[i]));
-			if(thisclass && getdefaultbytype(thisclass).refid!=""){
+		array < string> supplies;supplies.clear();
+		for(int i = 0;i < allactorclasses.size();i++){
+			let thisclass=((class < hdpickup>)(allactorclasses[i]));
+			if (thisclass && getdefaultbytype(thisclass).refid!=""){
 				supplies.push(thisclass.getclassname());
 				continue;
 			}
-			let thiswclass=((class<hdweapon>)(allactorclasses[i]));
-			if(
+			let thiswclass=((class < hdweapon>)(allactorclasses[i]));
+			if (
 				thiswclass
 				&&getdefaultbytype(thiswclass).binvbar
 				&&getdefaultbytype(thiswclass).refid!=""
@@ -753,64 +753,64 @@ class InsurgentLoadout:Inventory{
 				continue;
 			}
 		}
-		int imax=random(3,6);
-		int smax=supplies.size()-1;
-		for(int i=0;i<imax;i++){
-			let thisclass=supplies[random(0,smax)];
-			let thisitem=HDPickup(owner.GiveInventoryType(thisclass));
-			int thismax=1;
-			if(thisitem){
-				if(hd_debug)A_Log("insurgent input: "..thisclass);
-				let thismag=hdmagammo(thisitem);
-				if(thismag)thismag.syncamount();
+		int imax = random(3, 6);
+		int smax = supplies.size()-1;
+		for(int i = 0;i < imax;i++){
+			let thisclass = supplies[random(0, smax)];
+			let thisitem = HDPickup(owner.GiveInventoryType(thisclass));
+			int thismax = 1;
+			if (thisitem){
+				if (hd_debug)A_Log("insurgent input: "..thisclass);
+				let thismag = hdmagammo(thisitem);
+				if (thismag)thismag.syncamount();
 
-				thismax=max(1,HDPickup.MaxGive(owner,thisitem.getclass(),
+				thismax = max(1, HDPickup.MaxGive(owner, thisitem.getclass(), 
 					thismag?thismag.getbulk():thisitem.bulk
 				));
 
-				thisitem.amount=random(1,max(1,thismax>>2));
-				if(thismag)thismag.syncamount();
-				if(hd_debug)A_Log(thisitem.getclassname().."  "..thisitem.amount);
+				thisitem.Amount = random(1, max(1, thismax >> 2));
+				if (thismag)thismag.syncamount();
+				if (hd_debug)A_Log(thisitem.getclassname().."  "..thisitem.Amount);
 			}else{
-				let thiswitem=HDWeapon(owner.GiveInventoryType(thisclass));
-				if(thiswitem){
-					if(hd_debug)A_Log("insurgent input: "..thisclass);
+				let thiswitem = HDWeapon(owner.GiveInventoryType(thisclass));
+				if (thiswitem){
+					if (hd_debug)A_Log("insurgent input: "..thisclass);
 
-					let wb=thiswitem.weaponbulk();
-					if(wb)thismax=int(max(1,HDCONST_MAXPOCKETSPACE/wb));
-					else thismax=thiswitem.maxamount>>3;
+					let wb = thiswitem.weaponbulk();
+					if (wb)thismax = int(max(1, HDCONST_MAXPOCKETSPACE / wb));
+					else thismax = thiswitem.maxamount >> 3;
 
-					thiswitem.amount=random(1,max(1,thismax>>2));
-					if(hd_debug)A_Log(thiswitem.getclassname().."  "..thiswitem.amount);
+					thiswitem.Amount = random(1, max(1, thismax >> 2));
+					if (hd_debug)A_Log(thiswitem.getclassname().."  "..thiswitem.Amount);
 				}
 			}
 		}
 		//randomize integrity of armour
-		let armourstored=HDArmour(owner.findinventory("HDArmour"));
-		if(armourstored){
+		let armourstored = HDArmour(owner.FindInventory("HDArmour"));
+		if (armourstored){
 			armourstored.syncamount();
-			bool nomega=armourstored.amount>2;
-			for(int i=0;i<armourstored.amount;i++){
-				if(
+			bool nomega = armourstored.Amount > 2;
+			for(int i = 0;i < armourstored.Amount;i++){
+				if (
 					!nomega
-					&&!random(0,12)
+					&&!random(0, 12)
 				){
-					armourstored.mags[i]=random(1001,1000+HDCONST_BATTLEARMOUR);
+					armourstored.mags[i]=random(1001, 1000 + HDCONST_BATTLEARMOUR);
 				}else{
-					armourstored.mags[i]=random(1,HDCONST_GARRISONARMOUR);
+					armourstored.mags[i]=random(1, HDCONST_GARRISONARMOUR);
 				}
 			}
 		}
-		let armourworn=HDArmourWorn(owner.findinventory("HDArmourWorn"));
-		if(armourworn){
-			armourworn.mega=!random(0,12);
-			armourworn.durability=random(1,
+		let armourworn = HDArmourWorn(owner.FindInventory("HDArmourWorn"));
+		if (armourworn){
+			armourworn.mega=!random(0, 12);
+			armourworn.durability = random(1, 
 				armourworn.mega?HDCONST_BATTLEARMOUR:HDCONST_GARRISONARMOUR
 			);
 		}
 
-		let bp=hdbackpack(owner.FindInventory("HDBackpack",true));
-		if(bp&&!random(0,31))bp.randomcontents();
+		let bp = hdbackpack(owner.FindInventory("HDBackpack", true));
+		if (bp&&!random(0, 31))bp.randomcontents();
 
 		destroy();
 	}

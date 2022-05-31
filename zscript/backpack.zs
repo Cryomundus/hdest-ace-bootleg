@@ -1,31 +1,31 @@
 // ------------------------------------------------------------
 // Backpack
 // ------------------------------------------------------------
-const HDCONST_BPMAX=1000;
+const HDCONST_BPMAX = 1000;
 
 enum HDItemTypes
 {
-	IType_Invalid,
-	IType_Weapon,
-	IType_Armour,
-	IType_Mag,
+	IType_Invalid, 
+	IType_Weapon, 
+	IType_Armour, 
+	IType_Mag, 
 	IType_Pickup
 }
 
 enum HDStorageItemActions
 {
-	SIIAct_Extract,
-	SIIAct_Pocket,
-	SIIAct_Insert,
+	SIIAct_Extract, 
+	SIIAct_Pocket, 
+	SIIAct_Insert, 
 }
 
 
 enum HDBackpackFlags
 {
-	BF_FROMCONSOLIDATE = 1,
-	BF_SELECT = 1 << 1,
-	BF_IGNORECAP = 1 << 2,
-	BF_SILENT = 1 << 3,
+	BF_FROMCONSOLIDATE = 1, 
+	BF_SELECT = 1 << 1, 
+	BF_IGNORECAP = 1 << 2, 
+	BF_SILENT = 1 << 3, 
 	BF_FROMMANAGER = 1 << 4
 }
 
@@ -33,13 +33,13 @@ enum HDBackpackFlags
 class StorageItem play
 {
 	Inventory InvRef;
-	class<Inventory> ItemClass;
+	class < Inventory> ItemClass;
 	string NiceName;
 	string RefId;
-	Array<string> Icons;
-	Array<double> Bulks;
-	Array<int> Amounts; // [Ace] Only one element (index 0) is used for singular items.
-	Array<int> WeaponStatus; // [Ace] Every HDWEP_STATUSSLOTS starts a new weapon.
+	Array < string> Icons;
+	Array < double> Bulks;
+	Array < int> Amounts; // [Ace] Only one element (index 0) is used for singular items.
+	Array < int> WeaponStatus; // [Ace] Every HDWEP_STATUSSLOTS starts a new weapon.
 
 	clearscope double GetBulk()
 	{
@@ -77,9 +77,9 @@ class ItemStorage play
 	double TotalBulk;
 	double MaxBulk;
 	int SelItemIndex;
-	Array<StorageItem> Items;
+	Array < StorageItem> Items;
 
-	clearscope StorageItem Find(class<Inventory> item)
+	clearscope StorageItem Find(class < Inventory> item)
 	{
 		if (!item)
 		{
@@ -127,7 +127,7 @@ class ItemStorage play
 	// [Ace] Can also be used as "ClassifyItem". Multiuse!
 	// Fallback to cls if the reference is null.
 	// Extendable if more conditions need to be added later on.
-	virtual clearscope int CheckConditions(Inventory item, class<Inventory> cls = null)
+	virtual clearscope int CheckConditions(Inventory item, class < Inventory> cls = null)
 	{
 		if (item)
 		{
@@ -153,10 +153,10 @@ class ItemStorage play
 		else if (cls)
 		{
 			let def = GetDefaultByType(cls);
-			let wpn = cls is 'HDWeapon' ? GetDefaultByType((class<HDWeapon>)(cls)) : null;
-			let arm = cls is 'HDArmour' ? GetDefaultByType((class<HDArmour>)(cls)) : null;
-			let mag = cls is 'HDMagAmmo' ? GetDefaultByType((class<HDMagAmmo>)(cls)) : null;
-			let pkp = cls is 'HDPickup' ? GetDefaultByType((class<HDPickup>)(cls)) : null;
+			let wpn = cls is 'HDWeapon' ? GetDefaultByType((class < HDWeapon>)(cls)) : null;
+			let arm = cls is 'HDArmour' ? GetDefaultByType((class < HDArmour>)(cls)) : null;
+			let mag = cls is 'HDMagAmmo' ? GetDefaultByType((class < HDMagAmmo>)(cls)) : null;
+			let pkp = cls is 'HDPickup' ? GetDefaultByType((class < HDPickup>)(cls)) : null;
 
 			if (def.bNOINTERACTION || def.bUNDROPPABLE || def.bUNTOSSABLE || def.GetTag() == def.GetClassName() || pkp && !pkp.bFITSINBACKPACK || wpn && (wpn.bCHEATNOTWEAPON || !wpn.bFITSINBACKPACK))
 			{
@@ -172,10 +172,10 @@ class ItemStorage play
 		return IType_Invalid;
 	}
 
-	virtual clearscope int GetOperationSpeed(class<Inventory> item, int operation)
+	virtual clearscope int GetOperationSpeed(class < Inventory> item, int operation)
 	{
-		let wpn = (class<HDWeapon>)(item);
-		let pkp = (class<HDPickup>)(item);
+		let wpn = (class < HDWeapon>)(item);
+		let pkp = (class < HDPickup>)(item);
 		bool multipickup = pkp && GetDefaultByType(pkp).bMULTIPICKUP;
 		switch (operation)
 		{
@@ -241,7 +241,7 @@ class ItemStorage play
 	// [Ace] The difference between AddAmount and TryInsertItem is that AddAmount can be used to create items out of thin air.
 	// It can also remove items.
 	// Same return as TryInsertItem.
-	virtual int AddAmount(class<Inventory> item, int amt, int flags = BF_IGNORECAP)
+	virtual int AddAmount(class < Inventory> item, int amt, int flags = BF_IGNORECAP)
 	{
 		int Inserted = 0;
 
@@ -269,7 +269,7 @@ class ItemStorage play
 		return Inserted;
 	}
 
-	virtual clearscope int GetAmount(class<Inventory> item)
+	virtual clearscope int GetAmount(class < Inventory> item)
 	{
 		StorageItem si = Find(item);
 		if (si)
@@ -509,7 +509,7 @@ class ItemStorage play
 		return RetVal;
 	}
 
-	bool DestroyItem(class<Inventory> item)
+	bool DestroyItem(class < Inventory> item)
 	{
 		StorageItem si = Find(item);
 		if (si)
@@ -520,7 +520,7 @@ class ItemStorage play
 		return false;
 	}
 
-	// [Ace] Null receiver means the item is dropped/spilled on the ground.
+	// [Ace] Null receiver means the item is dropped / spilled on the ground.
 	// Null remover means <amt> amount of the item is destroyed from the backpack. Receiver is ignored.
 	virtual Inventory RemoveItem(StorageItem item, Actor remover, Actor receiver, int amt = 1, int index = 0, int flags = 0)
 	{
@@ -529,10 +529,10 @@ class ItemStorage play
 			return null;
 		}
 
-		let wpn = (class<HDWeapon>)(item.ItemClass);
-		let arm = (class<HDArmour>)(item.ItemClass);
-		let mag = (class<HDMagAmmo>)(item.ItemClass);
-		let pkp = (class<HDPickup>)(item.ItemClass);
+		let wpn = (class < HDWeapon>)(item.ItemClass);
+		let arm = (class < HDArmour>)(item.ItemClass);
+		let mag = (class < HDMagAmmo>)(item.ItemClass);
+		let pkp = (class < HDPickup>)(item.ItemClass);
 
 		Inventory spawned = null;
 		vector3 SpawnPos = remover ? (remover.pos.x + 5 * cos(remover.angle), remover.pos.y + 5 * sin(remover.angle), remover.pos.z + remover.height * 0.8) : (0, 0, 0);
@@ -745,9 +745,9 @@ class ItemStorage play
 						deletethis = false;
 					}
 				}
-				else if (item && item.amount > 0)
+				else if (item && item.Amount > 0)
 				{
-					deletethis=false;
+					deletethis = false;
 				}
 			}
 
@@ -808,7 +808,7 @@ class HDBackpack : HDWeapon{
 		{
 			return Super.CreateTossable(amt);
 		}
-		if (!HDPlayerPawn.CheckStrip(owner,self))
+		if (!HDPlayerPawn.CheckStrip(owner, self))
 		{
 			return null;
 		}
@@ -846,7 +846,7 @@ class HDBackpack : HDWeapon{
 	}
 	override string GetHelpText()
 	{
-		return WEPHELP_FIRE.."/"..WEPHELP_ALTFIRE.."  Previous/Next item\n"
+		return WEPHELP_FIRE.."/"..WEPHELP_ALTFIRE.."  Previous / Next item\n"
 		..WEPHELP_FIREMODE.."+"..WEPHELP_UPDOWN.."  Scroll through items\n"
 		..WEPHELP_RELOAD.."  Insert\n"
 		..WEPHELP_UNLOAD.."  Remove\n"
@@ -858,7 +858,7 @@ class HDBackpack : HDWeapon{
 	//syntax: bak item1. item2. item3 (basically use dots instead of commas)
 	override void LoadoutConfigure(string input)
 	{
-		input.Replace(".", ",");
+		input.Replace(".", ", ");
 		if (hd_debug)
 		{
 			console.printf("Backpack Loadout: "..input);
@@ -873,11 +873,11 @@ class HDBackpack : HDWeapon{
 			StorageItem si = Storage.GetSelectedItem();
 			if (si)
 			{
-				amt=clamp(amt,1,10);
+				amt = clamp(amt, 1, 10);
 				int DropAmt=
 					si.ItemClass is "HDPickup"
-					&&GetDefaultByType((class<HDPickup>)(si.ItemClass)).bMULTIPICKUP
-				?int(max(1,ENC_426MAG/GetDefaultByType((class<HDPickup>)(si.ItemClass)).bulk))
+					&&GetDefaultByType((class < HDPickup>)(si.ItemClass)).bMULTIPICKUP
+				?int(max(1, ENC_426MAG / GetDefaultByType((class < HDPickup>)(si.ItemClass)).bulk))
 				:1;
 				Storage.RemoveItem(si, owner, null, DropAmt * amt);
 			}
@@ -905,7 +905,7 @@ class HDBackpack : HDWeapon{
 	}
 
 	// [Ace] This static should probably be moved elsewhere.
-	static class<Inventory> FindByRefId(string id)
+	static class < Inventory> FindByRefId(string id)
 	{
 		if (id == "")
 		{
@@ -914,8 +914,8 @@ class HDBackpack : HDWeapon{
 
 		for (int i = 0; i < AllActorClasses.Size(); ++i)
 		{
-			let wpn = (class<HDWeapon>)(AllActorClasses[i]);
-			let pkp = (class<HDPickup>)(AllActorClasses[i]);
+			let wpn = (class < HDWeapon>)(AllActorClasses[i]);
+			let pkp = (class < HDPickup>)(AllActorClasses[i]);
 			if (wpn && GetDefaultByType(wpn).RefId ~== id)
 			{
 				return wpn;
@@ -929,7 +929,7 @@ class HDBackpack : HDWeapon{
 		return null;
 	}
 
-	static Inventory SpawnAndConfigure(class<Inventory> item, string cfg1 = "", string cfg2 = "")
+	static Inventory SpawnAndConfigure(class < Inventory> item, string cfg1 = "", string cfg2 = "")
 	{
 		if (!item)
 		{
@@ -971,7 +971,7 @@ class HDBackpack : HDWeapon{
 		return Spawned;
 	}
 
-	void RemoveClass(class<Inventory> cls, bool replace = false)
+	void RemoveClass(class < Inventory> cls, bool replace = false)
 	{
 		if (!cls)
 		{
@@ -980,10 +980,10 @@ class HDBackpack : HDWeapon{
 
 		if (Storage.DestroyItem(cls) && replace)
 		{
-			Array<class<Inventory> > validItems;
+			Array < class < Inventory> > validItems;
 			for (int i = 0; i < AllActorClasses.Size(); ++i)
 			{
-				let itemCls = (class<Inventory>)(AllActorClasses[i]);
+				let itemCls = (class < Inventory>)(AllActorClasses[i]);
 				if (!itemCls || itemCls == cls)
 				{
 					continue;
@@ -998,8 +998,8 @@ class HDBackpack : HDWeapon{
 			int index = random(0, validItems.Size() - 1);
 			if (index > -1)
 			{
-				let wepDef = (class<HDWeapon>)(validItems[index]) ? GetDefaultByType((class<HDWeapon>)(validItems[index])) : null;
-				let pkpDef = (class<HDPickup>)(validItems[index]) ? GetDefaultByType((class<HDPickup>)(validItems[index])) : null;
+				let wepDef = (class < HDWeapon>)(validItems[index]) ? GetDefaultByType((class < HDWeapon>)(validItems[index])) : null;
+				let pkpDef = (class < HDPickup>)(validItems[index]) ? GetDefaultByType((class < HDPickup>)(validItems[index])) : null;
 
 				if (wepDef)
 				{
@@ -1022,15 +1022,15 @@ class HDBackpack : HDWeapon{
 
 	virtual void InitializeAmount(string loadlist)
 	{
-		Array<string> LItems;
+		Array < string> LItems;
 		loadlist.Replace(" ", "");
-		loadlist.Split(LItems, ",");
+		loadlist.Split(LItems, ", ");
 		for (int i = 0; i < LItems.Size(); ++i)
 		{
 			string config = LItems[i].Mid(3, LItems[i].Length());
 			LItems[i] = LItems[i].Left(3);
 
-			class<Inventory> cls = FindByRefId(LItems[i]);
+			class < Inventory> cls = FindByRefId(LItems[i]);
 			if (!cls)
 			{
 				continue;
@@ -1046,12 +1046,12 @@ class HDBackpack : HDWeapon{
 
 	virtual void RandomContents(bool clear = false)
 	{
-		Array<class<Inventory> > ValidItems;
+		Array < class < Inventory> > ValidItems;
 		for (int i = 0; i < AllActorClasses.Size(); ++i)
 		{
-			let invitem = (class<Inventory>)(AllActorClasses[i]);
-			let wpn = (class<HDWeapon>)(invitem);
-			let pkp = (class<HDPickup>)(invitem);
+			let invitem = (class < Inventory>)(AllActorClasses[i]);
+			let wpn = (class < HDWeapon>)(invitem);
+			let pkp = (class < HDPickup>)(invitem);
 
 			if (!invitem || pkp && GetDefaultByType(pkp).bNORANDOMBACKPACKSPAWN || wpn && GetDefaultByType(wpn).bNORANDOMBACKPACKSPAWN)
 			{
@@ -1077,7 +1077,7 @@ class HDBackpack : HDWeapon{
 		for (int i = 0; i < MaxItems; ++i)
 		{
 			int amt;
-			class<Inventory> Picked = ValidItems[random(0, ValidItems.Size() - 1)];
+			class < Inventory> Picked = ValidItems[random(0, ValidItems.Size() - 1)];
 			switch (Storage.CheckConditions(null, Picked))
 			{
 				case IType_Weapon:
@@ -1086,12 +1086,12 @@ class HDBackpack : HDWeapon{
 					break;
 				case IType_Armour:
 				case IType_Mag:
-					let mag = GetDefaultByType((class<HDMagAmmo>)(Picked));
+					let mag = GetDefaultByType((class < HDMagAmmo>)(Picked));
 					amt = int(min(random(1, random(1, 20)), mag.MaxAmount, MaxCapacity / (max(1.0, mag.RoundBulk) * max(1.0, mag.MagBulk) * 5)));
 					Storage.AddAmount(Picked, amt, flags: 0);
 					break;
 				case IType_Pickup:
-					let pkp = GetDefaultByType((class<HDPickup>)(Picked));
+					let pkp = GetDefaultByType((class < HDPickup>)(Picked));
 					amt = int(min(random(1, pkp.bMULTIPICKUP ? random(1, 80) : random(1, random(1, 20))), pkp.MaxAmount, MaxCapacity / (max(1.0, pkp.bulk) * 5.0)));
 					if (pkp.RefId == "")
 					{
@@ -1110,7 +1110,7 @@ class HDBackpack : HDWeapon{
 		}
 	}
 
-	virtual bool CanGrabInsert(Inventory item, class<Inventory> cls, Actor inserter)
+	virtual bool CanGrabInsert(Inventory item, class < Inventory> cls, Actor inserter)
 	{
 		return true;
 	}
@@ -1211,7 +1211,7 @@ class HDBackpack : HDWeapon{
 		if (PressingAltReload() || invoker.Storage.TotalBulk > invoker.Storage.MaxBulk)
 		{
 			StorageItem si = invoker.Storage.GetSelectedItem();
-			int dropAmt = (si && si.ItemClass is "HDAmmo" && GetDefaultByType((class<HDAmmo>)(si.ItemClass)).bMULTIPICKUP) ? random(10,50) : 1;
+			int dropAmt = (si && si.ItemClass is "HDAmmo" && GetDefaultByType((class < HDAmmo>)(si.ItemClass)).bMULTIPICKUP) ? random(10, 50) : 1;
 			invoker.Storage.RemoveItem(si, self, null, dropAmt);
 			if (invoker.Storage.TotalBulk ~== 0)
 			{
@@ -1314,7 +1314,7 @@ class HDBackpack : HDWeapon{
 		Weapon.SelectionOrder 1010;
 		Inventory.Icon "BPAKA0";
 		Inventory.PickupMessage "Picked up a backpack to help fill your life with ammo!";
-		Inventory.PickupSound "weapons/pocket";
+		Inventory.PickupSound "weapons / pocket";
 		Tag "Backpack";
 		HDWeapon.RefId HDLD_BACKPAK;
 		HDBackpack.MaxCapacity HDCONST_BPMAX;
@@ -1342,7 +1342,7 @@ class HDBackpack : HDWeapon{
 			TNT1 A 10
 			{
 				A_UpdateStorage(); // [Ace] Populates items.
-				A_StartSound("weapons/pocket", CHAN_WEAPON);
+				A_StartSound("weapons / pocket", CHAN_WEAPON);
 				if (invoker.Storage.TotalBulk > (HDCONST_BPMAX * 0.7))
 				{
 					A_SetTics(20);
@@ -1362,7 +1362,7 @@ class HDBackpack : HDWeapon{
 				StorageItem si = invoker.Storage.GetSelectedItem();
 				if (si && si.ItemClass is 'HDMagAmmo')
 				{
-					let mag = GetDefaultByType((class<HDMagAmmo>)(si.ItemClass));
+					let mag = GetDefaultByType((class < HDMagAmmo>)(si.ItemClass));
 					if (mag.MustShowInMagManager || mag.RoundType != "")
 					{
 						A_MagManager(mag.GetClassName());
@@ -1381,14 +1381,14 @@ class HDBackpack : HDWeapon{
 	}
 }
 
-//semi-filled backpacks at random
+//semi - filled backpacks at random
 class WildBackpack:IdleDummy replaces Backpack{
-		//$Category "Items/Hideous Destructor/Gear"
+		//$Category "Items / Hideous Destructor / Gear"
 		//$Title "Backpack (Random Spawn)"
 		//$Sprite "BPAKC0"
 	override void postbeginplay(){
 		super.postbeginplay();
-		let aaa=HDBackpack(spawn("HDBackpack",pos,ALLOW_REPLACE));
+		let aaa = HDBackpack(spawn("HDBackpack", pos, ALLOW_REPLACE));
 		aaa.RandomContents();
 		destroy();
 	}

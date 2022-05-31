@@ -1,9 +1,9 @@
 // ------------------------------------------------------------
 // H.E.R.P. Robot
 // ------------------------------------------------------------
-const HERP_CONTROLRANGE=DERP_CONTROLRANGE*1.6;
+const HERP_CONTROLRANGE = DERP_CONTROLRANGE * 1.6;
 enum HERPConst{
-	HERP_TID=851816,
+	HERP_TID = 851816, 
 }
 class HERPLeg:Actor{
 	default{
@@ -12,10 +12,10 @@ class HERPLeg:Actor{
 	vector3 relpos;
 	double oldfloorz;
 	override void Tick(){
-		if(!master){destroy();return;}
-		binvisible=oldfloorz!=floorz;
-		setorigin(master.pos+relpos,true);
-		oldfloorz=floorz;
+		if (!master){destroy();return;}
+		binvisible = oldfloorz != floorz;
+		setorigin(master.pos + relpos, true);
+		oldfloorz = floorz;
 	}
 	states{
 	spawn:
@@ -25,17 +25,17 @@ class HERPLeg:Actor{
 }
 class HERPBot:HDUPK{
 	default{
-		//$Category "Monsters/Hideous Destructor"
+		//$Category "Monsters / Hideous Destructor"
 		//$Title "H.E.R.P. Robot"
 		//$Sprite "HERPA1"
 
 		+ismonster +noblockmonst +friendly +standstill +nofear
 		+shootable +ghost +noblood +dontgib
-		+missilemore //on/off
+		+missilemore //on / off
 		+nobouncesound
 		height 9;radius 7;mass 400;health 200;
-		damagefactor "hot",0.7;
-		damagefactor "cold",0.7;
+		damagefactor "hot", 0.7;
+		damagefactor "cold", 0.7;
 		obituary "%o went HERP.";
 		hdupk.pickupmessage ""; //just use the spawned one
 		hdupk.pickupsound "";
@@ -45,144 +45,144 @@ class HERPBot:HDUPK{
 
 	//it is now canon: the mag and seal checkers are built inextricably into the AI.
 	//if you tried to use a jailbroken mag, the whole robot just segfaults.
-	int ammo[3]; //the mag being used: -1-51, -1 no mag, 0 empty, 51 sealed, >100  dirty
-	int battery; //the battery, -1-20
+	int ammo[3]; //the mag being used: -1 - 51, -1 no mag, 0 empty, 51 sealed, >100  dirty
+	int battery; //the battery, -1 - 20
 	double startangle;
 	double startpitch;
 	bool scanright;
 	int botid;
 
-	override bool cancollidewith(actor other,bool passive){return other.bmissile||HDPickerUpper(other);}
+	override bool cancollidewith(actor other, bool passive){return other.bmissile||HDPickerUpper(other);}
 	override bool ongrab(actor other){
-		if(ishostile(other)){
-			bmissilemore=false;
+		if (ishostile(other)){
+			bmissilemore = false;
 			setstatelabel("off");
 		}
 		return true;
 	}
-	override void Die(actor source,actor inflictor,int dmgflags){
-		super.Die(source,inflictor,dmgflags);
-		if(self)bsolid=true;
+	override void Die(actor source, actor inflictor, int dmgflags){
+		super.Die(source, inflictor, dmgflags);
+		if (self)bsolid = true;
 	}
 	override void Tick(){
-		if(
-			pos.z+vel.z<floorz+12
+		if (
+			pos.z + vel.z < floorz + 12
 		){
-			vel.z=0;
-			setz(floorz+12);
-			bnogravity=true;
-		}else bnogravity=pos.z-floorz<=12;
-		if(bnogravity)vel.xy*=getfriction();
+			vel.z = 0;
+			setz(floorz + 12);
+			bnogravity = true;
+		}else bnogravity = pos.z - floorz <= 12;
+		if (bnogravity)vel.xy *= getfriction();
 		super.tick();
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
-		startangle=angle;
-		startpitch=pitch;
-		scanright=false;
-		if(!master){
+		startangle = angle;
+		startpitch = pitch;
+		scanright = false;
+		if (!master){
 			ammo[0]=51;
 			ammo[1]=51;
 			ammo[2]=51;
-			battery=20;
+			battery = 20;
 		}
 		bool gbg;actor lll;
-		[gbg,lll]=A_SpawnItemEx(
-			"HERPLeg",xofs:-7,zofs:-12,
-			angle:0,
+		[gbg, lll]=A_SpawnItemEx(
+			"HERPLeg", xofs:-7, zofs:-12, 
+			angle:0, 
 			flags:SXF_NOCHECKPOSITION|SXF_SETMASTER
 		);
-		HERPLeg(lll).relpos=lll.pos-pos;
+		HERPLeg(lll).relpos = lll.pos - pos;
 		lll.pitch=-60;
-		[gbg,lll]=A_SpawnItemEx(
-			"HERPLeg",xofs:-7,zofs:-12,
-			angle:-120,
+		[gbg, lll]=A_SpawnItemEx(
+			"HERPLeg", xofs:-7, zofs:-12, 
+			angle:-120, 
 			flags:SXF_NOCHECKPOSITION|SXF_SETMASTER
 		);
-		HERPLeg(lll).relpos=lll.pos-pos;
+		HERPLeg(lll).relpos = lll.pos - pos;
 		lll.pitch=-60;
-		[gbg,lll]=A_SpawnItemEx(
-			"HERPLeg",xofs:-7,zofs:-12,
-			angle:120,
+		[gbg, lll]=A_SpawnItemEx(
+			"HERPLeg", xofs:-7, zofs:-12, 
+			angle:120, 
 			flags:SXF_NOCHECKPOSITION|SXF_SETMASTER
 		);
-		HERPLeg(lll).relpos=lll.pos-pos;
+		HERPLeg(lll).relpos = lll.pos - pos;
 		lll.pitch=-60;
 	}
-	void herpbeep(string snd="herp/beep",double vol=1.){
-		A_StartSound(snd,CHAN_VOICE);
-		if(
+	void herpbeep(string snd="herp / beep", double vol = 1.){
+		A_StartSound(snd, CHAN_VOICE);
+		if (
 			master
 			&&master.player
 			&&master.player.readyweapon is "HERPController"
-		)master.A_StartSound(snd,CHAN_WEAPON,volume:0.4);
+		)master.A_StartSound(snd, CHAN_WEAPON, volume:0.4);
 	}
 	void message(string msg){
-		if(master)master.A_Log("\cd[HERP"..(botid?"(\cj"..botid.."\cd)":"").."]\cj  "..msg,true);
+		if (master)master.A_Log("\cd[HERP"..(botid?"(\cj"..botid.."\cd)":"").."]\cj  "..msg, true);
 	}
 	void scanturn(){
-		if(battery<1){
-			message("Operational fault. Please check your manual for proper maintenance. (ERR-4fd92-00B) Power low.");
+		if (battery < 1){
+			message("Operational fault. Please check your manual for proper maintenance. (ERR - 4fd92 - 00B) Power low.");
 			setstatelabel("nopower");
 			return;
 		}
-		if(health<1){
+		if (health < 1){
 			A_Die();
 			setstatelabel("death");
 			return;
 		}
-		if(!bmissilemore){
+		if (!bmissilemore){
 			setstatelabel("off");
 			return;
 		}
-		if(bmissileevenmore){
+		if (bmissileevenmore){
 			setstatelabel("inputready");
 			return;
 		}
-		if(!random(0,8192))battery--;
+		if (!random(0, 8192))battery--;
 		A_ClearTarget();
 
-		//shoot 5 lines for at least some z-axis awareness
+		//shoot 5 lines for at least some z - axis awareness
 		actor a;int b;int c=-2;
 		while(
-			c<=1
+			c <= 1
 		){
 			c++;
 			//shoot a line out
 			flinetracedata hlt;
 			linetrace(
-				angle,4096,c+pitch,
-				flags:TRF_NOSKY,
-				offsetz:9.5,
+				angle, 4096, c + pitch, 
+				flags:TRF_NOSKY, 
+				offsetz:9.5, 
 				data:hlt
 			);
 
-			if(
+			if (
 				c==0
-				&&hlt.hittype!=Trace_HitNone
-				&&hlt.distance>0
+				&&hlt.hittype != Trace_HitNone
+				&&hlt.distance > 0
 			){
-				vector3 relpos=hlt.hitlocation-pos;
-				double rtt=0.03*hlt.distance;
-				if(scanright)rtt=-rtt;
-				double saf=1.;
-				for(int i=0;i<7;i++){
-					relpos-=hlt.hitdir;
+				vector3 relpos = hlt.hitlocation - pos;
+				double rtt = 0.03 * hlt.distance;
+				if (scanright)rtt=-rtt;
+				double saf = 1.;
+				for(int i = 0;i < 7;i++){
+					relpos -= hlt.hitdir;
 					a_spawnparticle(
-						"red",SPF_FULLBRIGHT|SPF_RELVEL,lifetime:(tics<<1),size:3,0,
-						relpos.x,
-						relpos.y,
-						relpos.z,
-						vely:rtt,
+						"red", SPF_FULLBRIGHT|SPF_RELVEL, lifetime:(tics << 1), size:3, 0, 
+						relpos.x, 
+						relpos.y, 
+						relpos.z, 
+						vely:rtt, 
 						startalphaf:saf
 					);
-					saf-=0.12;
+					saf -= 0.12;
 				}
 			}
 
 			//if the line hits a valid target, go into shooting state
-			actor hitactor=hlt.hitactor;
-			if(
+			actor hitactor = hlt.hitactor;
+			if (
 				hitactor
 				&&isHostile(hitactor)
 				&&hitactor.bshootable
@@ -190,38 +190,38 @@ class HERPBot:HDUPK{
 				&&!hitactor.bnevertarget
 				&&(hitactor.bismonster||hitactor.player)
 				&&(!hitactor.player||!(hitactor.player.cheats&CF_NOTARGET))
-				&&hitactor.health>random((hitactor.vel==(0,0,0))?0:-10,5)
+				&&hitactor.health > random((hitactor.vel==(0, 0, 0))?0:-10, 5)
 				&&hitactor.checksight(self)
 			){
-				target=hitactor;
+				target = hitactor;
 				setstatelabel("ready");
 				message("IFF system alert: enemy pattern recognized.");
-				if(hd_debug)A_Log(string.format("HERP targeted %s",hitactor.getclassname()));
+				if (hd_debug)A_Log(string.format("HERP targeted %s", hitactor.getclassname()));
 				return;
 			}
 		}
 
 		//if nothing, keep moving (add angle depending on scanright)
-		A_SetAngle(angle+(scanright?-3:3),SPF_INTERPOLATE);
+		A_SetAngle(angle+(scanright?-3:3), SPF_INTERPOLATE);
 
 		//if anglechange is too far, start moving the other way
-		double chg=deltaangle(angle,startangle);
-		if(abs(chg)>35){
-			if(chg<0)scanright=true;
-			else scanright=false;
+		double chg = deltaangle(angle, startangle);
+		if (abs(chg)>35){
+			if (chg < 0)scanright = true;
+			else scanright = false;
 			setstatelabel("postbeep");
 		}
 
 		//drift back into home pitch
-		if(pitch!=startpitch){
-			A_SetPitch(pitch+clamp(startpitch-pitch,-2,2),SPF_INTERPOLATE);
+		if (pitch != startpitch){
+			A_SetPitch(pitch + clamp(startpitch - pitch, -2, 2), SPF_INTERPOLATE);
 		}
 	}
 	actor A_SpawnPickup(){
-		let hu=HERPUsable(spawn("HERPUsable",pos,ALLOW_REPLACE));
-		if(hu){
-			hu.translation=translation;
-			if(health<1)hu.weaponstatus[0]|=HERPF_BROKEN;
+		let hu = HERPUsable(spawn("HERPUsable", pos, ALLOW_REPLACE));
+		if (hu){
+			hu.translation = translation;
+			if (health < 1)hu.weaponstatus[0]|=HERPF_BROKEN;
 			hu.weaponstatus[HERP_MAG1]=ammo[0];
 			hu.weaponstatus[HERP_MAG2]=ammo[1];
 			hu.weaponstatus[HERP_MAG3]=ammo[2];
@@ -236,31 +236,31 @@ class HERPBot:HDUPK{
 	spawn:
 		HERP A 0;
 	spawn2:
-		HERP A 0 A_JumpIfHealthLower(1,"dead");
+		HERP A 0 A_JumpIfHealthLower(1, "dead");
 		HERP A 10 A_ClearTarget();
 	idle:
 		HERP A 2 scanturn();
 		wait;
 	postbeep:
-		HERP A 6 herpbeep("herp/beep");
+		HERP A 6 herpbeep("herp / beep");
 		goto idle;
 
 
 	inputwaiting:
 		HERP A 4;
 		HERP A 0{
-			if(!master){
+			if (!master){
 				setstatelabel("spawn");
 				return;
 			}
-			herpbeep("herp/beep");
+			herpbeep("herp / beep");
 			message("Establishing connection...");
-			A_SetTics(random(10,min(350,int(0.3*distance3d(master)))));
+			A_SetTics(random(10, min(350, int(0.3 * distance3d(master)))));
 		}
 		HERP A 20{
-			if(master){
-				bmissileevenmore=true;
-				herpbeep("herp/beepready");
+			if (master){
+				bmissileevenmore = true;
+				herpbeep("herp / beepready");
 				message("Connected!");
 			}else{
 				setstatelabel("inputabort");
@@ -268,104 +268,104 @@ class HERPBot:HDUPK{
 			}
 		}
 	inputready:
-		HERP A 1 A_JumpIf(
+		HERP A 1 A_Jumpif (
 			!master
 			||!master.player
 			||!(master.player.readyweapon is "HERPController")
-		,"inputabort");
+		, "inputabort");
 		wait;
 	inputabort:
-		HERP A 4{bmissileevenmore=false;}
-		HERP A 2 herpbeep("herp/beepready");
+		HERP A 4{bmissileevenmore = false;}
+		HERP A 2 herpbeep("herp / beepready");
 		HERP A 20 message("Disconnected.");
 		goto spawn;
 
 
 	ready:
-		HERP A 12 A_StartSound("weapons/vulcanup",CHAN_BODY,CHANF_OVERLAP);
-		HERP AAA 1 herpbeep("herp/beepready");
+		HERP A 12 A_StartSound("weapons / vulcanup", CHAN_BODY, CHANF_OVERLAP);
+		HERP AAA 1 herpbeep("herp / beepready");
 	aim:
-		HERP A 2 A_FaceTarget(2.,2.,0,0,FAF_TOP,-4);
+		HERP A 2 A_FaceTarget(2., 2., 0, 0, FAF_TOP, -4);
 	shoot:
 		HERP B 2 bright light("SHOT"){
-			int currammoraw=ammo[0];
-			int currammo=currammoraw%100;
-			int currammo1=ammo[1]%100;
-			int currammo2=ammo[2]%100;
-			if(
+			int currammoraw = ammo[0];
+			int currammo = currammoraw%100;
+			int currammo1 = ammo[1]%100;
+			int currammo2 = ammo[2]%100;
+			if (
 				(
-					currammo<1
-					&&currammo1<0
-					&&currammo2<0
+					currammo < 1
+					&&currammo1 < 0
+					&&currammo2 < 0
 				)||(
-					currammoraw>100
-					&&!random(0,7)
+					currammoraw > 100
+					&&!random(0, 7)
 				)
 			){
-				message("Operational fault. Please check your manual for proper maintenance. (ERR-42392-41A) Cartridge empty. Shutting down...");
-				if(currammoraw>100&&!random(0,3))ammo[0]--;
-				bmissilemore=random(0,15);
+				message("Operational fault. Please check your manual for proper maintenance. (ERR - 42392 - 41A) Cartridge empty. Shutting down...");
+				if (currammoraw > 100&&!random(0, 3))ammo[0]--;
+				bmissilemore = random(0, 15);
 				setstatelabel("off");
 				return;
 			}
-			if(currammo<1&&currammo1>=0){
+			if (currammo < 1&&currammo1 >= 0){
 				setstatelabel("swapmag");
 				return;
 			}
 
 			//deplete 1 round plus break seal
-			if(currammo==51)currammo=49;else{
-				currammo=max(currammo-1,0);
-				if(currammoraw>100)currammo+=100;
+			if (currammo==51)currammo = 49;else{
+				currammo = max(currammo - 1, 0);
+				if (currammoraw > 100)currammo += 100;
 			}
 			ammo[0]=currammo;
 
-			A_StartSound("herp/shoot",CHAN_WEAPON,CHANF_OVERLAP);
-			HDBulletActor.FireBullet(self,"HDB_426",zofs:6,spread:1,distantsound:"world/herpfar");
+			A_StartSound("herp / shoot", CHAN_WEAPON, CHANF_OVERLAP);
+			HDBulletActor.FireBullet(self, "HDB_426", zofs:6, spread:1, distantsound:"world / herpfar");
 		}
 		HERP C 2{
-			angle-=frandom(0.6,0.8);
-			pitch-=frandom(1.2,1.8);
-			if(bfriendly)A_AlertMonsters(0,AMF_TARGETEMITTER);
+			angle -= frandom(0.6, 0.8);
+			pitch -= frandom(1.2, 1.8);
+			if (bfriendly)A_AlertMonsters(0, AMF_TARGETEMITTER);
 			else A_AlertMonsters();
 		}
 		HERP A 0{
-			if(ammo[0]<1){
+			if (ammo[0]<1){
 				setstatelabel("swapmag");
-			}else if(
+			}else if (
 				target
-				&&target.health>random(-10,5)
+				&&target.health > random(-10, 5)
 			){
 				flinetracedata herpline;
 				linetrace(
-					angle,4096,pitch,
-					offsetz:12,
+					angle, 4096, pitch, 
+					offsetz:12, 
 					data:herpline
 				);
-				if(herpline.hitactor!=target){
-					if(checksight(target))setstatelabel("aim");
-					else target=null;
+				if (herpline.hitactor != target){
+					if (checksight(target))setstatelabel("aim");
+					else target = null;
 				}else setstatelabel("shoot");
 			}
 		}goto idle;
 	swapmag:
 		HERP A 3{
-			int nextmag=ammo[1];
-			if(
-				nextmag<1
+			int nextmag = ammo[1];
+			if (
+				nextmag < 1
 				||nextmag==100
-				||(nextmag>100&&!random(0,3))
+				||(nextmag > 100&&!random(0, 3))
 			){
-				message("Operational fault. Please check your manual for proper maintenance. (ERR-42392-41A) Cartridge empty. Shutting down...");
-				A_StartSound("weapons/vulcandown",8,CHANF_OVERLAP);
+				message("Operational fault. Please check your manual for proper maintenance. (ERR - 42392 - 41A) Cartridge empty. Shutting down...");
+				A_StartSound("weapons / vulcandown", 8, CHANF_OVERLAP);
 				setstatelabel("off");
 			}else{
-				int currammo=ammo[0];
-				if(currammo>=0){
-					let mmm=hd4mmag(spawn("hd4mmag",(pos.xy,pos.z-6)));
-					mmm.mags.clear();mmm.mags.push(max(0,currammo));
-					double angloff=angle+100;
-					mmm.vel=(cos(angloff),sin(angloff),1)*frandom(0.7,1.3)+vel;
+				int currammo = ammo[0];
+				if (currammo >= 0){
+					let mmm = hd4mmag(spawn("hd4mmag", (pos.xy, pos.z - 6)));
+					mmm.mags.clear();mmm.mags.push(max(0, currammo));
+					double angloff = angle + 100;
+					mmm.vel=(cos(angloff), sin(angloff), 1)*frandom(0.7, 1.3) + vel;
 				}
 				ammo[0]=ammo[1];
 				ammo[1]=ammo[2];
@@ -376,84 +376,84 @@ class HERPBot:HDUPK{
 		HERP A -1;
 	off:
 		HERP A 10{
-			if(health>0){
-				double turn=clamp(deltaangle(angle,startangle),-24,24);
-				if(turn){
-					A_StartSound("herp/crawl",CHAN_BODY,volume:0.6);
-					A_SetAngle(angle+turn,SPF_INTERPOLATE);
+			if (health > 0){
+				double turn = clamp(deltaangle(angle, startangle), -24, 24);
+				if (turn){
+					A_StartSound("herp / crawl", CHAN_BODY, volume:0.6);
+					A_SetAngle(angle + turn, SPF_INTERPOLATE);
 					A_SetTics(5);
 				}
 			}
 		}
 		HERP A 0{
-			if(
+			if (
 				!bmissilemore
-				||absangle(angle,startangle)>12
+				||absangle(angle, startangle)>12
 				||(
-					ammo[0]%100<1
-					&&ammo[1]%100<1
-					&&ammo[2]%100<1
+					ammo[0]%100 < 1
+					&&ammo[1]%100 < 1
+					&&ammo[2]%100 < 1
 				)
 			)setstatelabel("off");
 		}goto idle;
 	give:
 		---- A 0{
-			let hu=A_SpawnPickup();
-			if(hu){
-				hu.translation=self.translation;
-				grabthinker.grab(target,hu);
+			let hu = A_SpawnPickup();
+			if (hu){
+				hu.translation = self.translation;
+				grabthinker.grab(target, hu);
 			}
-			let ctr=HERPController(target.findinventory("HERPController"));
-			if(ctr)ctr.UpdateHerps(false);
+			let ctr = HERPController(target.FindInventory("HERPController"));
+			if (ctr)ctr.UpdateHerps(false);
 		}stop;
 	death:
 		HERP A 0{
-			if(ammo[0]>=0)ammo[0]=random(0,ammo[0]+randompick(0,0,0,100));
-			if(ammo[1]>=0)ammo[1]=random(0,ammo[1]+randompick(0,0,0,100));
-			if(ammo[2]>=0)ammo[2]=random(0,ammo[2]+randompick(0,0,0,100));
-			battery=min(battery,random(-1,20));
-			if(battery<0){
-				A_GiveInventory("Heat",1000);
-				ammo[0]=min(ammo[0],0);
-				ammo[1]=min(ammo[1],0);
-				ammo[2]=min(ammo[2],0);
+			if (ammo[0]>=0)ammo[0]=random(0, ammo[0]+randompick(0, 0, 0, 100));
+			if (ammo[1]>=0)ammo[1]=random(0, ammo[1]+randompick(0, 0, 0, 100));
+			if (ammo[2]>=0)ammo[2]=random(0, ammo[2]+randompick(0, 0, 0, 100));
+			battery = min(battery, random(-1, 20));
+			if (battery < 0){
+				A_GiveInventory("Heat", 1000);
+				ammo[0]=min(ammo[0], 0);
+				ammo[1]=min(ammo[1], 0);
+				ammo[2]=min(ammo[2], 0);
 			}
 			A_NoBlocking();
-			A_StartSound("world/shotgunfar",CHAN_BODY,CHANF_OVERLAP,0.4);
+			A_StartSound("world / shotgunfar", CHAN_BODY, CHANF_OVERLAP, 0.4);
 		}
-		HERP A 1 A_StartSound("weapons/bigcrack",15);
-		HERP A 1 A_StartSound("weapons/bigcrack",16);
-		HERP A 1 A_StartSound("weapons/bigcrack",17);
-		HERP AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0 A_SpawnItemEx("HugeWallChunk",frandom(-6,6),frandom(-6,6),frandom(0,6), vel.x+frandom(-6,6),vel.y+frandom(-6,6),vel.z+frandom(1,8),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
+		HERP A 1 A_StartSound("weapons / bigcrack", 15);
+		HERP A 1 A_StartSound("weapons / bigcrack", 16);
+		HERP A 1 A_StartSound("weapons / bigcrack", 17);
+		HERP AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 0 A_SpawnItemEx("HugeWallChunk", frandom(-6, 6), frandom(-6, 6), frandom(0, 6), vel.x + frandom(-6, 6), vel.y + frandom(-6, 6), vel.z + frandom(1, 8), 0, SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
 		HERP A 0{
-			A_StartSound("weapons/vulcandown",CHAN_WEAPON,CHANF_OVERLAP);
+			A_StartSound("weapons / vulcandown", CHAN_WEAPON, CHANF_OVERLAP);
 			string yay="";
-			switch(random(0,8)){
+			switch(random(0, 8)){
 			case 0:
-				yay="Operational fault. Please check your manual for proper maintenance. (ERR-4fd92-00B) Power low.";break;
+				yay="Operational fault. Please check your manual for proper maintenance. (ERR - 4fd92 - 00B) Power low.";break;
 			case 1:
-				yay="Operational fault. Please check your manual for proper maintenance. (ERR-74x29-58A) Unsupported ammunition type.\n\n\cjPlease note: Reloading a 4.26 UAC Standard magazine or its components without the supervision of a Volt UAC Standard Certified Cartridge Professional(tm) is a breach of the Volt End User License Agreement.";break;
+				yay="Operational fault. Please check your manual for proper maintenance. (ERR - 74x29 - 58A) Unsupported ammunition type.\n\n\cjPlease note: Reloading a 4.26 UAC Standard magazine or its components without the supervision of a Volt UAC Standard Certified Cartridge Professional(tm) is a breach of the Volt End User License Agreement.";break;
 			case 2:
-				yay="Operational fault. Please check your manual for proper maintenance. (ERR-8w8i7-8VX) No interface detected.";break;
+				yay="Operational fault. Please check your manual for proper maintenance. (ERR - 8w8i7 - 8VX) No interface detected.";break;
 			case 3:
-				yay="Illegal operation. Please check your manual for proper maintenance. (ERR-u0H85-6NN) System will restart.";break;
+				yay="Illegal operation. Please check your manual for proper maintenance. (ERR - u0H85 - 6NN) System will restart.";break;
 			case 4:
-				yay="Illegal operation. Identify Friend/Foe system has been tampered with. Please contact your commanding officer immediately. (ERR-0023j-000) System will halt.";break;
+				yay="Illegal operation. Identify Friend / Foe system has been tampered with. Please contact your commanding officer immediately. (ERR - 0023j - 000) System will halt.";break;
 			case 5:
-				yay="Formatting C:\\ (DBG-444j2-0A0)";break;
+				yay="Formatting C:\\ (DBG - 444j2 - 0A0)";break;
 			case 6:
-				yay="Testing mode initialized.  (DBG-86nm8-BN5) Cache cleared.";break;
+				yay="Testing mode initialized.  (DBG - 86nm8 - BN5) Cache cleared.";break;
 			case 7:
 				yay="*** Fatal Error *** Address not mapped to object (signal 11) Address: 0x8";break;
 			case 8:
 				yay="*** Fatal Error *** Segmentation fault (signal 11) Address: (nil)";break;
 			}
-			if(!random(0,3))yay="\cg"..yay;
+			if (!random(0, 3))yay="\cg"..yay;
 			message(yay);
 		}
-		HERP AAA 1 A_SpawnItemEx("HDSmoke",frandom(-2,2),frandom(-2,2),frandom(-2,2), vel.x+frandom(-2,2),vel.y+frandom(-2,2),vel.z+frandom(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
-		HERP AAA 3 A_SpawnItemEx("HDSmoke",frandom(-2,2),frandom(-2,2),frandom(-2,2), vel.x+frandom(-2,2),vel.y+frandom(-2,2),vel.z+frandom(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
-		HERP AAA 9 A_SpawnItemEx("HDSmoke",frandom(-2,2),frandom(-2,2),frandom(-2,2), vel.x+frandom(-2,2),vel.y+frandom(-2,2),vel.z+frandom(1,4),0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
+		HERP AAA 1 A_SpawnItemEx("HDSmoke", frandom(-2, 2), frandom(-2, 2), frandom(-2, 2), vel.x + frandom(-2, 2), vel.y + frandom(-2, 2), vel.z + frandom(1, 4), 0, SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
+		HERP AAA 3 A_SpawnItemEx("HDSmoke", frandom(-2, 2), frandom(-2, 2), frandom(-2, 2), vel.x + frandom(-2, 2), vel.y + frandom(-2, 2), vel.z + frandom(1, 4), 0, SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
+		HERP AAA 9 A_SpawnItemEx("HDSmoke", frandom(-2, 2), frandom(-2, 2), frandom(-2, 2), vel.x + frandom(-2, 2), vel.y + frandom(-2, 2), vel.z + frandom(1, 4), 0, SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM);
 	dead:
 		HERP A -1 A_SpawnPickup();
 		stop;
@@ -461,20 +461,20 @@ class HERPBot:HDUPK{
 }
 class EnemyHERP:HERPBot{
 	default{
-		//$Category "Monsters/Hideous Destructor"
+		//$Category "Monsters / Hideous Destructor"
 		//$Title "H.E.R.P. Robot (Hostile)"
 		//$Sprite "HERPA1"
 
 		-friendly
-		translation "112:120=152:159","121:127=9:12";
+		translation "112:120 = 152:159", "121:127 = 9:12";
 	}
 }
 class BrokenHERP:HERPBot{
 	default{
-		//$Category "Monsters/Hideous Destructor"
+		//$Category "Monsters / Hideous Destructor"
 		//$Title "H.E.R.P. Robot (Broken)"
 		//$Sprite "HERPA1"
-		translation "112:120=152:159","121:127=9:12";
+		translation "112:120 = 152:159", "121:127 = 9:12";
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
@@ -486,11 +486,11 @@ class BrokenHERP:HERPBot{
 		stop;
 	death.spawndead:
 		HERP A -1{
-			ammo[0]=random(0,ammo[0]+randompick(0,0,0,100));
-			ammo[1]=random(0,ammo[1]+randompick(0,0,0,100));
-			ammo[2]=random(0,ammo[2]+randompick(0,0,0,100));
-			battery=min(battery,random(-1,20));
-			if(battery<0){
+			ammo[0]=random(0, ammo[0]+randompick(0, 0, 0, 100));
+			ammo[1]=random(0, ammo[1]+randompick(0, 0, 0, 100));
+			ammo[2]=random(0, ammo[2]+randompick(0, 0, 0, 100));
+			battery = min(battery, random(-1, 20));
+			if (battery < 0){
 				ammo[0]=0;ammo[1]=0;ammo[2]=0;
 			}
 			A_NoBlocking();
@@ -500,7 +500,7 @@ class BrokenHERP:HERPBot{
 }
 class HERPUsable:HDWeapon{
 	default{
-		//$Category "Items/Hideous Destructor"
+		//$Category "Items / Hideous Destructor"
 		//$Title "H.E.R.P. Robot (Pickup)"
 		//$Sprite "HERPA1"
 
@@ -508,44 +508,44 @@ class HERPUsable:HDWeapon{
 		+inventory.invbar
 		+hdweapon.droptranslation
 		+hdweapon.fitsinbackpack
-		inventory.amount 1;
+		inventory.Amount 1;
 		inventory.maxamount 1;
 		inventory.icon "HERPEX";
-		inventory.pickupsound "misc/w_pkup";
+		inventory.pickupsound "misc / w_pkup";
 		inventory.pickupmessage "Picked up a Heavy Engagement Rotary Platform robot.";
 		tag "H.E.R.P. robot";
 		hdweapon.refid HDLD_HERPBOT;
 		weapon.selectionorder 1015;
 	}
 	override string pickupmessage(){
-		if(weaponstatus[0]&HERPF_BROKEN)return super.pickupmessage().." It is damaged.";
+		if (weaponstatus[0]&HERPF_BROKEN)return super.pickupmessage().." It is damaged.";
 		return super.pickupmessage();
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
-	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}
+	override hdweapon GetSpareWeapon(actor newowner, bool reverse, bool doselect){return GetSpareWeaponRegular(newowner, reverse, doselect);}
 	override double gunmass(){
-		double amt=9+weaponstatus[HERP_BATTERY]<0?0:1;
-		if(weaponstatus[1]>=0)amt+=3.6;
-		if(weaponstatus[2]>=0)amt+=3.6;
-		if(weaponstatus[3]>=0)amt+=3.6;
-		if(owner&&owner.player.cmd.buttons&BT_ZOOM)amt*=frandom(3,4);
+		double amt = 9 + weaponstatus[HERP_BATTERY]<0?0:1;
+		if (weaponstatus[1]>=0)amt += 3.6;
+		if (weaponstatus[2]>=0)amt += 3.6;
+		if (weaponstatus[3]>=0)amt += 3.6;
+		if (owner&&owner.player.cmd.buttons&BT_ZOOM)amt *= frandom(3, 4);
 		return amt;
 	}
 	override double weaponbulk(){
-		double enc=ENC_HERP;
-		for(int i=1;i<4;i++){
-			if(weaponstatus[i]>=0)enc+=max(ENC_426MAG*0.2,weaponstatus[i]*ENC_426*0.8);
+		double enc = ENC_HERP;
+		for(int i = 1;i < 4;i++){
+			if (weaponstatus[i]>=0)enc += max(ENC_426MAG * 0.2, weaponstatus[i]*ENC_426 * 0.8);
 		}
-		if(
+		if (
 			owner
 			&&owner.player.cmd.buttons&BT_ZOOM
 			&&owner.player.readyweapon==self
-		)enc*=2;
+		)enc *= 2;
 		return enc;
 	}
 	override int getsbarnum(int flags){
-		let ssbb=HDStatusBar(statusbar);
-		if(ssbb&&weaponstatus[0]&HERPF_BROKEN)ssbb.savedcolour=Font.CR_DARKGRAY;
+		let ssbb = HDStatusBar(statusbar);
+		if (ssbb&&weaponstatus[0]&HERPF_BROKEN)ssbb.savedcolour = Font.CR_DARKGRAY;
 		return weaponstatus[HERP_BOTID];
 	}
 	override void InitializeWepStats(bool idfa){
@@ -556,27 +556,27 @@ class HERPUsable:HDWeapon{
 	}
 	action void A_ResetBarrelSize(){
 		invoker.weaponstatus[HERP_YOFS]=100;
-		invoker.barrellength=0;
-		invoker.barrelwidth=0;
-		invoker.barreldepth=0;
-		invoker.bobspeed=2.4;
-		invoker.bobrangex=0.2;
-		invoker.bobrangey=0.8;
+		invoker.barrellength = 0;
+		invoker.barrelwidth = 0;
+		invoker.barreldepth = 0;
+		invoker.bobspeed = 2.4;
+		invoker.bobrangex = 0.2;
+		invoker.bobrangey = 0.8;
 	}
 	action void A_RaiseBarrelSize(){
-		invoker.barrellength=25;
-		invoker.barrelwidth=3;
-		invoker.barreldepth=3;
-		invoker.bobrangex=8.2;
-		invoker.bobrangey=4.6;
-		invoker.bobspeed=2.8;
+		invoker.barrellength = 25;
+		invoker.barrelwidth = 3;
+		invoker.barreldepth = 3;
+		invoker.bobrangex = 8.2;
+		invoker.bobrangey = 4.6;
+		invoker.bobspeed = 2.8;
 	}
 	states{
 	select:
 		TNT1 A 0 A_ResetBarrelSize();
 		goto super::select;
 	ready:
-		TNT1 A 0 A_JumpIf(pressingzoom(),"raisetofire");
+		TNT1 A 0 A_Jumpif (pressingzoom(), "raisetofire");
 		TNT1 A 1 A_HERPWeaponReady();
 		goto readyend;
 	user3:
@@ -585,26 +585,26 @@ class HERPUsable:HDWeapon{
 		goto nope;
 
 	unload:
-		TNT1 A 0 A_JumpIf(invoker.weaponstatus[1]<0
+		TNT1 A 0 A_Jumpif (invoker.weaponstatus[1]<0
 			&&invoker.weaponstatus[2]<0
-			&&invoker.weaponstatus[3]<0,"altunload");
+			&&invoker.weaponstatus[3]<0, "altunload");
 		TNT1 A 0{invoker.weaponstatus[0]|=HERPF_UNLOADONLY;}
 		//fallthrough to unloadmag
 	unloadmag:
 		TNT1 A 14;
 		TNT1 A 5 A_UnloadMag();
-		TNT1 A 0 A_JumpIf(invoker.weaponstatus[0]&HERPF_UNLOADONLY,"reloadend");
+		TNT1 A 0 A_Jumpif (invoker.weaponstatus[0]&HERPF_UNLOADONLY, "reloadend");
 		goto reloadend;
 	reload:
-		TNT1 A 0 A_JumpIf(HD4mMag.NothingLoaded(self,"HD4mMag"),"nope");
-		TNT1 A 14 A_StartSound("weapons/pocket",9);
+		TNT1 A 0 A_Jumpif (HD4mMag.NothingLoaded(self, "HD4mMag"), "nope");
+		TNT1 A 14 A_StartSound("weapons / pocket", 9);
 		TNT1 A 5 A_LoadMag();
 		goto reloadend;
 
 	altreload:
-		TNT1 A 0 A_JumpIf(pressinguse()||pressingzoom(),"altunload");
+		TNT1 A 0 A_Jumpif (pressinguse()||pressingzoom(), "altunload");
 		TNT1 A 0{
-			if(HDBattery.NothingLoaded(self,"HDBattery"))setweaponstate("nope");
+			if (HDBattery.NothingLoaded(self, "HDBattery"))setweaponstate("nope");
 			else invoker.weaponstatus[0]&=~HERPF_UNLOADONLY;
 		}goto unloadbattery;
 	altunload:
@@ -613,9 +613,9 @@ class HERPUsable:HDWeapon{
 	unloadbattery:
 		TNT1 A 20;
 		TNT1 A 5 A_UnloadBattery();
-		TNT1 A 0 A_JumpIf(invoker.weaponstatus[0]&HERPF_UNLOADONLY,"reloadend");
+		TNT1 A 0 A_Jumpif (invoker.weaponstatus[0]&HERPF_UNLOADONLY, "reloadend");
 	reloadbattery:
-		TNT1 A 14 A_StartSound("weapons/pocket",9);
+		TNT1 A 14 A_StartSound("weapons / pocket", 9);
 		TNT1 A 5 A_LoadBattery();
 	reloadend:
 		TNT1 A 6;
@@ -624,19 +624,19 @@ class HERPUsable:HDWeapon{
 		HERP A -1;
 		stop;
 
-	//for manual carry-firing
+	//for manual carry - firing
 	raisetofire:
-		TNT1 A 8 A_StartSound("herp/crawl",8,CHANF_OVERLAP,1.);
-		HERG A 1 offset(0,80) A_StartSound("herp/beepready",8,CHANF_OVERLAP);
-		HERG A 1 offset(0,60);
-		HERG A 1 offset(0,50) A_RaiseBarrelSize();
-		HERG A 1 offset(0,40);
-		HERG A 1 offset(0,34);
+		TNT1 A 8 A_StartSound("herp / crawl", 8, CHANF_OVERLAP, 1.);
+		HERG A 1 offset(0, 80) A_StartSound("herp / beepready", 8, CHANF_OVERLAP);
+		HERG A 1 offset(0, 60);
+		HERG A 1 offset(0, 50) A_RaiseBarrelSize();
+		HERG A 1 offset(0, 40);
+		HERG A 1 offset(0, 34);
 	readytofire:
 		HERG A 1{
-			if(pressingzoom()){
-				if(pressingfire())setweaponstate("directfire");
-				if(pitch<10&&!gunbraced())A_MuzzleClimb(frandom(-0.1,0.1),frandom(0.,0.1));
+			if (pressingzoom()){
+				if (pressingfire())setweaponstate("directfire");
+				if (pitch < 10&&!gunbraced())A_MuzzleClimb(frandom(-0.1, 0.1), frandom(0., 0.1));
 			}else{
 				setweaponstate("lowerfromfire");
 			}
@@ -645,95 +645,95 @@ class HERPUsable:HDWeapon{
 		loop;
 	directfire:
 		HERG A 2{
-			if(invoker.weaponstatus[HERP_BATTERY]<1){
+			if (invoker.weaponstatus[HERP_BATTERY]<1){
 				setweaponstate("directfail");
 				return;
 			}
-			int currammo=invoker.weaponstatus[1];
-			bool dirtymag=currammo>100;
+			int currammo = invoker.weaponstatus[1];
+			bool dirtymag = currammo > 100;
 			currammo%=100;
 
 			//check ammo and cycle mag if necessary
-			if(
+			if (
 				!currammo
 				||(
 					dirtymag
-					&&!random(0,63)
+					&&!random(0, 63)
 				)
 			){
-				let mmm=hd4mmag(spawn("hd4mmag",(pos.xy,pos.z+height-20)));
-				mmm.mags.clear();mmm.mags.push(max(0,currammo%100));
-				double angloff=angle+100;
-				mmm.vel=(cos(angloff),sin(angloff),1)*frandom(0.7,1.3)+vel;
+				let mmm = hd4mmag(spawn("hd4mmag", (pos.xy, pos.z + height - 20)));
+				mmm.mags.clear();mmm.mags.push(max(0, currammo%100));
+				double angloff = angle + 100;
+				mmm.vel=(cos(angloff), sin(angloff), 1)*frandom(0.7, 1.3) + vel;
 				invoker.weaponstatus[1]=-1;
 			}
-			if(
+			if (
 				invoker.weaponstatus[1]<0
 			){
 				invoker.weaponstatus[1]=invoker.weaponstatus[2];
 				invoker.weaponstatus[2]=invoker.weaponstatus[3];
 				invoker.weaponstatus[3]=-1;
 
-				int curmag=invoker.weaponstatus[1];
-				if(
-					curmag>0
-					&&curmag<51
+				int curmag = invoker.weaponstatus[1];
+				if (
+					curmag > 0
+					&&curmag < 51
 				)invoker.weaponstatus[1]+=100;
 
 				return;
 			}
 
 			//deplete ammo and fire
-			if(currammo==51)currammo=49;else{
-				currammo=max(0,currammo-1);
-				if(dirtymag)currammo+=100;
+			if (currammo==51)currammo = 49;else{
+				currammo = max(0, currammo - 1);
+				if (dirtymag)currammo += 100;
 			}
 			invoker.weaponstatus[1]=currammo;
-			A_Overlay(PSP_FLASH,"directflash");
+			A_Overlay(PSP_FLASH, "directflash");
 		}
 		HERG B 2;
-		HERG A 0 A_JumpIf(!pressingzoom(),"lowerfromfire");
+		HERG A 0 A_Jumpif (!pressingzoom(), "lowerfromfire");
 		HERG A 0 A_Refire("directfire");
 		goto readytofire;
 	directflash:
 		HERF A 1 bright{
 			HDFlashAlpha(-16);
 			HDBulletActor.FireBullet(
-				self,"HDB_426",zofs:height-12,
-				spread:1,
-				distantsound:"world/herpfar"
+				self, "HDB_426", zofs:height - 12, 
+				spread:1, 
+				distantsound:"world / herpfar"
 			);
-			A_StartSound("herp/shoot",CHAN_WEAPON,CHANF_OVERLAP);
+			A_StartSound("herp / shoot", CHAN_WEAPON, CHANF_OVERLAP);
 			A_AlertMonsters();
-			A_ZoomRecoil(max(0.95,1.-0.05*min(invoker.weaponstatus[ZM66S_AUTO],3)));
+			A_ZoomRecoil(max(0.95, 1.-0.05 * min(invoker.weaponstatus[ZM66S_AUTO], 3)));
 			A_MuzzleClimb(
-				frandom(-0.2,0.2),frandom(-0.4,0.2),
-				frandom(-0.4,0.4),frandom(-0.6,0.4),
-				frandom(-0.4,0.4),frandom(-1.,0.6),
-				frandom(-0.8,0.8),frandom(-1.6,0.8)
+				frandom(-0.2, 0.2), frandom(-0.4, 0.2), 
+				frandom(-0.4, 0.4), frandom(-0.6, 0.4), 
+				frandom(-0.4, 0.4), frandom(-1., 0.6), 
+				frandom(-0.8, 0.8), frandom(-1.6, 0.8)
 			);
 		}stop;
 	directfail:
 		HERG # 1 A_WeaponReady(WRF_NONE);
-		HERG # 0 A_JumpIf(pressingfire(),"directfail");
+		HERG # 0 A_Jumpif (pressingfire(), "directfail");
 		goto readytofire;
 	lowerfromfire:
-		HERG A 1 offset(0,34) A_ClearRefire();
-		HERG A 1 offset(0,40) A_StartSound("herp/beepready",8);
-		HERG A 1 offset(0,50);
-		HERG A 1 offset(0,60);
-		HERG A 1 offset(0,80)A_ResetBarrelSize();
-		TNT1 A 1 A_StartSound("herp/crawl",8);
-		TNT1 A 1 A_JumpIf(pressingfire()||pressingaltfire(),"nope");
+		HERG A 1 offset(0, 34) A_ClearRefire();
+		HERG A 1 offset(0, 40) A_StartSound("herp / beepready", 8);
+		HERG A 1 offset(0, 50);
+		HERG A 1 offset(0, 60);
+		HERG A 1 offset(0, 80)A_ResetBarrelSize();
+		TNT1 A 1 A_StartSound("herp / crawl", 8);
+		TNT1 A 1 A_Jumpif (pressingfire()||pressingaltfire(), "nope");
 		goto select;
 
 
 
 	readytorepair:
 		TNT1 A 1{
-			if(!pressingfire())setweaponstate("nope");
-			else if(PressingReload()){
-				if(invoker.weaponstatus[HERP_BATTERY]>=0){
+			if (!pressingfire())setweaponstate("nope");
+			else if (PressingReload()){
+				if (invoker.weaponstatus[HERP_BATTERY]>=0){
 					message("Damaged beyond function. Remove battery before attempting repairs.");
 				}else setweaponstate("repairbash");
 			}
@@ -741,7 +741,7 @@ class HERPUsable:HDWeapon{
 		wait;
 	repairbash:
 		TNT1 A 10 A_RepairAttempt();
-		TNT1 A 0 A_JumpIf(!(invoker.weaponstatus[0]&HERPF_BROKEN),"nope");
+		TNT1 A 0 A_Jumpif (!(invoker.weaponstatus[0]&HERPF_BROKEN), "nope");
 		goto readytorepair;
 	}
 
@@ -749,16 +749,16 @@ class HERPUsable:HDWeapon{
 
 
 	action void Message(string msg){
-		int botid=invoker.weaponstatus[HERP_BOTID];
-		A_Log("\cd[HERP"..(botid?"(\cj"..botid.."\cd)":"").."]\cj  "..msg,true);
+		int botid = invoker.weaponstatus[HERP_BOTID];
+		A_Log("\cd[HERP"..(botid?"(\cj"..botid.."\cd)":"").."]\cj  "..msg, true);
 	}
 	action void A_LoadMag(){
-		let magg=HD4mMag(findinventory("HD4mMag"));
-		if(!magg)return;
-		for(int i=1;i<4;i++){
-			if(invoker.weaponstatus[i]<0){
-				int toload=magg.takemag(true);
-				if(toload!=51)toload+=100;
+		let magg = HD4mMag(FindInventory("HD4mMag"));
+		if (!magg)return;
+		for(int i = 1;i < 4;i++){
+			if (invoker.weaponstatus[i]<0){
+				int toload = magg.takemag(true);
+				if (toload != 51)toload += 100;
 				invoker.weaponstatus[i]=toload;
 				break;
 			}
@@ -766,146 +766,146 @@ class HERPUsable:HDWeapon{
 	}
 	action void A_UnloadMag(){
 		bool unsafe=(player.cmd.buttons&BT_USE)||(player.cmd.buttons&BT_ZOOM);
-		for(int i=3;i>0;i--){
-			int thismag=invoker.weaponstatus[i];
-			if(thismag<0)continue;
-			if(unsafe||!thismag||thismag>50){
+		for(int i = 3;i > 0;i--){
+			int thismag = invoker.weaponstatus[i];
+			if (thismag < 0)continue;
+			if (unsafe||!thismag||thismag > 50){
 				invoker.weaponstatus[i]=-1;
-				if(thismag>100)thismag%=100;
-				if(thismag>51)thismag%=50;
-				if(pressingunload()||pressingreload()){
-					HD4mMag.GiveMag(self,"HD4mMag",thismag);
-					A_StartSound("weapons/pocket",9);
+				if (thismag > 100)thismag%=100;
+				if (thismag > 51)thismag%=50;
+				if (pressingunload()||pressingreload()){
+					HD4mMag.GiveMag(self, "HD4mMag", thismag);
+					A_StartSound("weapons / pocket", 9);
 					A_SetTics(20);
-				}else HD4mMag.SpawnMag(self,"HD4mMag",thismag);
+				}else HD4mMag.SpawnMag(self, "HD4mMag", thismag);
 				break;
 			}
 		}
 	}
 	action void A_LoadBattery(){
-		if(invoker.weaponstatus[4]>=0)return;
-		let batt=HDBattery(findinventory("HDBattery"));
-		if(!batt)return;
-		int toload=batt.takemag(true);
+		if (invoker.weaponstatus[4]>=0)return;
+		let batt = HDBattery(FindInventory("HDBattery"));
+		if (!batt)return;
+		int toload = batt.takemag(true);
 		invoker.weaponstatus[4]=toload;
-		A_StartSound("weapons/vulcopen1",8,CHANF_OVERLAP);
+		A_StartSound("weapons / vulcopen1", 8, CHANF_OVERLAP);
 	}
 	action void A_UnloadBattery(){
-		int batt=invoker.weaponstatus[4];
-		if(batt<0)return;
-		if(pressingunload()||pressingreload()){
-			HDBattery.GiveMag(self,"HDBattery",batt);
-			A_StartSound("weapons/pocket",9);
+		int batt = invoker.weaponstatus[4];
+		if (batt < 0)return;
+		if (pressingunload()||pressingreload()){
+			HDBattery.GiveMag(self, "HDBattery", batt);
+			A_StartSound("weapons / pocket", 9);
 			A_SetTics(20);
-		}else HDBattery.SpawnMag(self,"HDBattery",batt);
+		}else HDBattery.SpawnMag(self, "HDBattery", batt);
 		invoker.weaponstatus[4]=-1;
 	}
 	action void A_HERPWeaponReady(){
-		if(invoker.amount<1){
+		if (invoker.Amount < 1){
 			invoker.goawayanddie();
 			return;
 		}
-		if(pressingfire()){
-			int yofs=invoker.weaponstatus[HERP_YOFS];
-			yofs=max(yofs+12,yofs*3/2);
-			if(yofs>100)A_DeployHERP();
+		if (pressingfire()){
+			int yofs = invoker.weaponstatus[HERP_YOFS];
+			yofs = max(yofs + 12, yofs * 3 / 2);
+			if (yofs > 100)A_DeployHERP();
 			invoker.weaponstatus[HERP_YOFS]=yofs;
-		}else invoker.weaponstatus[HERP_YOFS]=invoker.weaponstatus[HERP_YOFS]*2/3;
-		if(pressingfiremode()){
+		}else invoker.weaponstatus[HERP_YOFS]=invoker.weaponstatus[HERP_YOFS]*2 / 3;
+		if (pressingfiremode()){
 			int inputamt=(GetMouseY(true)>>4);
 			inputamt+=(justpressed(BT_ATTACK)?1:justpressed(BT_ALTATTACK)?-1:0);
 			invoker.weaponstatus[HERP_BOTID]=clamp(
-				invoker.weaponstatus[HERP_BOTID]-inputamt,0,63
+				invoker.weaponstatus[HERP_BOTID]-inputamt, 0, 63
 			);
-		}else if(justpressed(BT_ALTATTACK)){
+		}else if (justpressed(BT_ALTATTACK)){
 			invoker.weaponstatus[0]^=HERPF_STARTOFF;
-			A_StartSound("weapons/fmswitch",8,CHANF_OVERLAP);
+			A_StartSound("weapons / fmswitch", 8, CHANF_OVERLAP);
 		}else A_WeaponReady(WRF_NOFIRE|WRF_ALLOWRELOAD|WRF_ALLOWUSER1|WRF_ALLOWUSER3|WRF_ALLOWUSER4);
 	}
 	action void A_DeployHERP(){
-		if(invoker.weaponstatus[0]&HERPF_BROKEN){
+		if (invoker.weaponstatus[0]&HERPF_BROKEN){
 			setweaponstate("readytorepair");
 			return;
 		}
-		if(invoker.weaponstatus[4]<1){
+		if (invoker.weaponstatus[4]<1){
 			message("No power. Please load 1 cell pack before deploying.");
 			setweaponstate("nope");
 			return;
 		}
 
 		actor hhh;int iii;
-		[iii,hhh]=A_SpawnItemEx("HERPBot",5,0,height-16,
-			2.5*cos(pitch),0,-2.5*sin(pitch),
-			0,SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION
+		[iii, hhh]=A_SpawnItemEx("HERPBot", 5, 0, height - 16, 
+			2.5 * cos(pitch), 0, -2.5 * sin(pitch), 
+			0, SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION
 			|SXF_TRANSFERPOINTERS|SXF_SETMASTER
 		);
-		hhh.A_StartSound("misc/w_pkup",5);
+		hhh.A_StartSound("misc / w_pkup", 5);
 		hhh.changetid(HERP_TID);
-		hhh.vel+=vel;hhh.angle=angle;
-		let hhhh=HERPBot(hhh);
-		hhhh.startangle=angle;
+		hhh.vel += vel;hhh.angle = angle;
+		let hhhh = HERPBot(hhh);
+		hhhh.startangle = angle;
 		hhhh.ammo[0]=invoker.weaponstatus[1];
 		hhhh.ammo[1]=invoker.weaponstatus[2];
 		hhhh.ammo[2]=invoker.weaponstatus[3];
-		hhhh.battery=invoker.weaponstatus[4];
-		hhhh.botid=invoker.weaponstatus[HERP_BOTID];
-		hhhh.bmissilemore=invoker.weaponstatus[0]&HERPF_STARTOFF?false:true;
+		hhhh.battery = invoker.weaponstatus[4];
+		hhhh.botid = invoker.weaponstatus[HERP_BOTID];
+		hhhh.bmissilemore = invoker.weaponstatus[0]&HERPF_STARTOFF?false:true;
 		Message("Deployed.");
 		A_GiveInventory("HERPController");
-		HERPController(findinventory("HERPController")).UpdateHerps(false);
+		HERPController(FindInventory("HERPController")).UpdateHerps(false);
 		dropinventory(invoker);
 		invoker.destroy();
 		return;
 	}
-	override void DrawHUDStuff(HDStatusBar sb,HDWeapon hdw,HDPlayerPawn hpl){
-		int batt=hdw.weaponstatus[4];
+	override void DrawHUDStuff(HDStatusBar sb, HDWeapon hdw, HDPlayerPawn hpl){
+		int batt = hdw.weaponstatus[4];
 
 		//bottom status bar
-		for(int i=2;i<4;i++){
-			if(hdw.weaponstatus[i]>=0)sb.drawrect(-11-i*4,-15,3,2);
+		for(int i = 2;i < 4;i++){
+			if (hdw.weaponstatus[i]>=0)sb.drawrect(-11 - i * 4, -15, 3, 2);
 		}
-		sb.drawwepnum(hdw.weaponstatus[1]%100,50,posy:-10);
+		sb.drawwepnum(hdw.weaponstatus[1]%100, 50, posy:-10);
 		bool herpon=!(hdw.weaponstatus[0]&HERPF_STARTOFF);
 		sb.drawstring(
-			sb.pnewsmallfont,herpon?"ON":"OFF",(-30,-30),
-			sb.DI_TEXT_ALIGN_RIGHT|sb.DI_TRANSLATABLE|sb.DI_SCREEN_CENTER_BOTTOM,
+			sb.pnewsmallfont, herpon?"ON":"OFF", (-30, -30), 
+			sb.DI_TEXT_ALIGN_RIGHT|sb.DI_TRANSLATABLE|sb.DI_SCREEN_CENTER_BOTTOM, 
 			herpon?Font.CR_GREEN:Font.CR_DARKRED
 		);
 
-		if(!batt)sb.drawstring(
-			sb.mamountfont,"00000",(-16,-8),
-			sb.DI_TEXT_ALIGN_RIGHT|sb.DI_TRANSLATABLE|sb.DI_SCREEN_CENTER_BOTTOM,
+		if (!batt)sb.drawstring(
+			sb.mamountfont, "00000", (-16, -8), 
+			sb.DI_TEXT_ALIGN_RIGHT|sb.DI_TRANSLATABLE|sb.DI_SCREEN_CENTER_BOTTOM, 
 			Font.CR_DARKGRAY
-		);else if(batt>0)sb.drawwepnum(batt,20);
+		);else if (batt > 0)sb.drawwepnum(batt, 20);
 
-		if(barrellength>0)return;
+		if (barrellength > 0)return;
 
-		int yofs=weaponstatus[HERP_YOFS];
-		if(yofs<70){
-			vector2 bob=hpl.hudbob*0.2;
-			bob.y+=yofs;
-			sb.drawimage("HERPA7A3",(10,14)+bob,
-				sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER|sb.DI_TRANSLATABLE,
-				scale:(2,2)
+		int yofs = weaponstatus[HERP_YOFS];
+		if (yofs < 70){
+			vector2 bob = hpl.hudbob * 0.2;
+			bob.y += yofs;
+			sb.drawimage("HERPA7A3", (10, 14) + bob, 
+				sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER|sb.DI_TRANSLATABLE, 
+				scale:(2, 2)
 			);
-			for(int i=1;i<4;i++){
-				int bbb=hdw.weaponstatus[i];
-				if(bbb==51)sb.drawimage("ZMAGA0",(-20,i*10)+bob,
-					sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-					scale:(2,2)
-				);else if(bbb>=0)sb.drawbar(
-					(bbb>=100?"ZMAGBROWN":"ZMAGNORM"),"ZMAGGREY",
-					bbb%100,50,
-					(-20,i*10)+bob,-1,
-					sb.SHADER_VERT,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+			for(int i = 1;i < 4;i++){
+				int bbb = hdw.weaponstatus[i];
+				if (bbb==51)sb.drawimage("ZMAGA0", (-20, i * 10) + bob, 
+					sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER, 
+					scale:(2, 2)
+				);else if (bbb >= 0)sb.drawbar(
+					(bbb >= 100?"ZMAGBROWN":"ZMAGNORM"), "ZMAGGREY", 
+					bbb%100, 50, 
+					(-20, i * 10) + bob, -1, 
+					sb.SHADER_VERT, sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 				);
 			}
-			if(batt>=0){
+			if (batt >= 0){
 				string batsprite;
-				if(batt>13)batsprite="CELLA0";
-				else if(batt>6)batsprite="CELLB0";
+				if (batt > 13)batsprite="CELLA0";
+				else if (batt > 6)batsprite="CELLB0";
 				else batsprite="CELLC0";
-				sb.drawimage(batsprite,(0,30)+bob,
+				sb.drawimage(batsprite, (0, 30) + bob, 
 					sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 				);
 			}
@@ -925,24 +925,24 @@ class HERPUsable:HDWeapon{
 		..WEPHELP_ZOOM.."  Manual firing"
 		;
 	}
-	static int backpackrepairs(actor owner,hdbackpack bp){
-		if(!owner||!bp)return 0;
-		StorageItem si=bp.Storage.Find('herpusable');
-		int fixbonus=0;
+	static int backpackrepairs(actor owner, hdbackpack bp){
+		if (!owner||!bp)return 0;
+		StorageItem si = bp.Storage.Find('herpusable');
+		int fixbonus = 0;
 		if (si){
-			for(int i=0;si.Amounts.Size()>0&&i<si.Amounts[0];){
-				if (si.WeaponStatus[HDWEP_STATUSSLOTS*i]&HERPF_BROKEN){
-					if (!random(0,7-fixbonus)){
+			for(int i = 0;si.Amounts.Size()>0&&i < si.Amounts[0];){
+				if (si.WeaponStatus[HDWEP_STATUSSLOTS * i]&HERPF_BROKEN){
+					if (!random(0, 7 - fixbonus)){
 						//fix
-						si.WeaponStatus[HDWEP_STATUSSLOTS*i]&=~HERPF_BROKEN;
-						if (fixbonus>0)fixbonus--;
-						owner.A_Log("You repair one of the broken H.E.R.P.s in your backpack.",true);
-					}else if(!random(0,7)){
+						si.WeaponStatus[HDWEP_STATUSSLOTS * i]&=~HERPF_BROKEN;
+						if (fixbonus > 0)fixbonus--;
+						owner.A_Log("You repair one of the broken H.E.R.P.s in your backpack.", true);
+					}else if (!random(0, 7)){
 						fixbonus++;
 						//delete and restart
-						bp.Storage.RemoveItem(si,null,null,index:i);
-						i=0;
-						owner.A_Log("You destroy one of the broken H.E.R.P.s in your backpack in your repair efforts.",true);
+						bp.Storage.RemoveItem(si, null, null, index:i);
+						i = 0;
+						owner.A_Log("You destroy one of the broken H.E.R.P.s in your backpack in your repair efforts.", true);
 						continue;
 					}
 				}
@@ -954,133 +954,133 @@ class HERPUsable:HDWeapon{
 
 
 	action void A_RepairAttempt(){
-		if(!invoker.RepairAttempt())return;
-		if(!(invoker.weaponstatus[0]&HERPF_BROKEN))A_SetHelpText();
+		if (!invoker.RepairAttempt())return;
+		if (!(invoker.weaponstatus[0]&HERPF_BROKEN))A_SetHelpText();
 		A_MuzzleClimb(
-			frandom(-1.,1.),frandom(-1.,1.),
-			frandom(-1.,1.),frandom(-1.,1.),
-			frandom(-1.,1.),frandom(-1.,1.),
-			frandom(-1.,1.),frandom(0.,1.)
+			frandom(-1., 1.), frandom(-1., 1.), 
+			frandom(-1., 1.), frandom(-1., 1.), 
+			frandom(-1., 1.), frandom(-1., 1.), 
+			frandom(-1., 1.), frandom(0., 1.)
 		);
 	}
 	bool RepairAttempt(){
-		if(!owner)return false;
-		int failchance=40;
+		if (!owner)return false;
+		int failchance = 40;
 		int spareindex=-1;
 		//find spares, whether to cannibalize or copy
-		let spw=spareweapons(owner.findinventory("spareweapons"));
-		if(spw){
-			for(int i=0;i<spw.weapontype.size();i++){
-				if(
+		let spw = spareweapons(owner.FindInventory("spareweapons"));
+		if (spw){
+			for(int i = 0;i < spw.weapontype.size();i++){
+				if (
 					spw.weapontype[i]==getclassname()
-					&&spw.GetWeaponValue(i,0)&HERPF_BROKEN
+					&&spw.GetWeaponValue(i, 0)&HERPF_BROKEN
 				){
-					if(spareindex==-1)spareindex=i;
-					failchance=min(10,failchance-5);
+					if (spareindex==-1)spareindex = i;
+					failchance = min(10, failchance - 5);
 					break;
 				}
 			}
 		}
-		if(!random(0,failchance)){
+		if (!random(0, failchance)){
 			weaponstatus[0]&=~HERPF_BROKEN;
-			owner.A_StartSound("herp/repair",CHAN_WEAPON);
-			owner.A_Log("You bring your H.E.R.P. back into working condition.",true);
+			owner.A_StartSound("herp / repair", CHAN_WEAPON);
+			owner.A_Log("You bring your H.E.R.P. back into working condition.", true);
 			//destroy one spare
-			if(
-				spareindex>=0
-				&&!random(0,3)
+			if (
+				spareindex >= 0
+				&&!random(0, 3)
 			){
 				spw.weaponbulk.delete(spareindex);
 				spw.weapontype.delete(spareindex);
 				spw.weaponstatus.delete(spareindex);
-				owner.A_Log("Another H.E.R.P. was cannibalized for parts.",true);
+				owner.A_Log("Another H.E.R.P. was cannibalized for parts.", true);
 			}
-		}else owner.A_StartSound("herp/repairtry",CHAN_WEAPONBODY,CHANF_OVERLAP,
-			volume:frandom(0.6,1.),pitch:frandom(0.7,1.4)
+		}else owner.A_StartSound("herp / repairtry", CHAN_WEAPONBODY, CHANF_OVERLAP, 
+			volume:frandom(0.6, 1.), pitch:frandom(0.7, 1.4)
 		);
 		return true;
 	}
 	override void consolidate(){
-		if(!owner)return;
-		int fixbonus=backpackrepairs(owner,hdbackpack(owner.FindInventory("HDBackpack",true)));
-		let spw=spareweapons(owner.findinventory("spareweapons"));
-		if(spw){
-			for(int i=0;i<spw.weapontype.size();i++){
-				if(spw.weapontype[i]!=getclassname())continue;
-				array<string>wpst;wpst.clear();
-				spw.weaponstatus[i].split(wpst,",");
-				int wpstint=wpst[0].toint();
-				if(
+		if (!owner)return;
+		int fixbonus = backpackrepairs(owner, hdbackpack(owner.FindInventory("HDBackpack", true)));
+		let spw = spareweapons(owner.FindInventory("spareweapons"));
+		if (spw){
+			for(int i = 0;i < spw.weapontype.size();i++){
+				if (spw.weapontype[i]!=getclassname())continue;
+				array < string > wpst;wpst.clear();
+				spw.weaponstatus[i].split(wpst, ", ");
+				int wpstint = wpst[0].toint();
+				if (
 					wpstint&HERPF_BROKEN
 				){
-					if(!random(0,max(0,7-fixbonus))){
-						if(fixbonus>0)fixbonus--;
+					if (!random(0, max(0, 7 - fixbonus))){
+						if (fixbonus > 0)fixbonus--;
 						wpstint&=~HERPF_BROKEN;
-						owner.A_Log("You repair one of your broken H.E.R.P.s.",true);
-						string newwepstat=spw.weaponstatus[i];
-						newwepstat=wpstint..newwepstat.mid(newwepstat.indexof(","));
+						owner.A_Log("You repair one of your broken H.E.R.P.s.", true);
+						string newwepstat = spw.weaponstatus[i];
+						newwepstat = wpstint..newwepstat.mid(newwepstat.indexof(", "));
 						spw.weaponstatus[i]=newwepstat;
-					}else if(!random(0,7)){
+					}else if (!random(0, 7)){
 						//delete
 						fixbonus++;
 						spw.weaponbulk.delete(i);
 						spw.weapontype.delete(i);
 						spw.weaponstatus.delete(i);
-						owner.A_Log("You destroy one of your broken H.E.R.P.s in your repair efforts.",true);
+						owner.A_Log("You destroy one of your broken H.E.R.P.s in your repair efforts.", true);
 						//go back to start
-						i=0;
+						i = 0;
 						continue;
 					}
 				}
 			}
 		}
-		if(
+		if (
 			(weaponstatus[0]&HERPF_BROKEN)
-			&&!random(0,7-fixbonus)
+			&&!random(0, 7 - fixbonus)
 		){
 			weaponstatus[0]&=~HERPF_BROKEN;
-			owner.A_Log("You manage some improvised field repairs to your H.E.R.P. robot.",true);
+			owner.A_Log("You manage some improvised field repairs to your H.E.R.P. robot.", true);
 		}
 	}
 	override void DropOneAmmo(int amt){
-		if(owner){
-			amt=clamp(amt,1,10);
-			if(owner.countinv("FourMilAmmo"))owner.A_DropInventory("FourMilAmmo",50);
+		if (owner){
+			amt = clamp(amt, 1, 10);
+			if (owner.CountInv("FourMilAmmo"))owner.A_DropInventory("FourMilAmmo", 50);
 			else{
-				owner.angle-=10;
-				owner.A_DropInventory("HD4mMag",1);
-				owner.angle+=20;
-				owner.A_DropInventory("HDBattery",1);
-				owner.angle-=10;
+				owner.angle -= 10;
+				owner.A_DropInventory("HD4mMag", 1);
+				owner.angle += 20;
+				owner.A_DropInventory("HDBattery", 1);
+				owner.angle -= 10;
 			}
 		}
 	}
 	override void ForceBasicAmmo(){
 		owner.A_TakeInventory("FourMilAmmo");
 		owner.A_TakeInventory("HD4mMag");
-		owner.A_GiveInventory("HD4mMag",3);
+		owner.A_GiveInventory("HD4mMag", 3);
 		owner.A_TakeInventory("HDBattery");
 		owner.A_GiveInventory("HDBattery");
 	}
 }
 enum HERPNum{
-	HERP_MAG1=1,
-	HERP_MAG2=2,
-	HERP_MAG3=3,
-	HERP_BATTERY=4,
-	HERP_BOTID=5,
-	HERP_YOFS=6,
+	HERP_MAG1 = 1, 
+	HERP_MAG2 = 2, 
+	HERP_MAG3 = 3, 
+	HERP_BATTERY = 4, 
+	HERP_BOTID = 5, 
+	HERP_YOFS = 6, 
 
-	HERPF_STARTOFF=1,
-	HERPF_UNLOADONLY=2,
-	HERPF_BROKEN=4,
+	HERPF_STARTOFF = 1, 
+	HERPF_UNLOADONLY = 2, 
+	HERPF_BROKEN = 4, 
 }
 
 
 extend class HDHandlers{
-	void HackHERP(hdplayerpawn ppp,int cmd,int tag,int cmd2){
-		let hpu=HERPController(ppp.findinventory("HERPController"));
-		if(
+	void HackHERP(HDPlayerPawn ppp, int cmd, int tag, int cmd2){
+		let hpu = HERPController(ppp.FindInventory("HERPController"));
+		if (
 			hpu
 			&&ppp.player
 			&&ppp.player.readyweapon==hpu
@@ -1091,105 +1091,105 @@ extend class HDHandlers{
 			&&hpu.weaponstatus[HERPS_INDEX]<hpu.herps.size()
 
 			&&hpu.herps[hpu.weaponstatus[HERPS_INDEX]]
-			&&hpu.herps[hpu.weaponstatus[HERPS_INDEX]].battery>0
+			&&hpu.herps[hpu.weaponstatus[HERPS_INDEX]].battery > 0
 			&&!hpu.herps[hpu.weaponstatus[HERPS_INDEX]].bmissilemore
 		)hpu.setownerweaponstate("hack");
-		else ppp.A_Log("No controller connection available. Bring up the interface with an idle H.E.R.P. connected first.",true);
+		else ppp.A_Log("No controller connection available. Bring up the interface with an idle H.E.R.P. connected first.", true);
 	}
-	void SetHERP(hdplayerpawn ppp,int botcmd,int botcmdid,int achange){
-		let herpinv=HERPUsable(ppp.findinventory("HERPUsable"));
-		int botid=herpinv?herpinv.weaponstatus[HERP_BOTID]:1;
+	void SetHERP(HDPlayerPawn ppp, int botcmd, int botcmdid, int achange){
+		let herpinv = HERPUsable(ppp.FindInventory("HERPUsable"));
+		int botid = herpinv?herpinv.weaponstatus[HERP_BOTID]:1;
 
 		//set HERP tag number with -#
-		if(botcmd<0){
-			if(!herpinv)return;
+		if (botcmd < 0){
+			if (!herpinv)return;
 			herpinv.weaponstatus[HERP_BOTID]=-botcmd;
-			ppp.A_Log(string.format("\cd[HERP] \cjNext HERP tag set to \cy%i",-botcmd),true);
+			ppp.A_Log(string.format("\cd[HERP] \cjNext HERP tag set to \cy%i", -botcmd), true);
 			return;
 		}
 
 		//give actual commands
-		bool anybots=false;
-		int affected=0;
-		bool badcommand=true;
-		actoriterator it=level.createactoriterator(HERP_TID,"HERPBot");
-		actor bot=null;
-		while(bot=it.Next()){
-			anybots=true;
-			let herp=HERPBot(bot);
-			if(
+		bool anybots = false;
+		int affected = 0;
+		bool badcommand = true;
+		actoriterator it = level.createactoriterator(HERP_TID, "HERPBot");
+		actor bot = null;
+		while(bot = it.Next()){
+			anybots = true;
+			let herp = HERPBot(bot);
+			if (
 				herp
 				&&herp.master==ppp
-				&&herp.health>0
+				&&herp.health > 0
 				&&(
 					!botcmdid||
 					botcmdid==herp.botid
 				)
 			){
-				if(botcmd==1){
-					badcommand=false;
-					if(
-						herp.battery<1
+				if (botcmd==1){
+					badcommand = false;
+					if (
+						herp.battery < 1
 						||(
 							herp.ammo[0]<1
 							&&herp.ammo[1]<1
 							&&herp.ammo[2]<1
 						)
 					){
-						ppp.A_Log(string.format("\cd[HERP] \crERROR:\cj HERP at [\cj%i\cu,\cj%i\cu] out of ammo or cells, \cxNOT\cj activated.",herp.pos.x,herp.pos.y),true);
+						ppp.A_Log(string.format("\cd[HERP] \crERROR:\cj HERP at [\cj%i\cu, \cj%i\cu] out of ammo or cells, \cxNOT\cj activated.", herp.pos.x, herp.pos.y), true);
 					}else{
 						affected++;
-						herp.bmissilemore=true;
+						herp.bmissilemore = true;
 					}
 				}
-				else if(botcmd==2){
+				else if (botcmd==2){
 					affected++;
-					badcommand=false;
-					herp.bmissilemore=false;
+					badcommand = false;
+					herp.bmissilemore = false;
 				}
-				else if(botcmd==3){
-					if(!achange){
-						ppp.A_Log(string.format("\cd[HERP] \crERROR:\cj No angle change indicated."),true);
+				else if (botcmd==3){
+					if (!achange){
+						ppp.A_Log(string.format("\cd[HERP] \crERROR:\cj No angle change indicated."), true);
 					}else{
-						badcommand=false;
+						badcommand = false;
 						affected++;
-						int anet=int((herp.startangle+achange))%360;
-						if(anet<0)anet+=360;
-						herp.startangle=anet;
+						int anet = int((herp.startangle + achange))%360;
+						if (anet < 0)anet += 360;
+						herp.startangle = anet;
 						herp.setstatelabel("off");
 
-						ppp.A_Log(string.format("\cd[HERP] \cj HERP at [\cj%i\cu,\cj%i\cu]\cj base angle now facing %s",herp.pos.x,herp.pos.y,hdmath.cardinaldirection(anet)),true);
+						ppp.A_Log(string.format("\cd[HERP] \cj HERP at [\cj%i\cu, \cj%i\cu]\cj base angle now facing %s", herp.pos.x, herp.pos.y, hdmath.cardinaldirection(anet)), true);
 					}
 				}
-				else if(botcmd==123){
-					badcommand=false;
-					ppp.A_Log(string.format("\cd[HERP] \cu [\cj%i\cu,\cj%i\cu]\cj facing %s \cy%i\cj %s",
-						herp.pos.x,herp.pos.y,
-						hdmath.cardinaldirection(herp.startangle),
-						herp.botid,
+				else if (botcmd==123){
+					badcommand = false;
+					ppp.A_Log(string.format("\cd[HERP] \cu [\cj%i\cu, \cj%i\cu]\cj facing %s \cy%i\cj %s", 
+						herp.pos.x, herp.pos.y, 
+						hdmath.cardinaldirection(herp.startangle), 
+						herp.botid, 
 						herp.bmissilemore?"\cxACTIVE":"\cyinactive"
-					),true);
+					), true);
 				}
 				else{
-					badcommand=true;
+					badcommand = true;
 					break;
 				}
 			}
 		}
-		if(
+		if (
 			!badcommand
-			&&botcmd!=123
+			&&botcmd != 123
 		){
 			string verb="hacked";
-			if(botcmd==1)verb="\cxactivated";
-			else if(botcmd==2)verb="\cydeactivated";
-			else if(botcmd==3)verb="\curedirected";
+			if (botcmd==1)verb="\cxactivated";
+			else if (botcmd==2)verb="\cydeactivated";
+			else if (botcmd==3)verb="\curedirected";
 			ppp.A_Log(string.format(
-				"\cd[HERP] \cj%i HERP%s %s%s\cj.",affected,affected==1?"":"s",
-				botcmdid?string.format("with tag \ca%i\cj ",botcmdid):"",
+				"\cd[HERP] \cj%i HERP%s %s%s\cj.", affected, affected==1?"":"s", 
+				botcmdid?string.format("with tag \ca%i\cj ", botcmdid):"", 
 				verb
-			),true);
-		}else if(badcommand)ppp.A_Log(string.format("\cd[HERP] \cj%sCommand format:\cu herp <option> <tag number> <direction>\n\cjOptions\n 1 = ON\n 2 = OFF\n 3 = DIRECTION (counterclockwise in degrees)\n 123 = QUERY\n -n = set tag number\n\cj  tag number on next deployment: \cy%i",anybots?"":"No HERPs currently deployed.\n",botid),true);
+			), true);
+		}else if (badcommand)ppp.A_Log(string.format("\cd[HERP] \cj%sCommand format:\cu herp <option> <tag number> <direction>\n\cjOptions\n 1 = ON\n 2 = OFF\n 3 = DIRECTION (counterclockwise in degrees)\n 123 = QUERY\n -n = set tag number\n\cj  tag number on next deployment: \cy%i", anybots?"":"No HERPs currently deployed.\n", botid), true);
 	}
 }
 
@@ -1210,70 +1210,70 @@ class HERPController:HDWeapon{
 		weapon.selectionorder 1013;
 		tag "H.E.R.P. interface";
 	}
-	array<herpbot> herps;
-	herpbot UpdateHerps(bool resetindex=true){
+	array < herpbot> herps;
+	herpbot UpdateHerps(bool resetindex = true){
 		herps.clear();
-		if(!owner)return null;
-		ThinkerIterator herpfinder=thinkerIterator.Create("HERPBot");
+		if (!owner)return null;
+		ThinkerIterator herpfinder = thinkerIterator.Create("HERPBot");
 		herpbot mo;
-		while(mo=HERPBot(herpfinder.Next())){
-			if(
+		while(mo = HERPBot(herpfinder.Next())){
+			if (
 				mo.master==owner
-				&&mo.battery>0
+				&&mo.battery > 0
 			)herps.push(mo);
 		}
-		if(resetindex)weaponstatus[HERPS_INDEX]=0;
-		if(!herps.size()){
-			if(
+		if (resetindex)weaponstatus[HERPS_INDEX]=0;
+		if (!herps.size()){
+			if (
 				owner
 				&&owner.player
 				&&owner.player.readyweapon==self
 			){
-				owner.A_Log("No H.E.R.P.s deployed. Abort.",true);
+				owner.A_Log("No H.E.R.P.s deployed. Abort.", true);
 				owner.A_SelectWeapon("HDFist");
 			}
 			destroy();
 			return null;
 		}
-		herpbot ddd=herps[0];
+		herpbot ddd = herps[0];
 		return ddd;
 	}
 	static void GiveController(actor caller){
-		caller.A_SetInventory("HERPController",1);
-		caller.findinventory("HERPController").binvbar=true;
-		let ddc=HERPController(caller.findinventory("HERPController"));
+		caller.A_SetInventory("HERPController", 1);
+		caller.FindInventory("HERPController").binvbar = true;
+		let ddc = HERPController(caller.FindInventory("HERPController"));
 		ddc.updateherps(false);
-		if(ddc&&!ddc.herps.size())caller.dropinventory(ddc);
+		if (ddc&&!ddc.herps.size())caller.dropinventory(ddc);
 	}
 	int NextHerp(){
-		int newindex=weaponstatus[HERPS_INDEX]+1;
-		if(newindex>=herps.size())newindex=0;
-		if(weaponstatus[HERPS_INDEX]!=newindex){
-			owner.A_Log("Switching to next H.E.R.P. in the list.",true);
+		int newindex = weaponstatus[HERPS_INDEX]+1;
+		if (newindex >= herps.size())newindex = 0;
+		if (weaponstatus[HERPS_INDEX]!=newindex){
+			owner.A_Log("Switching to next H.E.R.P. in the list.", true);
 			weaponstatus[HERPS_INDEX]=newindex;
 		}
 		return newindex;
 	}
 	override inventory CreateTossable(int amt){
-		if(
+		if (
 			(herps.size()&&herps[NextHerp()])
 			||updateherps(false)
 		)return null;
-		if(self)return weapon.createtossable(amt);
+		if (self)return weapon.createtossable(amt);
 		return null;
 	}
 	override string gethelptext(){
-		if(!herps.size())return "ERROR";
-		weaponstatus[HERPS_INDEX]=clamp(weaponstatus[HERPS_INDEX],0,herps.size()-1);
-		let herpcam=herps[weaponstatus[HERPS_INDEX]];
-		if(!herpcam)return "ERROR";
-		if(
-			herpcam.health<1
-			||herpcam.battery<1
+		if (!herps.size())return "ERROR";
+		weaponstatus[HERPS_INDEX]=clamp(weaponstatus[HERPS_INDEX], 0, herps.size()-1);
+		let herpcam = herps[weaponstatus[HERPS_INDEX]];
+		if (!herpcam)return "ERROR";
+		if (
+			herpcam.health < 1
+			||herpcam.battery < 1
 		)return WEPHELP_DROP.."  Next H.E.R.P.";
 		bool connected=(herpcam.bmissileevenmore);
 		bool turnedon=(herpcam.bmissilemore);
-		if(connected)return
+		if (connected)return
 		WEPHELP_FIREMODE.."  Hold to pilot and:\n"
 		.."  "..WEPHELP_FIRESHOOT
 		..WEPHELP_ALTRELOAD.."  Set home angle\n"
@@ -1287,56 +1287,56 @@ class HERPController:HDWeapon{
 		;
 	}
 	override void DrawSightPicture(
-		HDStatusBar sb,HDWeapon hdw,HDPlayerPawn hpl,
-		bool sightbob,vector2 bob,double fov,bool scopeview,actor hpc
+		HDStatusBar sb, HDWeapon hdw, HDPlayerPawn hpl, 
+		bool sightbob, vector2 bob, double fov, bool scopeview, actor hpc
 	){
-		if(
+		if (
 			!herps.size()
 			||weaponstatus[HERPS_INDEX]>=herps.size()
 		)return;
-		let herpcam=herps[weaponstatus[HERPS_INDEX]];
-		if(!herpcam)return;
+		let herpcam = herps[weaponstatus[HERPS_INDEX]];
+		if (!herpcam)return;
 
-		bool dead=herpcam.health<1;
-		bool nobat=dead||!herpcam.bmissilemore||herpcam.battery<1;
-		int scaledyoffset=46;
-		name ctex=nobat?"HDXHCAM1BLANK":"HDXCAM_HERP";
-		if(!nobat)texman.setcameratotexture(herpcam,ctex,60);
+		bool dead = herpcam.health < 1;
+		bool nobat = dead||!herpcam.bmissilemore||herpcam.battery < 1;
+		int scaledyoffset = 46;
+		name ctex = nobat?"HDXHCAM1BLANK":"HDXCAM_HERP";
+		if (!nobat)texman.setcameratotexture(herpcam, ctex, 60);
 		sb.drawimage(
-			ctex,(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER,
-			scale:nobat?(1,1):((0.25/1.2),0.25)
+			ctex, (0, scaledyoffset) + bob, sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER, 
+			scale:nobat?(1, 1):((0.25 / 1.2), 0.25)
 		);
 		sb.drawimage(
-			"tbwindow",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+			"tbwindow", (0, scaledyoffset) + bob, sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 		);
-		if(!dead)sb.drawimage(
-			"redpxl",(0,scaledyoffset)+bob,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-			alpha:0.4,scale:(2,2)
+		if (!dead)sb.drawimage(
+			"redpxl", (0, scaledyoffset) + bob, sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP, 
+			alpha:0.4, scale:(2, 2)
 		);
-		sb.drawnum(dead?0:max(0,herpcam.ammo[0]%100),
-			24+bob.x,22+bob.y,sb.DI_SCREEN_CENTER,Font.CR_RED,0.4
+		sb.drawnum(dead?0:max(0, herpcam.ammo[0]%100), 
+			24 + bob.x, 22 + bob.y, sb.DI_SCREEN_CENTER, Font.CR_RED, 0.4
 		);
-		int cmd=dead?0:herpcam.battery;
-		sb.drawnum(cmd,
-			24+bob.x,32+bob.y,sb.DI_SCREEN_CENTER,cmd>10?Font.CR_OLIVE:Font.CR_BROWN,0.4
+		int cmd = dead?0:herpcam.battery;
+		sb.drawnum(cmd, 
+			24 + bob.x, 32 + bob.y, sb.DI_SCREEN_CENTER, cmd > 10?Font.CR_OLIVE:Font.CR_BROWN, 0.4
 		);
 
-		string hpst1="\cxAUTO",hpst2="press \cdreload\cu for manual";
-		if(nobat){
+		string hpst1="\cxAUTO", hpst2="press \cdreload\cu for manual";
+		if (nobat){
 			hpst1="\cuOFF";
 			hpst2="press \cdaltfire\cu to turn on";
-		}else if(herpcam.bmissileevenmore){
+		}else if (herpcam.bmissileevenmore){
 			hpst1="\cyMANUAL";
 			hpst2=(owner.player.cmd.buttons&BT_FIREMODE)?"":"hold \cdfiremode\cu to steer";
 		}
 		sb.drawstring(
-			sb.psmallfont,hpst1,
-			(bob.x,10+bob.y),sb.DI_SCREEN_CENTER|sb.DI_TEXT_ALIGN_CENTER,alpha:0.7
+			sb.psmallfont, hpst1, 
+			(bob.x, 10 + bob.y), sb.DI_SCREEN_CENTER|sb.DI_TEXT_ALIGN_CENTER, alpha:0.7
 		);
-		if(cvar.getcvar("hd_helptext",owner.player).getbool()){
+		if (cvar.getcvar("hd_helptext", owner.player).getbool()){
 			sb.drawstring(
-				sb.psmallfont,hpst2,
-				(bob.x,18+bob.y),sb.DI_SCREEN_CENTER|sb.DI_TEXT_ALIGN_CENTER,Font.CR_DARKGRAY,alpha:0.6
+				sb.psmallfont, hpst2, 
+				(bob.x, 18 + bob.y), sb.DI_SCREEN_CENTER|sb.DI_TEXT_ALIGN_CENTER, Font.CR_DARKGRAY, alpha:0.6
 			);
 		}
 	}
@@ -1347,7 +1347,7 @@ class HERPController:HDWeapon{
 	ready:
 		TNT1 A 1{
 			A_SetHelpText();
-			if(
+			if (
 				!invoker.herps.size()
 				||invoker.weaponstatus[HERPS_INDEX]>=invoker.herps.size()
 			){
@@ -1355,31 +1355,31 @@ class HERPController:HDWeapon{
 				return;
 			}
 			A_WeaponReady(WRF_NOFIRE|WRF_ALLOWUSER3);
-			herpbot ddd=invoker.herps[invoker.weaponstatus[HERPS_INDEX]];
-			if(!ddd){
-				if(ddd=invoker.updateherps())A_Log("H.E.R.P. not found. Resetting list.",true);
+			herpbot ddd = invoker.herps[invoker.weaponstatus[HERPS_INDEX]];
+			if (!ddd){
+				if (ddd = invoker.updateherps())A_Log("H.E.R.P. not found. Resetting list.", true);
 				return;
 			}
-			int bt=player.cmd.buttons;
+			int bt = player.cmd.buttons;
 
-			if(
-				ddd.health<1
-				||ddd.distance3d(self)>frandom(0.9,1.1)*HERP_CONTROLRANGE
+			if (
+				ddd.health < 1
+				||ddd.distance3d(self)>frandom(0.9, 1.1)*HERP_CONTROLRANGE
 			)return;
 
-			if(justpressed(BT_ALTATTACK)){
-				ddd.bmissilemore=ddd.bmissilemore?false:true;
+			if (justpressed(BT_ALTATTACK)){
+				ddd.bmissilemore = ddd.bmissilemore?false:true;
 				ddd.herpbeep();
 			}
 
-			if(
+			if (
 				ddd.bmissileevenmore
 				&&ddd.bmissilemore
 			){
-				if(justpressed(BT_RELOAD)){
+				if (justpressed(BT_RELOAD)){
 					ddd.setstatelabel("inputabort");
-				}else if(bt&BT_FIREMODE){
-					if(
+				}else if (bt&BT_FIREMODE){
+					if (
 						bt&BT_ATTACK
 						&&!invoker.weaponstatus[HERPS_TIMER]
 						&&ddd.ammo[0]>0
@@ -1387,39 +1387,39 @@ class HERPController:HDWeapon{
 						invoker.weaponstatus[HERPS_TIMER]+=4;
 						ddd.setstatelabel("shoot");
 					}
-					int yaw=clamp(GetMouseX(true)>>5,-10,10);
-					if(!yaw)yaw=clamp(-player.cmd.sidemove,-10,10);
-					int ptch=clamp(GetMouseY(true)>>5,-10,10);
-					if(!ptch)ptch=clamp(player.cmd.forwardmove,-10,10);
-					if(yaw||ptch){
-						ddd.A_StartSound("herp/crawl",CHAN_BODY);
-						ddd.pitch=clamp(ddd.pitch-clamp(ptch,-10,10),-60,60);
-						ddd.angle+=clamp(yaw,-DERP_MAXTICTURN,DERP_MAXTICTURN);
-						ddd.startpitch=ddd.pitch;
+					int yaw = clamp(GetMouseX(true)>>5, -10, 10);
+					if (!yaw)yaw = clamp(-player.cmd.sidemove, -10, 10);
+					int ptch = clamp(GetMouseY(true)>>5, -10, 10);
+					if (!ptch)ptch = clamp(player.cmd.forwardmove, -10, 10);
+					if (yaw||ptch){
+						ddd.A_StartSound("herp / crawl", CHAN_BODY);
+						ddd.pitch = clamp(ddd.pitch - clamp(ptch, -10, 10), -60, 60);
+						ddd.angle += clamp(yaw, -DERP_MAXTICTURN, DERP_MAXTICTURN);
+						ddd.startpitch = ddd.pitch;
 					}
 				}
-				if(justpressed(BT_USER1)){
-					ddd.startangle=ddd.angle;
+				if (justpressed(BT_USER1)){
+					ddd.startangle = ddd.angle;
 					ddd.herpbeep();
-					A_Log("Home angle set.",true);
+					A_Log("Home angle set.", true);
 				}
-			}else if(justpressed(BT_RELOAD)){
+			}else if (justpressed(BT_RELOAD)){
 				ddd.setstatelabel("inputwaiting");
 			}
 
-			if(!invoker.bweaponbusy&&hdplayerpawn(self))hdplayerpawn(self).nocrosshair=0;
-			if(invoker.weaponstatus[HERPS_TIMER]>0)invoker.weaponstatus[HERPS_TIMER]--;
+			if (!invoker.bweaponbusy&&HDPlayerPawn(self))HDPlayerPawn(self).nocrosshair = 0;
+			if (invoker.weaponstatus[HERPS_TIMER]>0)invoker.weaponstatus[HERPS_TIMER]--;
 		}goto readyend;
 	user3:
 		---- A 0 A_MagManager("HD4mMag");
 		goto ready;
 	hack:
-		---- A 5 A_Log("Fetching nearby devices...",true);
+		---- A 5 A_Log("Fetching nearby devices...", true);
 		---- AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1 A_WeaponReady(WRF_NOFIRE|WRF_ALLOWUSER3);
-		---- AAAAAAAAAAAAAAAAAAA 1 A_WeaponMessage("\cj"..random(1000,9999).." "..random(1000,9999),10);
+		---- AAAAAAAAAAAAAAAAAAA 1 A_WeaponMessage("\cj"..random(1000, 9999).." "..random(1000, 9999), 10);
 		---- A 0{
-			if(random(0,3))invoker.HackNearbyHerps();
-			A_StartSound("herp/beep",CHAN_WEAPON);
+			if (random(0, 3))invoker.HackNearbyHerps();
+			A_StartSound("herp / beep", CHAN_WEAPON);
 		}
 		goto nope;
 	spawn:
@@ -1430,52 +1430,52 @@ class HERPController:HDWeapon{
 
 	//attempt to use the controller to connect to another H.E.R.P.
 	bool HackNearbyHerps(){
-		if(!owner||!herps.size())return false;
-		ThinkerIterator herpfinder=thinkerIterator.Create("HERPBot");
+		if (!owner||!herps.size())return false;
+		ThinkerIterator herpfinder = thinkerIterator.Create("HERPBot");
 		herpbot mo;
-		while(mo=HERPBot(herpfinder.Next())){
-			if(
-				mo.master!=owner
-				&&mo.distance3d(owner)<frandom(0.9,1.1)*HERP_CONTROLRANGE
+		while(mo = HERPBot(herpfinder.Next())){
+			if (
+				mo.master != owner
+				&&mo.distance3d(owner)<frandom(0.9, 1.1)*HERP_CONTROLRANGE
 			){
-				let opponent=mo.master;
-				int hackable=1;
-				if(mo.checksight(owner))hackable+=3;
-				if(
+				let opponent = mo.master;
+				int hackable = 1;
+				if (mo.checksight(owner))hackable += 3;
+				if (
 					!opponent
 					||!mo.checksight(opponent)
-					||mo.distance3d(opponent)>(HERP_CONTROLRANGE*0.6)
-				)hackable+=4;
-				if(random(0,hackable)){
-					mo.master=owner;
-					if(opponent){
-						let opcon=HERPController(opponent.findinventory("HERPController"));
-						if(opcon)opcon.updateherps(false);
-						mo.message("Operational fault. Please check your manual for proper maintenance. (ERR-4fd92-00B) Power low.");
+					||mo.distance3d(opponent)>(HERP_CONTROLRANGE * 0.6)
+				)hackable += 4;
+				if (random(0, hackable)){
+					mo.master = owner;
+					if (opponent){
+						let opcon = HERPController(opponent.FindInventory("HERPController"));
+						if (opcon)opcon.updateherps(false);
+						mo.message("Operational fault. Please check your manual for proper maintenance. (ERR - 4fd92 - 00B) Power low.");
 					}
-					owner.A_Log("H.E.R.P. connected.",true);
-					mo.bmissilemore=false;
-					if(owner.player)mo.bfriendly=true;else mo.bfriendly=owner.bfriendly;
-					mo.A_StartSound("herp/hacked",69420);
+					owner.A_Log("H.E.R.P. connected.", true);
+					mo.bmissilemore = false;
+					if (owner.player)mo.bfriendly = true;else mo.bfriendly = owner.bfriendly;
+					mo.A_StartSound("herp / hacked", 69420);
 					updateherps();
 					return true;
 				}else{
-					owner.A_Log("Connection error. H.E.R.P. not found or credentials expired. Please email vendor technical support for assistance.",true);
-					mo.target=owner;
+					owner.A_Log("Connection error. H.E.R.P. not found or credentials expired. Please email vendor technical support for assistance.", true);
+					mo.target = owner;
 					mo.message("IFF system alert: enemy pattern recognized.");
-					mo.startangle=mo.angleto(owner);
-					mo.bmissilemore=true;
+					mo.startangle = mo.angleto(owner);
+					mo.bmissilemore = true;
 					return false;
 				}
 			}
 		}
-		owner.A_Log("H.E.R.P. remote login attempt failed.",true);
+		owner.A_Log("H.E.R.P. remote login attempt failed.", true);
 		return false;
 	}
 }
 enum HERPControllerNums{
-	HERPS_INDEX=1,
-	HERPS_AMMO=2,
-	HERPS_MODE=3,
-	HERPS_TIMER=4,
+	HERPS_INDEX = 1, 
+	HERPS_AMMO = 2, 
+	HERPS_MODE = 3, 
+	HERPS_TIMER = 4, 
 }

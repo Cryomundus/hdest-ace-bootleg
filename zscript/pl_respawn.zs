@@ -4,13 +4,13 @@
 extend class HDPlayerPawn{
 	void ReplaceBot(){
 		actor spot;int garbage;
-		[garbage,spot]=A_SpawnItemEx("BotBot",flags:
+		[garbage, spot]=A_SpawnItemEx("BotBot", flags:
 			SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION|SXF_SETMASTER
 		);
 
-		setz(pos.z+50);
-		A_Log(string.format("Bot %s replaced with rifleman.",player.getusername()));
-		A_Morph("HDBotSpectator",int.MAX,MRF_FULLHEALTH,"CheckPuff","CheckPuff");
+		setz(pos.z + 50);
+		A_Log(string.format("Bot %s replaced with rifleman.", player.getusername()));
+		A_Morph("HDBotSpectator", int.MAX, MRF_FULLHEALTH, "CheckPuff", "CheckPuff");
 	}
 
 
@@ -19,7 +19,7 @@ extend class HDPlayerPawn{
 
 		//because when called on map this usually implies resetting other stuff
 		//would be nice to make this conditional on the level change actually resetting health, but oh well
-		if(maxhealth()<health)healthreset();
+		if (maxhealth()<health)healthreset();
 	}
 }
 
@@ -28,30 +28,30 @@ extend class HDPlayerPawn{
 extend class HDHandlers{
 	vector3 corpsepos[MAXPLAYERS];
 	override void PlayerRespawned(PlayerEvent e){
-		let hde=HDPlayerPawn(players[e.playernumber].mo);
-		if(!hde)return;
+		let hde = HDPlayerPawn(players[e.playernumber].mo);
+		if (!hde)return;
 
 		//revived with the Power of Friendship
-		if(hd_pof){
-			hde.incaptimer=140;
-			hde.incapacitated=20;
-			hde.damagemobj(null,null,hde.health-10,"maxhpdrain",DMG_FORCED);
-			hde.stunned=700;
-			hde.bloodloss=500;
-			hde.setorigin(corpsepos[e.playernumber],false);
+		if (hd_pof){
+			hde.incaptimer = 140;
+			hde.incapacitated = 20;
+			hde.damagemobj(null, null, hde.health - 10, "maxhpdrain", DMG_FORCED);
+			hde.stunned = 700;
+			hde.bloodloss = 500;
+			hde.setorigin(corpsepos[e.playernumber], false);
 			hde.angle=(corpsepos[e.playernumber].z%1.)*1000;
-			hde.pitch=80;
-			hde.A_StartSound(hde.painsound,CHAN_VOICE);
-			if(hd_disintegrator)hde.spawn("TeleFog",hde.pos,ALLOW_REPLACE);
+			hde.pitch = 80;
+			hde.A_StartSound(hde.painsound, CHAN_VOICE);
+			if (hd_disintegrator)hde.spawn("TeleFog", hde.pos, ALLOW_REPLACE);
 
 			hde.GetOverlayGivers(hde.OverlayGivers);
 
-			//For some reason the player, only in PoF where they burned to death,
+			//For some reason the player, only in PoF where they burned to death, 
 			//will be given a lethal amount of heat upon respawn.
 			//I have no idea what causes this.
 			//Until the source is discovered here is a gross hack.
-			hde.A_GiveInventory("heat",1);
-			heat(hde.findinventory("heat")).realamount=-999;
+			hde.A_GiveInventory("heat", 1);
+			heat(hde.FindInventory("heat")).realamount=-999;
 			return;
 		}
 
@@ -59,7 +59,7 @@ extend class HDHandlers{
 		hde.A_TakeInventory("Heat");
 
 		//mitigate spawncamping: don't respawn holding a reloader or something
-		if(
+		if (
 			hde.player
 			&&(
 				!hde.player.readyweapon
@@ -68,68 +68,68 @@ extend class HDHandlers{
 		)hde.A_SelectWeapon("HDFist");
 
 		//mitigate spawncamping: replenish ammo
-		if(!hd_dropeverythingondeath){
-			for(inventory hdww=hde.inv;hdww!=null;hdww=hdww.inv){
-				let hdw=hdweapon(hdww);
-				if(hdw&&!hdbackpack(hdw))hdw.initializewepstats(true);
-				let hdm=hdmagammo(hdww);
-				if(hdm)hdm.maxcheat();
+		if (!hd_dropeverythingondeath){
+			for(inventory hdww = hde.inv;hdww != null;hdww = hdww.inv){
+				let hdw = hdweapon(hdww);
+				if (hdw&&!hdbackpack(hdw))hdw.initializewepstats(true);
+				let hdm = hdmagammo(hdww);
+				if (hdm)hdm.maxcheat();
 			}
 		}
-		if(hdlivescounter.wiped(e.playernumber)){
+		if (hdlivescounter.wiped(e.playernumber)){
 			hde.A_GiveInventory("SpecMorph"); //keep as an inv for ease of testing
 			hde.A_GiveInventory("InvReset");
 		}else{
-			if(
+			if (
 				teamplay&&deathmatch
 			){
-				vector3 tmspn=teamspawns[players[e.playernumber].getteam()];
-				if(tmspn!=(0,0,0)){
-					hde.setorigin(tmspn,false);
-					hde.angle=teamspawnangle[players[e.playernumber].getteam()];
-					if(
-						!hde.trymove(hde.pos.xy,true)
+				vector3 tmspn = teamspawns[players[e.playernumber].getteam()];
+				if (tmspn!=(0, 0, 0)){
+					hde.setorigin(tmspn, false);
+					hde.angle = teamspawnangle[players[e.playernumber].getteam()];
+					if (
+						!hde.trymove(hde.pos.xy, true)
 						&&hde.blockingmobj&&hde.blockingmobj.bshootable
-					)hde.blockingmobj.damagemobj(hde,hde,hde.TELEFRAG_DAMAGE,"Balefire",DMG_FORCED);
+					)hde.blockingmobj.damagemobj(hde, hde, hde.TELEFRAG_DAMAGE, "Balefire", DMG_FORCED);
 					hde.A_Recoil(-15);
 				}
 			}
 
-			hde.spawn("TeleFog",hde.pos,ALLOW_REPLACE); //HDPP only sets telefog in postbeginplay
+			hde.spawn("TeleFog", hde.pos, ALLOW_REPLACE); //HDPP only sets telefog in postbeginplay
 		}
 	}
 
 	vector3 teamspawns[255]; //how do you get # of teams
 	double teamspawnangle[255];
-	void MoveToTeamSpawn(hdplayerpawn ppp,int team,int cmd){
-		string messagesubject=string.format("\cl%s has",ppp.player.getusername());
+	void MoveToTeamSpawn(HDPlayerPawn ppp, int team, int cmd){
+		string messagesubject = string.format("\cl%s has", ppp.player.getusername());
 		string message;
-		if(cmd==666){
-			if(ppp.player.crouchfactor<1.||!ppp.checkmove(ppp.pos.xy,PCM_NOACTORS)){
+		if (cmd==666){
+			if (ppp.player.crouchfactor < 1.||!ppp.checkmove(ppp.pos.xy, PCM_NOACTORS)){
 				ppp.A_Log("\crThere is not enough room to set a spawnpoint.");
 				return;
 			}else{
 				teamspawns[team]=ppp.pos;
 				teamspawnangle[team]=ppp.angle;
-				message=string.format(" changed the team spawnpoint to [\cx%i\cl,\cy%i\cl,\cz%i\cl]",
-					teamspawns[team].x,teamspawns[team].y,teamspawns[team].z
+				message = string.format(" changed the team spawnpoint to [\cx%i\cl, \cy%i\cl, \cz%i\cl]", 
+					teamspawns[team].x, teamspawns[team].y, teamspawns[team].z
 				);
 			}
-		}else if(cmd<0||cmd==999){
-			teamspawns[team]=(0,0,0);
+		}else if (cmd < 0||cmd==999){
+			teamspawns[team]=(0, 0, 0);
 			message=(" \cyCLEARED\cl the team spawnpoint! You will respawn randomly!\n\cu(Type \crteamspawn 666\cu to set a new spawnpoint.)");
 		}else{
-			if(teamspawns[team]==(0,0,0))ppp.A_Log("\clNo team spawnpoint has been set. Type \crteamspawn 666\cl to set it.",true);
-			else ppp.A_Log(string.format("\clThe team spawnpoint is [\cx%i\cl,\cy%i\cl,\cz%i\cl]",
-				teamspawns[team].x,teamspawns[team].y,teamspawns[team].z
-			),true);
+			if (teamspawns[team]==(0, 0, 0))ppp.A_Log("\clNo team spawnpoint has been set. Type \crteamspawn 666\cl to set it.", true);
+			else ppp.A_Log(string.format("\clThe team spawnpoint is [\cx%i\cl, \cy%i\cl, \cz%i\cl]", 
+				teamspawns[team].x, teamspawns[team].y, teamspawns[team].z
+			), true);
 			return;
 		}
-		for(int i=0;i<MAXPLAYERS;i++){
-			if(players[i].getteam()==team&&players[i].mo)
+		for(int i = 0;i < MAXPLAYERS;i++){
+			if (players[i].getteam()==team&&players[i].mo)
 			players[i].mo.A_Print(
-				string.format("%s\cl%s",
-					i==ppp.playernumber()?"\clYou have":messagesubject,
+				string.format("%s\cl%s", 
+					i==ppp.playernumber()?"\clYou have":messagesubject, 
 					message
 				)
 			);
@@ -145,10 +145,10 @@ class SpecMorph:ActionItem{
 	states{
 	pickup:
 		TNT1 A 0{
-			setz(pos.z+50);
-			A_Morph("HDSpectator",int.MAX,MRF_FULLHEALTH,"CheckPuff","TeleportFog");
-			if(!multiplayer)return;
-			if(player)A_Log(string.format("%s is now a spectator.",player.getusername()));
+			setz(pos.z + 50);
+			A_Morph("HDSpectator", int.MAX, MRF_FULLHEALTH, "CheckPuff", "TeleportFog");
+			if (!multiplayer)return;
+			if (player)A_Log(string.format("%s is now a spectator.", player.getusername()));
 		}fail;
 	}
 }
@@ -174,24 +174,24 @@ class HDSpectator:HDPlayerPawn{
 		height 1;radius 1;
 	}
 	override int damagemobj(
-		actor inflictor,actor source,int damage,
-		name mod,int flags,double angle
+		actor inflictor, actor source, int damage, 
+		name mod, int flags, double angle
 	){
-		return PlayerPawn.damagemobj(inflictor,source,damage,mod,flags,angle);
+		return PlayerPawn.damagemobj(inflictor, source, damage, mod, flags, angle);
 	}
 	override void DeathThink(){PlayerPawn.DeathThink();}
-	override void Die(actor source,actor inflictor,int dmgflags,name MeansOfDeath){
-		PlayerPawn.Die(source,inflictor,dmgflags,MeansOfDeath);
+	override void Die(actor source, actor inflictor, int dmgflags, name MeansOfDeath){
+		PlayerPawn.Die(source, inflictor, dmgflags, MeansOfDeath);
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
-		setz(min(floorz+64,ceilingz-4));
-		if(!multiplayer)return;
-		textalpha=0;
-		titleticker=0;
-		viewheight=height*0.5;
+		setz(min(floorz + 64, ceilingz - 4));
+		if (!multiplayer)return;
+		textalpha = 0;
+		titleticker = 0;
+		viewheight = height * 0.5;
 	}
-	override bool cancollidewith(actor other,bool passive){return false;}
+	override bool cancollidewith(actor other, bool passive){return false;}
 	override void checkcrouch(bool totallyfrozen){}
 	override void CrouchMove(int direction){}
 	override void MovePlayer(){PlayerPawn.MovePlayer();}
@@ -202,41 +202,41 @@ class HDSpectator:HDPlayerPawn{
 	int titleticker;
 	override void tick(){
 		playerpawn.tick();
-		if(!player||player.bot||player.mo!=self)return;
+		if (!player||player.bot||player.mo != self)return;
 		A_TakeInventory("HDFist");
 
-		int oldinput=getplayerinput(MODINPUT_OLDBUTTONS);
-		int buttons=player.cmd.buttons;
-		vel*=0.9;
+		int oldinput = getplayerinput(MODINPUT_OLDBUTTONS);
+		int buttons = player.cmd.buttons;
+		vel *= 0.9;
 
-		if(buttons&BT_CROUCH)vel.z-=1;
-		if(buttons&BT_JUMP)vel.z+=1;
+		if (buttons&BT_CROUCH)vel.z -= 1;
+		if (buttons&BT_JUMP)vel.z += 1;
 
-		if(textalpha<0.7)textalpha+=0.02;
-		if(!titleticker){
-			if(hdlivescounter.owndeaths(playernumber())>fraglimit%100)spectitle="O u t   o f   l i v e s .";
+		if (textalpha < 0.7)textalpha += 0.02;
+		if (!titleticker){
+			if (hdlivescounter.owndeaths(playernumber())>fraglimit%100)spectitle="O u t   o f   l i v e s .";
 			else spectitle="Now spectating.";
 			titleticker=-1;
-		}else if(titleticker>0)titleticker--;
+		}else if (titleticker > 0)titleticker--;
 
 		//warp to players
 		int chosenplayer=-1;int choosedir;
-		if(
+		if (
 			(buttons&BT_ATTACK)&&!(oldinput&BT_ATTACK)
 			||(buttons&BT_ALTATTACK)&&!(oldinput&BT_ALTATTACK)
 		){
-			if(buttons&BT_ATTACK)choosedir=1;
+			if (buttons&BT_ATTACK)choosedir = 1;
 			else choosedir=-1;
 	
-			for(int i=0;i<MAXPLAYERS&&chosenplayer<0;i++){
-				destplayer+=choosedir;
-				if(destplayer<0)destplayer=MAXPLAYERS-1;
-				else if(destplayer==MAXPLAYERS)destplayer=0;
+			for(int i = 0;i < MAXPLAYERS&&chosenplayer < 0;i++){
+				destplayer += choosedir;
+				if (destplayer < 0)destplayer = MAXPLAYERS - 1;
+				else if (destplayer==MAXPLAYERS)destplayer = 0;
 
-				if(!playeringame[destplayer])continue;
+				if (!playeringame[destplayer])continue;
 
-				actor pmo=players[destplayer].mo;
-				if(
+				actor pmo = players[destplayer].mo;
+				if (
 					pmo
 					&&!(pmo is "HDSpectator")
 					&&(
@@ -245,11 +245,11 @@ class HDSpectator:HDPlayerPawn{
 						||players[destplayer].getteam()==player.getteam()
 					)
 				){
-					titleticker=70;
+					titleticker = 70;
 					spectitle="Now viewing: \cx"..players[destplayer].getusername();
-					setorigin(pmo.pos,true);
-					angle=pmo.angle;pitch=10;
-					A_ChangeVelocity(-6,0,12,CVF_RELATIVE|CVF_REPLACE);
+					setorigin(pmo.pos, true);
+					angle = pmo.angle;pitch = 10;
+					A_ChangeVelocity(-6, 0, 12, CVF_RELATIVE|CVF_REPLACE);
 					break;
 				}
 			}

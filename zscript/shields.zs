@@ -9,7 +9,7 @@ class HDMagicShield:HDDamageHandler{
 		-standstill  //if enabled, do not deplete if over maxamount
 		+inventory.keepdepleted
 
-		inventory.amount 1;
+		inventory.Amount 1;
 		inventory.maxamount 1024;
 		inventory.icon "BON2A0";
 
@@ -22,104 +22,104 @@ class HDMagicShield:HDDamageHandler{
 	override double getbulk(){return bulk;}
 	override void AttachToOwner(actor other){
 		super.AttachToOwner(other);
-		if(hdmobbase(other)){
-			int mmm=hdmobbase(other).maxshields;
-			if(mmm>0){
-				maxamount=mmm;
-				amount=mmm;
-				buntossable=true;
+		if (hdmobbase(other)){
+			int mmm = hdmobbase(other).maxshields;
+			if (mmm > 0){
+				maxamount = mmm;
+				amount = mmm;
+				buntossable = true;
 			}
 		}
 	}
 	override inventory CreateTossable(int amt){
-		if(bulk>0)return super.createtossable(amt);
+		if (bulk > 0)return super.createtossable(amt);
 		return null;
 	}
 	override void OnDrop(actor dropper){
 		super.OnDrop(dropper);
-		let aaa=HDMagAmmo(spawn("ShieldCore",pos));
-		aaa.vel=vel;
-		aaa.target=dropper;
-		if(dropper){
-			aaa.amount=1;
+		let aaa = HDMagAmmo(spawn("ShieldCore", pos));
+		aaa.vel = vel;
+		aaa.target = dropper;
+		if (dropper){
+			aaa.Amount = 1;
 			aaa.mags.clear();
 			aaa.mags.push(amount);
-			let sss=dropper.findinventory("HDMagicShield");
-			if(sss){
-				aaa.mags[0]+=sss.amount;
+			let sss = dropper.FindInventory("HDMagicShield");
+			if (sss){
+				aaa.mags[0]+=sss.Amount;
 				sss.destroy();
 			}
 		}
-		if(self)destroy();
+		if (self)destroy();
 	}
 	static void Deplete(
-		actor owner,
-		int amount,
-		HDMagicShield shields=null,
-		bool destroydepleted=false
+		actor owner, 
+		int amount, 
+		HDMagicShield shields = null, 
+		bool destroydepleted = false
 	){
-		if(!shields)shields=HDMagicShield(owner.findinventory("HDMagicShield"));
-		if(shields){
-			shields.amount-=amount;
-			if(shields.amount<1){
+		if (!shields)shields = HDMagicShield(owner.FindInventory("HDMagicShield"));
+		if (shields){
+			shields.Amount -= amount;
+			if (shields.Amount < 1){
 				int downto=-64;
-				shields.amount=downto;
-				if(hd_debug)console.printf(owner.getclassname().." shield broke to "..downto.."!");
-				owner.A_StartSound("misc/mobshieldx", CHAN_BODY, CHANF_OVERLAP, 0.75);
-				double oradius=owner.radius;
-				double oheight=owner.height;
-				vector3 ovel=owner.vel;
-				for(int i=0;i<10;i++){
-					vector3 rpos=owner.pos+(
-						frandom(-oradius,oradius),
-						frandom(-oradius,oradius),
-						frandom(0,oheight)
+				shields.Amount = downto;
+				if (hd_debug)console.printf(owner.getclassname().." shield broke to "..downto.."!");
+				owner.A_StartSound("misc / mobshieldx", CHAN_BODY, CHANF_OVERLAP, 0.75);
+				double oradius = owner.radius;
+				double oheight = owner.height;
+				vector3 ovel = owner.vel;
+				for(int i = 0;i < 10;i++){
+					vector3 rpos = owner.pos+(
+						frandom(-oradius, oradius), 
+						frandom(-oradius, oradius), 
+						frandom(0, oheight)
 					);
-					actor spk=actor.spawn("ShieldSpark",rpos,ALLOW_REPLACE);
-					spk.vel=(frandom(-2,2),frandom(-2,2),frandom(-2,2))+ovel;
+					actor spk = actor.spawn("ShieldSpark", rpos, ALLOW_REPLACE);
+					spk.vel=(frandom(-2, 2), frandom(-2, 2), frandom(-2, 2)) + ovel;
 				}
-				if(destroydepleted)shields.destroy();
+				if (destroydepleted)shields.destroy();
 			}
 		}
 	}
 	override void DoEffect(){
-		if(
+		if (
 			owner.bcorpse
-			||owner.health<1
+			||owner.health < 1
 			||owner.isfrozen()
 		)return;
-		if(accuracy>0)accuracy--;
+		if (accuracy > 0)accuracy--;
 
-		if(
-			amount<1
+		if (
+			amount < 1
 			&&(
-				maxamount<1
+				maxamount < 1
 				||(
 					owner.player
 					&&!bquicktoretaliate
 				)
 			)
 		){
-			if(!bquicktoretaliate){
-				let aaa=owner.spawn("SpentShield",(owner.pos.xy,owner.pos.z+owner.height*0.8));
-				if(aaa){
-					aaa.vel=owner.vel+(cos(owner.angle),sin(owner.angle),1.);
+			if (!bquicktoretaliate){
+				let aaa = owner.spawn("SpentShield", (owner.pos.xy, owner.pos.z + owner.height * 0.8));
+				if (aaa){
+					aaa.vel = owner.vel+(cos(owner.angle), sin(owner.angle), 1.);
 				}
 			}
 			destroy();
 			return;
 		}
 
-		//replenish shields and handle breaking/unbreaking
-		if(
+		//replenish shields and handle breaking / unbreaking
+		if (
 			!bstandstill
-			&&amount>maxamount
+			&&amount > maxamount
 		)amount--;
-		else if(
-			amount<maxamount
+		else if (
+			amount < maxamount
 			&&(
 				(
-					mass>0
+					mass > 0
 				)||(
 					bquicktoretaliate
 					&&!(level.time&(1|2|4))
@@ -127,53 +127,53 @@ class HDMagicShield:HDDamageHandler{
 			)
 		){
 			amount++;
-			if(mass>0)mass--;
+			if (mass > 0)mass--;
 		}
 
-		if(
+		if (
 			bquicktoretaliate
 			&&amount==1
-			&&maxamount>1
+			&&maxamount > 1
 		){
-			if(hd_debug)console.printf(owner.getclassname().." shield restored!");
+			if (hd_debug)console.printf(owner.getclassname().." shield restored!");
 			FlashSparks(owner);
 		}
 	}
 	static void FlashSparks(actor owner){
-		if(!owner)return;
-		owner.A_StartSound("misc/mobshieldf",CHAN_BODY,CHANF_OVERLAP,0.75);
-		double oradius=owner.radius;
-		double oheight=owner.height;
-		for(int i=0;i<10;i++){
-			vector3 rpos=owner.pos+(
-				frandom(-oradius,oradius),
-				frandom(-oradius,oradius),
-				frandom(0,oheight)
+		if (!owner)return;
+		owner.A_StartSound("misc / mobshieldf", CHAN_BODY, CHANF_OVERLAP, 0.75);
+		double oradius = owner.radius;
+		double oheight = owner.height;
+		for(int i = 0;i < 10;i++){
+			vector3 rpos = owner.pos+(
+				frandom(-oradius, oradius), 
+				frandom(-oradius, oradius), 
+				frandom(0, oheight)
 			);
-			actor spk=actor.spawn("ShieldSpark",rpos,ALLOW_REPLACE);
-			vector3 sv=spk.Vec3To(owner);
-			sv.z+=oheight*0.5;
+			actor spk = actor.spawn("ShieldSpark", rpos, ALLOW_REPLACE);
+			vector3 sv = spk.Vec3To(owner);
+			sv.z += oheight * 0.5;
 			spk.vel=(sv*(1./50));
 		}
 	}
 
 	//called from HDPlayerPawn and HDMobBase's DamageMobj
-	override int,name,int,int,int,int,int HandleDamage(
-		int damage,
-		name mod,
-		int flags,
-		actor inflictor,
-		actor source,
-		int towound,
-		int toburn,
-		int tostun,
+	override int, name, int, int, int, int, int HandleDamage(
+		int damage, 
+		name mod, 
+		int flags, 
+		actor inflictor, 
+		actor source, 
+		int towound, 
+		int toburn, 
+		int tostun, 
 		int tobreak
 	){
-		actor victim=owner;
-		if(
+		actor victim = owner;
+		if (
 			!victim
 			||(flags&(DMG_NO_FACTOR|DMG_FORCED))
-			||amount<1
+			||amount < 1
 			||!inflictor
 			||(inflictor==victim)
 			||(inflictor is "HDBulletActor")
@@ -185,127 +185,127 @@ class HDMagicShield:HDDamageHandler{
 			||mod=="holy"
 			||mod=="jointlock"
 			||mod=="staples"
-		)return damage,mod,flags,towound,toburn,tostun,tobreak;
+		)return damage, mod, flags, towound, toburn, tostun, tobreak;
 
-		if(!stamina)stamina=maxamount;
+		if (!stamina)stamina = maxamount;
 
-		int blocked=min(amount>>1,damage,stamina>>1);
-		damage-=blocked;
+		int blocked = min(amount >> 1, damage, stamina >> 1);
+		damage -= blocked;
 		bool supereffective=(
 			mod=="BFGBallAttack"
 			||mod=="electrical"
 			||mod=="balefire"
 		);
 
-		HDMagicShield.Deplete(victim,max(supereffective?(blocked<<2):blocked,1),self);
+		HDMagicShield.Deplete(victim, max(supereffective?(blocked << 2):blocked, 1), self);
 
 
-		if(hd_debug)console.printf("BLOCKED (not bullet)  "..blocked.."    OF  "..damage+blocked..",   "..amount.." REMAIN");
+		if (hd_debug)console.printf("BLOCKED (not bullet)  "..blocked.."    OF  "..damage + blocked..",   "..Amount.." REMAIN");
 
 
 		//spawn shield debris
 		vector3 sparkpos;
-		if(
+		if (
 			inflictor
-			&&inflictor!=source
-		)sparkpos=inflictor.pos;
-		else if(
+			&&inflictor != source
+		)sparkpos = inflictor.pos;
+		else if (
 			source
 		)sparkpos=(
-			victim.pos.xy+victim.radius*(source.pos.xy-victim.pos.xy).unit()
-			,victim.pos.z+min(victim.height,source.height*0.6)
+			victim.pos.xy + victim.radius*(source.pos.xy - victim.pos.xy).unit()
+			, victim.pos.z + min(victim.height, source.height * 0.6)
 		);
-		else sparkpos=(victim.pos.xy,victim.pos.z+victim.height*0.6);
+		else sparkpos=(victim.pos.xy, victim.pos.z + victim.height * 0.6);
 
-		int shrd=max(1,blocked>>6);
-		for(int i=0;i<shrd;i++){
-			actor aaa=victim.spawn("ShieldSpark",sparkpos,ALLOW_REPLACE);
-			aaa.vel=(frandom(-3,3),frandom(-3,3),frandom(-3,3));
+		int shrd = max(1, blocked >> 6);
+		for(int i = 0;i < shrd;i++){
+			actor aaa = victim.spawn("ShieldSpark", sparkpos, ALLOW_REPLACE);
+			aaa.vel=(frandom(-3, 3), frandom(-3, 3), frandom(-3, 3));
 		}
 
 		//chance to flinch
-		if(damage<1){
-			if(
+		if (damage < 1){
+			if (
 				!(flags&DMG_NO_PAIN)
 				&&blocked>(victim.spawnhealth()>>3)
-				&&random(0,255)<victim.painchance
+				&&random(0, 255)<victim.painchance
 			)hdmobbase.forcepain(victim);
 		}
 
-		return damage,mod,flags,towound,toburn,tostun,tobreak;
+		return damage, mod, flags, towound, toburn, tostun, tobreak;
 	}
 
 	//called from HDBulletActor's OnHitActor
-	override double,double OnBulletImpact(
-		HDBulletActor bullet,
-		double pen,
-		double penshell,
-		double hitangle,
-		double deemedwidth,
-		vector3 hitpos,
-		vector3 vu,
+	override double, double OnBulletImpact(
+		HDBulletActor bullet, 
+		double pen, 
+		double penshell, 
+		double hitangle, 
+		double deemedwidth, 
+		vector3 hitpos, 
+		vector3 vu, 
 		bool hitactoristall
 	){
-		actor victim=owner;
-		if(
+		actor victim = owner;
+		if (
 			!victim
 			||!bullet
-			||amount<1
-		)return pen,penshell;
+			||amount < 1
+		)return pen, penshell;
 
-		if(!stamina)stamina=maxamount;
+		if (!stamina)stamina = maxamount;
 
-		double bulletpower=pen*bullet.mass*0.1;
-		if(bulletpower<1){
-			if(frandom(0,1)<bulletpower)bulletpower=1;
-			else bulletpower=0;
+		double bulletpower = pen * bullet.mass * 0.1;
+		if (bulletpower < 1){
+			if (frandom(0, 1)<bulletpower)bulletpower = 1;
+			else bulletpower = 0;
 		}
 
-		int depleteshield=int(min(bulletpower,amount));
+		int depleteshield = int(min(bulletpower, amount));
 
 
-		if(hd_debug)console.printf("BLOCKED  "..depleteshield.."    OF  "..int(bulletpower)..",   "..int(amount-bulletpower).." REMAIN");
+		if (hd_debug)console.printf("BLOCKED  "..depleteshield.."    OF  "..int(bulletpower)..",   "..int(amount - bulletpower).." REMAIN");
 
 
-		if(depleteshield<=0){
-			if(!bulletpower)return 0,penshell;
-			return pen,penshell;
+		if (depleteshield <= 0){
+			if (!bulletpower)return 0, penshell;
+			return pen, penshell;
 		}
 
-		HDMagicShield.Deplete(victim,depleteshield,self);
-		spawn("ShieldNeverBlood",bullet.pos,ALLOW_REPLACE);
+		HDMagicShield.Deplete(victim, depleteshield, self);
+		spawn("ShieldNeverBlood", bullet.pos, ALLOW_REPLACE);
 
 
 		victim.vel+=(
-			((victim.pos.xy,victim.pos.z+victim.height*0.5)-bullet.pos).unit()
+			((victim.pos.xy, victim.pos.z + victim.height * 0.5)-bullet.pos).unit()
 			*depleteshield
 			/victim.mass
 		);
-		victim.angle+=deltaangle(victim.angle,victim.angleto(bullet))*frandom(-0.005,0.03);
-		victim.pitch+=frandom(-1.,1.);
+		victim.angle += deltaangle(victim.angle, victim.angleto(bullet))*frandom(-0.005, 0.03);
+		victim.pitch += frandom(-1., 1.);
 
-		double addpenshell=min(pen,amount,stamina>>3);
-		if(addpenshell>0){
-			pen-=addpenshell;
-			penshell+=addpenshell; //in case anything else uses this value
+		double addpenshell = min(pen, amount, stamina >> 3);
+		if (addpenshell > 0){
+			pen -= addpenshell;
+			penshell += addpenshell; //in case anything else uses this value
 		}
-		return pen,penshell;
+		return pen, penshell;
 	}
 	states{
 	use:
 		TNT1 A 0{
-			if(invoker.accuracy>70){
+			if (invoker.accuracy > 70){
 				A_DropInventory(invoker.getclassname());
 			}else{
-				if(!invoker.accuracy){
-					if(
-						invoker.amount<invoker.maxamount
-						&&invoker.mass>0
+				if (!invoker.accuracy){
+					if (
+						invoker.Amount < invoker.maxamount
+						&&invoker.mass > 0
 					)A_Log(
-						"WARNING: shield is not done charging! Aborting now will permanently degrade performance. Double-tap Use to proceed anyway."
-					,true);
+						"WARNING: shield is not done charging! Aborting now will permanently degrade performance. Double - tap Use to proceed anyway."
+					, true);
 				}
-				invoker.accuracy=80;
+				invoker.accuracy = 80;
 			}
 		}fail;
 	}
@@ -320,8 +320,8 @@ class ShieldSpark:IdleDummy{
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
-		scale*=frandom(0.2,0.5);
-		roll=frandom(0,360);
+		scale *= frandom(0.2, 0.5);
+		roll = frandom(0, 360);
 	}
 	states{
 	spawn:
@@ -341,7 +341,7 @@ class NullPuff:Actor{
 //pickup item that gives you shields. currently unused.
 class ShieldCore:HDMagAmmo{
 	default{
-		//$Category "Items/Hideous Destructor/"
+		//$Category "Items / Hideous Destructor/"
 		//$Title "Shield Core"
 		//$Sprite "BON2A0"
 
@@ -356,58 +356,58 @@ class ShieldCore:HDMagAmmo{
 		hdmagammo.magbulk ENC_426MAG;
 
 		inventory.pickupmessage "Picked up a shield core.";
-		inventory.pickupsound "misc/i_pkup";
+		inventory.pickupsound "misc / i_pkup";
 	}
 	override bool isused(){return true;}
 	override int getsbarnum(int flags){
-		int ms=mags.size()-1;
-		if(ms<0)return -1000000;
+		int ms = mags.size()-1;
+		if (ms < 0)return -1000000;
 		return mags[ms];
 	}
-	override double getbulk(){return amount*magbulk;}
+	override double getbulk(){return amount * magbulk;}
 	override bool Extract(){return false;}
 	override bool Insert(){return false;}
 	override void Tick(){
 		super.Tick();
-		if(accuracy>0)accuracy--;
+		if (accuracy > 0)accuracy--;
 	}
 	action void A_UseShield(){
 
 		//update and cycle
 		invoker.syncamount();
-		int lastmag=invoker.mags.size()-1;
-		if(player.cmd.buttons&BT_USE){
-			invoker.mags.insert(0,invoker.mags[lastmag]);
+		int lastmag = invoker.mags.size()-1;
+		if (player.cmd.buttons&BT_USE){
+			invoker.mags.insert(0, invoker.mags[lastmag]);
 			invoker.mags.pop();
 			return;
 		}
 
 		//use the existing shield to drop it
-		let sss=hdpickup(findinventory("HDMagicShield"));
-		if(sss){
+		let sss = hdpickup(FindInventory("HDMagicShield"));
+		if (sss){
 			useinventory(sss);
-			if(sss)return;
+			if (sss)return;
 		}
 
 		A_GiveInventory("HDMagicShield");
-		sss=hdpickup(findinventory("HDMagicShield"));
-		if(sss){
-			int togive=invoker.mags[lastmag];
-			sss.bstandstill=false;
-			sss.bquicktoretaliate=false;
-			sss.binvbar=true;
-			sss.amount=1;
-			sss.maxamount=togive;
-			sss.bulk=invoker.magbulk;
-			sss.mass=togive-1;
+		sss = hdpickup(FindInventory("HDMagicShield"));
+		if (sss){
+			int togive = invoker.mags[lastmag];
+			sss.bstandstill = false;
+			sss.bquicktoretaliate = false;
+			sss.binvbar = true;
+			sss.Amount = 1;
+			sss.maxamount = togive;
+			sss.bulk = invoker.magbulk;
+			sss.mass = togive - 1;
 			invoker.mags.pop();
-			invoker.amount--;
-			if(sss.amount>0)HDMagicShield.FlashSparks(self);
+			invoker.Amount--;
+			if (sss.Amount > 0)HDMagicShield.FlashSparks(self);
 		}
 	}
 	states{
 	spawn:
-		BON2 ABCD 1 A_SetTics(random(1,10));
+		BON2 ABCD 1 A_SetTics(random(1, 10));
 		loop;
 	use:
 		TNT1 A 0 A_UseShield();
@@ -417,14 +417,14 @@ class ShieldCore:HDMagAmmo{
 class SpentShield:HDDebris{
 	default{
 		scale 0.3;height 3;radius 3;
-		bouncesound "misc/fragknock";
+		bouncesound "misc / fragknock";
 	}
 	states{
 	spawn:
 		BON2 E 0;
 	spawn2:
 		---- A 1{
-			A_SetRoll(roll+60,SPF_INTERPOLATE);
+			A_SetRoll(roll + 60, SPF_INTERPOLATE);
 		}wait;
 	death:
 		---- A -1;

@@ -2,7 +2,7 @@
 // Stealth monster replacements
 // ------------------------------------------------------------
 class HDStealthPorter:Actor{
-	class<actor>spawntype;
+	class < actor > spawntype;
 	property spawntype:spawntype;
 	default{
 		+ismonster
@@ -14,34 +14,34 @@ class HDStealthPorter:Actor{
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
-		if(!spawntype){
-			A_SpawnItemEx("NinjaPirate",
+		if (!spawntype){
+			A_SpawnItemEx("NinjaPirate", 
 				flags:SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS|SXF_TRANSFERAMBUSHFLAG
 			);
 			destroy();
 			return;
 		}
 		A_SetSize(
-			getdefaultbytype(spawntype).radius,
+			getdefaultbytype(spawntype).radius, 
 			getdefaultbytype(spawntype).height
 		);
-		speed=radius;
+		speed = radius;
 	}
 	void A_CheckPortIn(){
-		if(
+		if (
 			target
-			&&absangle(target.angleto(self),target.angle)>90
+			&&absangle(target.angleto(self), target.angle)>90
 		){
-			let aaa=spawn(spawntype,pos,ALLOW_REPLACE);
-			if(!aaa)return;
+			let aaa = spawn(spawntype, pos, ALLOW_REPLACE);
+			if (!aaa)return;
 
-			HDF.TransferSpecials(self,aaa,HDF.TS_ANGLE);
-			aaa.target=target;
-			let hdm=hdmobbase(aaa);
-			if(hdm)hdm.A_Vocalize(hdm.seesound);
-			else hdm.A_StartSound(hdm.seesound,CHAN_VOICE);
+			HDF.TransferSpecials(self, aaa, HDF.TS_ANGLE);
+			aaa.target = target;
+			let hdm = hdmobbase(aaa);
+			if (hdm)hdm.A_Vocalize(hdm.seesound);
+			else hdm.A_StartSound(hdm.seesound, CHAN_VOICE);
 
-			spawn("TeleFog",pos,ALLOW_REPLACE);
+			spawn("TeleFog", pos, ALLOW_REPLACE);
 			A_AlertMonsters();
 
 			destroy();
@@ -84,10 +84,10 @@ class StealthPortBabuin:HDStealthPorter{
 class HDStealthDemon:RandomSpawner replaces StealthDemon{
 	default{
 		+ismonster
-		dropitem "NinjaPirate",256,20;
-		dropitem "SpecBabuin",256,5;
-		dropitem "StealthPortBabuin",256,4;
-		dropitem "ShellShade",256,1;
+		dropitem "NinjaPirate", 256, 20;
+		dropitem "SpecBabuin", 256, 5;
+		dropitem "StealthPortBabuin", 256, 4;
+		dropitem "ShellShade", 256, 1;
 	}
 }
 class HDStealthHellKnight:HDStealthPorter replaces StealthHellKnight{

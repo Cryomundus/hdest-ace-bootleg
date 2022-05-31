@@ -1,10 +1,10 @@
 // ------------------------------------------------------------
 // The player!
 // ------------------------------------------------------------
-const HDCONST_SPRINTMAXHEARTRATE=20;
-const HDCONST_SPRINTFATIGUE=30;
-const HDCONST_WALKFATIGUE=40;
-const HDCONST_DAMAGEFATIGUE=80;
+const HDCONST_SPRINTMAXHEARTRATE = 20;
+const HDCONST_SPRINTFATIGUE = 30;
+const HDCONST_WALKFATIGUE = 40;
+const HDCONST_DAMAGEFATIGUE = 80;
 class HDPlayerPawn:PlayerPawn{
 	vector3 lastvel;double lastheight;
 	bool teleported;
@@ -68,131 +68,131 @@ class HDPlayerPawn:PlayerPawn{
 
 		player.viewheight 48;
 		player.attackzoffset 21;
-		player.damagescreencolor "12 06 04",0;
+		player.damagescreencolor "12 06 04", 0;
 		player.jumpz 0;
-		player.colorrange 112,127;
+		player.colorrange 112, 127;
 		maxstepheight 24;
 		player.gruntspeed 9999999999.0;
 		player.displayname "Operator";
 		player.crouchsprite "PLYC";
 		player.aircapacity 4.5;
 
-		hdplayerpawn.loadout "";
-		hdplayerpawn.maxpocketspace HDCONST_MAXPOCKETSPACE;
+		HDPlayerPawn.loadout "";
+		HDPlayerPawn.maxpocketspace HDCONST_MAXPOCKETSPACE;
 		player.startitem "CustomLoadoutGiver";
 	}
-	override bool cancollidewith(actor other,bool passive){
+	override bool cancollidewith(actor other, bool passive){
 		return(
 			!player
 			||other.floorz==other.pos.z
 			||!hdfist(player.readyweapon)
-			||hdfist(player.readyweapon).grabbed!=other
+			||hdfist(player.readyweapon).grabbed != other
 		);
 	}
 	override void PostBeginPlay(){
 		super.PostBeginPlay();
 		cachecvars();
 
-		standsprite=sprite;
-		if(player)ApplyUserSkin(true);
+		standsprite = sprite;
+		if (player)ApplyUserSkin(true);
 
-		lastvel=vel;
-		lastheight=height;
-		lastangle=angle;
-		lastpitch=pitch;
-		beatcap=35;beatmax=35;
-		feetangle=angle;
+		lastvel = vel;
+		lastheight = height;
+		lastangle = angle;
+		lastpitch = pitch;
+		beatcap = 35;beatmax = 35;
+		feetangle = angle;
 
-		if(!scopecamera)scopecamera=spawn("ScopeCamera",pos+(0,0,height-6),ALLOW_REPLACE);
-		scopecamera.target=self;
+		if (!scopecamera)scopecamera = spawn("ScopeCamera", pos+(0, 0, height - 6), ALLOW_REPLACE);
+		scopecamera.target = self;
 
-		if(player&&player.bot&&hd_nobots&&!hdlivescounter.wiped(playernumber()))ReplaceBot();
+		if (player&&player.bot&&hd_nobots&&!hdlivescounter.wiped(playernumber()))ReplaceBot();
 		A_TakeInventory("NullWeapon");
 
-		A_SetTeleFog("TeleportFog","TeleportFog");
+		A_SetTeleFog("TeleportFog", "TeleportFog");
 
 		hdlivescounter.updatefragcounts(hdlivescounter.get());
 		showgametip();
 	}
 	void A_CheckGunBraced(){
-		if(incapacitated||HDWeapon.IsBusy(self))gunbraced=false;
-		else if(
+		if (incapacitated||HDWeapon.IsBusy(self))gunbraced = false;
+		else if (
 			!barehanded
 			&&!gunbraced
 			&&floorz==pos.z
-			&&!countinv("IsMoving")
-			&&!countinv("HDZerk")
+			&&!CountInv("IsMoving")
+			&&!CountInv("HDZerk")
 		){
-			double zat2=(getzat(16*heightmult)-floorz-height);
-			if(zat2<0 && zat2>=-30*heightmult){
-				gunbraced=true;
-				muzzleclimb1.y-=0.1;
-				muzzleclimb2.y+=0.05;
-				muzzleclimb3.y+=0.05;
+			double zat2=(getzat(16 * heightmult)-floorz - height);
+			if (zat2 < 0 && zat2>=-30 * heightmult){
+				gunbraced = true;
+				muzzleclimb1.y -= 0.1;
+				muzzleclimb2.y += 0.05;
+				muzzleclimb3.y += 0.05;
 			}else{
-				gunbraced=false;
+				gunbraced = false;
 				flinetracedata glt;
 				linetrace(
-					angle+22,12,pitch,
-					offsetz:height-7,
-					offsetforward:cos(pitch)*10,
+					angle + 22, 12, pitch, 
+					offsetz:height - 7, 
+					offsetforward:cos(pitch)*10, 
 					data:glt
 				);
-				if(glt.hittype==Trace_HitWall){
-					muzzleclimb1.x+=0.1;
-					muzzleclimb2.x-=0.05;
-					muzzleclimb3.x-=0.05;
-					gunbraced=true;
+				if (glt.hittype==Trace_HitWall){
+					muzzleclimb1.x += 0.1;
+					muzzleclimb2.x -= 0.05;
+					muzzleclimb3.x -= 0.05;
+					gunbraced = true;
 				}else{
 					linetrace(
-						angle-22,12,pitch,
-						offsetz:height-7,
-						offsetforward:cos(pitch)*10,
+						angle - 22, 12, pitch, 
+						offsetz:height - 7, 
+						offsetforward:cos(pitch)*10, 
 						data:glt
 					);
-					if(glt.hittype==Trace_HitWall){
-						muzzleclimb1.x-=0.1;
-						muzzleclimb2.x+=0.05;
-						muzzleclimb3.x+=0.05;
-						gunbraced=true;
+					if (glt.hittype==Trace_HitWall){
+						muzzleclimb1.x -= 0.1;
+						muzzleclimb2.x += 0.05;
+						muzzleclimb3.x += 0.05;
+						gunbraced = true;
 					}
 				}
 			}
-			if(gunbraced)A_StartSound("weapons/guntouch",8,CHANF_OVERLAP,0.3);
+			if (gunbraced)A_StartSound("weapons / guntouch", 8, CHANF_OVERLAP, 0.3);
 		}
 	}
 	void A_CheckSeeState(){
-		if(!player)return;
-		gunbraced=false;
+		if (!player)return;
+		gunbraced = false;
 		UpdateEncumbrance();
-		feetangle=angle;
+		feetangle = angle;
 
 		//random low health stumbling
-		if(floorz>=pos.z && !random(1,2)){
-			if(health<random(35,45)){
-				if(player.crouchfactor<0.7)A_ChangeVelocity(
-					random(-4,2),frandom(-3,3),random(-1,0),CVF_RELATIVE
+		if (floorz >= pos.z && !random(1, 2)){
+			if (health < random(35, 45)){
+				if (player.crouchfactor < 0.7)A_ChangeVelocity(
+					random(-4, 2), frandom(-3, 3), random(-1, 0), CVF_RELATIVE
 				);
-				vel.xy*=frandom(0.7,1.0);
-			}else if(health<random(60,65)){
-				if(player.crouchfactor<0.7)A_ChangeVelocity(
-					random(-2,1),frandom(-1,1),random(-1,0),CVF_RELATIVE
+				vel.xy *= frandom(0.7, 1.0);
+			}else if (health < random(60, 65)){
+				if (player.crouchfactor < 0.7)A_ChangeVelocity(
+					random(-2, 1), frandom(-1, 1), random(-1, 0), CVF_RELATIVE
 				);
-				vel.xy*=frandom(0.9,1.0);
+				vel.xy *= frandom(0.9, 1.0);
 			}
 		}
-		if(stunned)setstatelabel("seestun");
-		else if(cansprint && runwalksprint>0){
-			if(bloodpressure<30)bloodpressure+=2;
+		if (stunned)setstatelabel("seestun");
+		else if (cansprint && runwalksprint > 0){
+			if (bloodpressure < 30)bloodpressure += 2;
 			setstatelabel("seesprint");
-		}else if(runwalksprint<0){
+		}else if (runwalksprint < 0){
 			setstatelabel("seewalk");
 		}
 
-		if(player.readyweapon&&player.readyweapon!=WP_NOCHANGE){
-			player.readyweapon.bobspeed=player.readyweapon.default.bobspeed;
-			if(stunned||mustwalk||runwalksprint<0){
-				player.readyweapon.bobspeed*=0.6;
+		if (player.readyweapon&&player.readyweapon != WP_NOCHANGE){
+			player.readyweapon.bobspeed = player.readyweapon.default.bobspeed;
+			if (stunned||mustwalk||runwalksprint < 0){
+				player.readyweapon.bobspeed *= 0.6;
 			}
 		}
 	}
@@ -206,7 +206,7 @@ class HDPlayerPawn:PlayerPawn{
 		---- AAAAAA 5 A_CheckGunBraced();
 		loop;
 	see:
-		---- A 0 A_Jump(256,"see0");
+		---- A 0 A_Jump(256, "see0");
 	seepreview:
 		PLAY ABCD 4;
 		loop;
@@ -215,11 +215,11 @@ class HDPlayerPawn:PlayerPawn{
 		#### ABCD 4;
 		goto spawn;
 	seestun:
-		#### ABCD random(2,10) A_GiveInventory("IsMoving",2);
+		#### ABCD random(2, 10) A_GiveInventory("IsMoving", 2);
 		goto spawn;
 	seewalk:
 		#### ABCD 6{
-			if(height>40 && runwalksprint<0)A_TakeInventory("IsMoving",5);
+			if (height > 40 && runwalksprint < 0)A_TakeInventory("IsMoving", 5);
 		}
 		goto spawn;
 	seesprint:
@@ -231,12 +231,12 @@ class HDPlayerPawn:PlayerPawn{
 
 	missile:
 		#### E 4 UpdateEncumbrance();
-		---- A 0 A_Jump(256,"spawn2");
+		---- A 0 A_Jump(256, "spawn2");
 	melee:
 		#### F 2 bright light("SHOT"){
-			bspawnsoundsource=true;
+			bspawnsoundsource = true;
 		}
-		---- A 0 A_Jump(256,"missile");
+		---- A 0 A_Jump(256, "missile");
 	}
 	transient cvar hd_nozoomlean;
 	transient cvar hd_aimsensitivity;
@@ -256,59 +256,59 @@ class HDPlayerPawn:PlayerPawn{
 	transient cvar neverswitchonpickup;
 	void cachecvars(){
 		playerinfo plr;
-		if(player)plr=player;
+		if (player)plr = player;
 		else{
-			for(int i=0;i<MAXPLAYERS;i++){
-				if(playeringame[i]){
-					plr=players[i];
+			for(int i = 0;i < MAXPLAYERS;i++){
+				if (playeringame[i]){
+					plr = players[i];
 					break;
 				}
 			}
 		}
-		hd_nozoomlean=cvar.getcvar("hd_nozoomlean",plr);
-		hd_aimsensitivity=cvar.getcvar("hd_aimsensitivity",plr);
-		hd_bracesensitivity=cvar.getcvar("hd_bracesensitivity",plr);
-		hd_noslide=cvar.getcvar("hd_noslide",plr);
-		hd_usefocus=cvar.getcvar("hd_usefocus",plr);
-		hd_lasttip=cvar.getcvar("hd_lasttip",plr);
-		hd_helptext=cvar.getcvar("hd_helptext",plr);
-		hd_voicepitch=cvar.getcvar("hd_voicepitch",plr);
-		hd_maglimit=cvar.getcvar("hd_maglimit",plr);
-		hd_skin=cvar.getcvar("hd_skin",plr);
-		hd_give=cvar.getcvar("hd_give",plr);
-		hd_monstervoicepitch=cvar.getcvar("hd_monstervoicepitch",plr);
-		hd_pronouns=cvar.getcvar("hd_pronouns",plr);
-		hd_height=cvar.getcvar("hd_height",plr);
-		hd_strength=cvar.getcvar("hd_strength",plr);
-		neverswitchonpickup=cvar.getcvar("neverswitchonpickup",plr);
+		hd_nozoomlean = cvar.getcvar("hd_nozoomlean", plr);
+		hd_aimsensitivity = cvar.getcvar("hd_aimsensitivity", plr);
+		hd_bracesensitivity = cvar.getcvar("hd_bracesensitivity", plr);
+		hd_noslide = cvar.getcvar("hd_noslide", plr);
+		hd_usefocus = cvar.getcvar("hd_usefocus", plr);
+		hd_lasttip = cvar.getcvar("hd_lasttip", plr);
+		hd_helptext = cvar.getcvar("hd_helptext", plr);
+		hd_voicepitch = cvar.getcvar("hd_voicepitch", plr);
+		hd_maglimit = cvar.getcvar("hd_maglimit", plr);
+		hd_skin = cvar.getcvar("hd_skin", plr);
+		hd_give = cvar.getcvar("hd_give", plr);
+		hd_monstervoicepitch = cvar.getcvar("hd_monstervoicepitch", plr);
+		hd_pronouns = cvar.getcvar("hd_pronouns", plr);
+		hd_height = cvar.getcvar("hd_height", plr);
+		hd_strength = cvar.getcvar("hd_strength", plr);
+		neverswitchonpickup = cvar.getcvar("neverswitchonpickup", plr);
 	}
 }
-const VB_MAX=0.9;
+const VB_MAX = 0.9;
 
 
 
 
 //Camera actor for player's scope
 class ScopeCamera:IdleDummy{
-	hdplayerpawn hpl;
+	HDPlayerPawn hpl;
 	override void postbeginplay(){
 		super.postbeginplay();
-		hpl=hdplayerpawn(target);
+		hpl = HDPlayerPawn(target);
 	}
 	override void tick(){
-		if(!hpl){
+		if (!hpl){
 			destroy();
 			return;
 		}
-		A_SetAngle(hpl.angle-hpl.hudbob.x*0.54,SPF_INTERPOLATE);
-		A_SetPitch(hpl.pitch+hpl.hudbob.y*0.27,SPF_INTERPOLATE);
+		A_SetAngle(hpl.angle - hpl.hudbob.x * 0.54, SPF_INTERPOLATE);
+		A_SetPitch(hpl.pitch + hpl.hudbob.y * 0.27, SPF_INTERPOLATE);
 		A_SetRoll(hpl.roll);
 
-		double cf=(!!hpl.player)?hpl.player.viewheight:HDCONST_PLAYERHEIGHT-6;
+		double cf=(!!hpl.player)?hpl.player.viewheight:HDCONST_PLAYERHEIGHT - 6;
 
 		vector3 newpos = hpl.vec3Angle(
-			1 * cos(-hpl.pitch) + 1 * abs(sin(-hpl.pitch)),
-			hpl.angle,
+			1 * cos(-hpl.pitch) + 1 * abs(sin(-hpl.pitch)), 
+			hpl.angle, 
 			1 * sin(-hpl.pitch) + cf);
 		SetOrigin(newpos, true);
 	}
@@ -319,18 +319,18 @@ class ScopeCamera:IdleDummy{
 //stuff to reset upon entering a new level
 extend class HDHandlers{
 	override void PlayerEntered(PlayerEvent e){
-		let p=HDPlayerPawn(players[e.PlayerNumber].mo);
-		if(p){
+		let p = HDPlayerPawn(players[e.PlayerNumber].mo);
+		if (p){
 			//do NOT put anything here that must be done for everyone at the very start of the game!
-			//Players 5-8 will not work.
+			//Players 5 - 8 will not work.
 
-			if(deathmatch)p.spawn("TeleFog",p.pos,ALLOW_REPLACE);
+			if (deathmatch)p.spawn("TeleFog", p.pos, ALLOW_REPLACE);
 
 			p.levelreset();  //reset if changing levels
 			hdlivescounter.get();  //only needs to be done once
 
 			//replace bot if changing levels
-			if(
+			if (
 				hd_nobots
 				&&players[e.PlayerNumber].bot
 				&&!hdlivescounter.wiped(e.playernumber)
@@ -344,70 +344,70 @@ extend class HDHandlers{
 extend class HDPlayerPawn{
 	//reset various... things.
 	void levelreset(){
-		lastvel=vel;
-		lastheight=height;
-		lastangle=angle;
-		lastpitch=pitch;
+		lastvel = vel;
+		lastheight = height;
+		lastangle = angle;
+		lastpitch = pitch;
 
-		incapacitated=0;
-		incaptimer=0;
+		incapacitated = 0;
+		incaptimer = 0;
 
-		beatcap=35;beatmax=35;
-		bloodpressure=0;beatcounter=0;
-		fatigue=0;
-		stunned=0;
+		beatcap = 35;beatmax = 35;
+		bloodpressure = 0;beatcounter = 0;
+		fatigue = 0;
+		stunned = 0;
 
-		bloodloss=0;
-		healthcap=maxhealth();
-		strength=basestrength();
+		bloodloss = 0;
+		healthcap = maxhealth();
+		strength = basestrength();
 
 		A_Capacitated();
 
-		feetangle=angle;
-		hasgrabbed=false;
+		feetangle = angle;
+		hasgrabbed = false;
 
 		//heat presists after zero value, so it must be destroyed
-		let hhh=findinventory("Heat");if(hhh)hhh.destroy();
+		let hhh = FindInventory("Heat");if (hhh)hhh.destroy();
 
-		oldwoundcount+=woundcount+unstablewoundcount;
-		woundcount=0;
-		unstablewoundcount=0;
+		oldwoundcount += woundcount + unstablewoundcount;
+		woundcount = 0;
+		unstablewoundcount = 0;
 
-		oldwoundcount=min(90,oldwoundcount-1);
-		burncount=min(90,burncount-1);
-		if(!random(0,7))aggravateddamage--;
+		oldwoundcount = min(90, oldwoundcount - 1);
+		burncount = min(90, burncount - 1);
+		if (!random(0, 7))aggravateddamage--;
 
-		givebody(max(0,maxhealth()-health));
+		givebody(max(0, maxhealth()-health));
 
 		UpdateEncumbrance();
 
-		HDWeapon.SetBusy(self,false);
+		HDWeapon.SetBusy(self, false);
 		A_TakeInventory("IsMoving");
 		A_TakeInventory("Heat");
-		gunbraced=false;
+		gunbraced = false;
 
 		GiveBasics();
 
-		A_WeaponOffset(0,30); //reset the weaponoffset so weapon floatiness in playerturn works after level change
+		A_WeaponOffset(0, 30); //reset the weaponoffset so weapon floatiness in playerturn works after level change
 
-		let hbl=HDBlurSphere(findinventory("HDBlurSphere"));
-		if(!hbl||!hbl.worn){
-			bshadow=false;
-			bnotarget=false;
-			bnevertarget=false;
-			a_setrenderstyle(1.,STYLE_Normal);
+		let hbl = HDBlurSphere(FindInventory("HDBlurSphere"));
+		if (!hbl||!hbl.worn){
+			bshadow = false;
+			bnotarget = false;
+			bnevertarget = false;
+			a_setrenderstyle(1., STYLE_Normal);
 		}
 
-		if(
+		if (
 			player
 			&&player
-			&&cvar.getcvar("hd_consolidate",player).getbool()
+			&&cvar.getcvar("hd_consolidate", player).getbool()
 		)ConsolidateAmmo();
 
-		if(player){
-			Shader.SetEnabled(player,"NiteVis",false);
-			Shader.SetEnabled(player,"NiteVisRed",false);
-			if(getage()>10)showgametip();
+		if (player){
+			Shader.SetEnabled(player, "NiteVis", false);
+			Shader.SetEnabled(player, "NiteVisRed", false);
+			if (getage()>10)showgametip();
 		}
 	}
 }
@@ -416,7 +416,7 @@ class kickchecker:actor{
 		projectile;
 		radius 6;height 10;
 	}
-	override bool cancollidewith(actor other,bool passive){
+	override bool cancollidewith(actor other, bool passive){
 		return(
 			other.bshootable
 			&&!other.bghost
