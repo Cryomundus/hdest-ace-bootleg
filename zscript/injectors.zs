@@ -488,95 +488,161 @@ class InjectZerkDummy:InjectStimDummy{
 		}stop;
 	}
 }
-class HDZerk:HDDrug{
-	enum ZerkAmounts{
-		HDZERK_DURATION=TICRATE*60*4,
-		HDZERK_COOLOFF=TICRATE*60*5,
-		HDZERK_MAX=HDZERK_COOLOFF+HDZERK_DURATION,
-		HDZERK_OVER=HDZERK_MAX+HDZERK_COOLOFF,
+class HDZerk:HDDrug
+{
+	enum ZerkAmounts
+	{
+		HDZERK_DURATION = TICRATE * 60 * 4,
+		HDZERK_COOLOFF = TICRATE * 60 * 3,
+		HDZERK_MAX = HDZERK_COOLOFF + HDZERK_DURATION,
+		HDZERK_OVER = HDZERK_MAX + HDZERK_COOLOFF,
 	}
-	override void DisplayOverlay(hdstatusbar sb,hdplayerpawn hpl){
-		sb.SetSize(0,320,200);
-		sb.BeginHUD(forcescaled:true);
-		sb.fill(
-			amount<HDZERK_COOLOFF?
-				color(min(100,amount>>5)+(hpl.beatcount?random[zerkshit](-1,1):random[zerkshit](-5,5)),0,0,0)
-				:color(min(100,(amount-HDZERK_COOLOFF)>>5)+(hpl.beatcount>>2),90,14,12),
-			0,0,screen.getwidth(),screen.getheight()
-		);
+	override void DisplayOverlay(HDStatusBar sb, HDPlayerPawn hpl)
+	{
+		sb.SetSize(0, 320, 200);
+		sb.BeginHUD(forcescaled: true);
+		sb.fill(amount < HDZERK_COOLOFF ? Color(min(100, Amount >> 5) + (hpl.beatcount ? random[zerkshit](-1, 1) : random[zerkshit](-5, 5)), 0, 0, 0) : Color(min(100, (Amount - HDZERK_COOLOFF) >> 5) + (hpl.beatcount >> 2), 90, 14, 12), 0, 0, Screen.GetWidth(), Screen.GetHeight());
 	}
-	clearscope static bool IsZerk(actor zerker){
-		return zerker.countinv("HDZerk")>HDZerk.HDZERK_COOLOFF;
+	clearscope static bool IsZerk(actor zerker)
+	{
+		return Zerker.CountInv('HDZerk') > HDZerk.HDZERK_COOLOFF;
 	}
-	override void DoEffect(){
-		if(amount<1)return;
-		int amt=amount;amount--;
+	override void DoEffect()
+	{
+		if (Amount < 1)
+		{
+			return;
+		}
+		int amt = amount;
+		amount--;
 
-		let hdp=hdplayerpawn(owner);
-		if(amt==(HDZERK_COOLOFF+128))hdp.AddBlackout(256,2,4,24);
+		let hdp = HDPlayerPawn(owner);
+		if (amt == (HDZERK_COOLOFF + 128))
+		{
+			hdp.AddBlackout(256, 2, 4, 24);
+		}
 
-		bool iszerk=amt>HDZERK_COOLOFF;
-		if(
-			iszerk
-			&&hdp.bloodloss<HDCONST_MAXBLOODLOSS
-		){
-			if(
-				iszerk
-				&&hdp.strength<3.
-			)hdp.strength+=0.03;
-
-			if(hdp.bloodpressure<40-(hdp.bloodloss>>4))hdp.bloodpressure++;
-			if(amt>HDZERK_MAX){
-				if(!random(0,7))hdp.damagemobj(hdp,hdp,random(1,5),"bashing",DMG_NO_ARMOR|DMG_NO_PAIN);
-				if(!random(0,31))hdp.aggravateddamage++;
-				if(hdp.beatcap>random(1,12))hdp.beatcap--;
-			}else if(amt>(HDZERK_MAX-(TICRATE<<1))){
-				if(hdp.strength<2.)hdp.strength+=0.05;
-				hdp.stunned=max(hdp.stunned,10);
-				hdp.muzzleclimb1+=(frandom(-2,2),frandom(-2,2));
-				hdp.vel+=(frandom(-0.5,0.5),frandom(-0.5,0.5),frandom(-0.5,0.5));
-				if(!random(0,3)){
-					hdp.givebody(1);
-					A_SetBlend("20 0a 0f",0.4,3);
-
-					if(!random(0,int(8-amt*0.0005))){
-						hdp.woundcount+=random(0,1);
-						if(!random(0,7))hdp.A_StartSound(hdp.painsound,CHAN_VOICE);
-						else if(!random(0,7))hdp.aggravateddamage++;
-					}
-
-					if(!HDFist(hdp.player.readyweapon)){
-						hdp.Disarm(hdp);
-						hdp.A_SelectWeapon("HDFist");
-					}
-				}
-			}else if(amt>(HDZERK_MAX-(TICRATE<<3))){
-				hdp.muzzleclimb1+=(frandom(-1,1),frandom(-1,1));
-				hdp.vel+=(frandom(-0.1,0.1),frandom(-0.1,0.1),frandom(-0.1,0.1));
-				if(hdp.fatigue>0)hdp.fatigue-=1;
-				if(!random(0,3)){
-					hdp.givebody(1);
-					if(!HDFist(hdp.player.readyweapon)){
-						hdp.Disarm(hdp);
-						hdp.A_SelectWeapon("HDFist");
-					}
-				}
-			}else if(iszerk){
-				if(hdp.health<(hdp.healthcap<<2))hdp.givebody(1);
-				if(hdp.stunned)hdp.stunned=hdp.stunned*4/5;
-				if(hdp.fatigue>0&&!(level.time&(1|2)))hdp.fatigue-=1;
-				if(hdp.incaptimer)hdp.incaptimer=hdp.incaptimer*14/15;
+		bool isZerk = amt > HDZERK_COOLOFF;
+		if (isZerk && hdp.bloodloss < HDCONST_MAXBLOODLOSS)
+		{
+			if (isZerk && hdp.strength < 3.0)
+			{
+				hdp.strength += 0.03;
 			}
-		}else if(amt==HDZERK_COOLOFF){
-			hdp.A_StartSound(hdp.painsound,CHAN_VOICE);
-			if(!random(0,4))hdp.aggravateddamage+=random(1,3);
-		}else if(amt>0){
-			if(
-				!countinv("HDStim")
-				||!(level.time&(1|2|4))
-			){
-				if(hdp.stunned<40)hdp.stunned+=3;
-				if(hdp.fatigue<HDCONST_SPRINTFATIGUE)hdp.fatigue++;
+
+			if (hdp.bloodpressure < 40 - (hdp.bloodloss >> 4))
+			{
+				hdp.bloodpressure++;
+			}
+
+			if (amt > HDZERK_MAX)
+			{
+				if (!random(0, 7))
+				{
+					hdp.DamageMobj(hdp, hdp, random(1, 5), 'bashing', DMG_NO_ARMOR | DMG_NO_PAIN);
+				}
+				if (!random(0, 31))
+				{
+					hdp.aggravateddamage++;
+				}
+				if (hdp.beatcap > random(1,12))
+				{
+					hdp.beatcap--;
+				}
+			}
+			else if (amt > (HDZERK_MAX - (TICRATE << 2)))
+			{
+				if (hdp.strength < 2.0)
+				{
+					hdp.strength += 0.05;
+				}
+				hdp.stunned = max(hdp.stunned, 10);
+				hdp.muzzleclimb1 += (frandom(-2, 2), frandom(-2, 2));
+				hdp.vel += (frandom(-0.5, 0.5), frandom(-0.5, 0.5), frandom(-0.5, 0.5));
+				hdp.GiveBody(1);
+				if (!random(0, 3))
+				{
+					A_SetBlend("20 0a 0f", 0.4, 3);
+
+					if (!random(0, int(8 - amt * 0.0005)))
+					{
+						hdp.woundcount += random(0, 1);
+						if (!random(0, 7))
+						{
+							hdp.A_StartSound(hdp.PainSound, CHAN_VOICE);
+						}
+						else if (!random(0, 7))
+						{
+							hdp.aggravateddamage++;
+						}
+					}
+
+					if (!HDFist(hdp.player.ReadyWeapon))
+					{
+						hdp.Disarm(hdp);
+						hdp.A_SelectWeapon("HDFist");
+					}
+				}
+			}
+			else if (amt > (HDZERK_MAX - (TICRATE << 3)))
+			{
+				hdp.muzzleclimb1 += (frandom(-1, 1), frandom(-1, 1));
+				hdp.vel += (frandom(-0.1, 0.1), frandom(-0.1, 0.1), frandom(-0.1, 0.1));
+				if (hdp.fatigue > 0)
+				{
+					hdp.fatigue -= 1;
+				}
+				if (!random(0, 3))
+				{
+					hdp.GiveBody(1);
+					if (!HDFist(hdp.player.ReadyWeapon))
+					{
+						hdp.Disarm(hdp);
+						hdp.A_SelectWeapon("HDFist");
+					}
+				}
+			}
+			else if (isZerk)
+			{
+				if (hdp.Health < (hdp.healthcap << 2))
+				{
+					hdp.GiveBody(2);
+				}
+				if (hdp.stunned > 0)
+				{
+					hdp.stunned = hdp.stunned * 4 / 5;
+				}
+				if (hdp.fatigue > 0 && !(level.time & (1 | 2)))
+				{
+					hdp.fatigue -= 1;
+				}
+				if (hdp.incaptimer > 0)
+				{
+					hdp.incaptimer = hdp.incaptimer * 14 / 15;
+				}
+			}
+		}
+		else if (amt == HDZERK_COOLOFF)
+		{
+			hdp.A_StartSound(hdp.painsound, CHAN_VOICE);
+			if (!random(0,4))
+			{
+				hdp.aggravateddamage += random(1, 3);
+			}
+		}
+		else if (amt > 0)
+		{
+			if (hdp.CountInv("HDStim") > 0 || !(level.time & (1 | 2 | 4)))
+			{
+				if (hdp.stunned < 40)
+				{
+					hdp.stunned += 3;
+				}
+
+				if (hdp.fatigue < HDCONST_SPRINTFATIGUE)
+				{
+					hdp.fatigue++;
+				}
 			}
 		}
 
