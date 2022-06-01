@@ -4,45 +4,45 @@
 extend class HDPlayerPawn{
 	int inpain;
 	override int DamageMobj(
-		actor inflictor, 
-		actor source, 
-		int damage, 
-		name mod, 
-		int flags, 
+		actor inflictor,
+		actor source,
+		int damage,
+		name mod,
+		int flags,
 		double angle
 	){
 		//"You have to be aware of recursively called code pointers in death states.
-		//It can easily happen that Actor A dies, calling function B in its death state, 
+		//It can easily happen that Actor A dies, calling function B in its death state,
 		//which in turn nukes the data which is being checked in DamageMobj."
-		if (!self || health < 1)return damage;
+		if(!self || health<1)return damage;
 
 		//don't do all this for voodoo dolls
-		if (!player)return super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+		if(!player)return super.DamageMobj(inflictor,source,damage,mod,flags,angle);
 
-		int originaldamage = damage;
+		int originaldamage=damage;
 
-		silentdeath = false;
+		silentdeath=false;
 
 		//replace all armour with custom HD stuff
-		if (CountInv("PowerIronFeet")){
+		if(countinv("PowerIronFeet")){
 			A_GiveInventory("WornRadsuit");
 			A_TakeInventory("PowerIronFeet");
 		}
-		if (CountInv("BasicArmor")){
+		if(countinv("BasicArmor")){
 			A_GiveInventory("HDArmourWorn");
 			A_TakeInventory("BasicArmor");
 		}
 
-		if (
+		if(
 			damage==TELEFRAG_DAMAGE
 			&&source
 		){
-			if (source==self){
+			if(source==self){
 				flags|=DMG_FORCED;
 			}
 
 			//because spawn telefrags are bullshit
-			else if (
+			else if(
 				(
 					(
 						source.player
@@ -52,7 +52,7 @@ extend class HDPlayerPawn{
 					)||botbot(source)
 				)&&(
 					!deathmatch
-					||level.time < TICRATE
+					||level.time<TICRATE
 					||source.getage()<10
 				)
 			){
@@ -61,14 +61,14 @@ extend class HDPlayerPawn{
 		}
 
 
-		int towound = 0;
-		int toburn = 0;
-		int tostun = 0;
-		int tobreak = 0;
-		int toaggravate = 0;
+		int towound=0;
+		int toburn=0;
+		int tostun=0;
+		int tobreak=0;
+		int toaggravate=0;
 
 
-		if (inflictor&&inflictor.bpiercearmor)flags|=DMG_NO_ARMOR;
+		if(inflictor&&inflictor.bpiercearmor)flags|=DMG_NO_ARMOR;
 
 
 		//deal with some synonyms
@@ -76,73 +76,73 @@ extend class HDPlayerPawn{
 
 
 		//factor in cheats and server settings
-		if (
+		if(
 			!(flags&DMG_FORCED)
-			&&damage != TELEFRAG_DAMAGE
+			&&damage!=TELEFRAG_DAMAGE
 		){
-			if (
+			if(
 				binvulnerable||!bshootable
 				||(player&&(
 					player.cheats&CF_GODMODE2 || player.cheats&CF_GODMODE
 				))
 			){
 				A_TakeInventory("Heat");
-				woundcount = 0;
-				oldwoundcount = 0;
-				unstablewoundcount = 0;
-				burncount = 0;
-				aggravateddamage = 0;
+				woundcount=0;
+				oldwoundcount=0;
+				unstablewoundcount=0;
+				burncount=0;
+				aggravateddamage=0;
 				return 0;
 			}
-			double dfl = damage * hd_damagefactor;
-			damage = int(dfl);
-			if (frandom(0, 1)<dfl - damage)damage++;
+			double dfl=damage*hd_damagefactor;
+			damage=int(dfl);
+			if(frandom(0,1)<dfl-damage)damage++;
 		}
 
 		//credit and blame where it's due
-		if (source is "BotBot")source = source.master;
+		if(source is "BotBot")source=source.master;
 
 		//abort if zero team damage, otherwise save factor for wounds and burns
-		double tmd = 1.;
-		if (
+		double tmd=1.;
+		if(
 			source is "PlayerPawn"
-			&&source != self
+			&&source!=self
 			&&isteammate(source)
-			&&player != source.player
+			&&player!=source.player
 		){
-			if (teamdamage <= 0) return 0;
-			else tmd = teamdamage;
+			if(teamdamage<=0) return 0;
+			else tmd=teamdamage;
 		}
 
-		if (source&&source.player)flags|=DMG_PLAYERATTACK;
+		if(source&&source.player)flags|=DMG_PLAYERATTACK;
 
 
 		//duck under crushing ceilings
-		if (
+		if(
 			mod=="crush"
-			&&ceilingz < pos.z + height
+			&&ceilingz<pos.z+height
 		)player.crouching=-1;
 
 
 		//process all items (e.g. armour) that may affect the damage
-		array < HDDamageHandler> handlers;
-		if (
+		array<HDDamageHandler> handlers;
+		if(
 			!(flags&DMG_FORCED)
-			&&damage < TELEFRAG_DAMAGE
+			&&damage<TELEFRAG_DAMAGE
 		){
-			HDDamageHandler.GetHandlers(self, handlers);
-			for(int i = 0;i < handlers.Size();i++){
-				let hhh = handlers[i];
-				if (hhh&&hhh.owner==self)
-				[damage, mod, flags, towound, toburn, tostun, tobreak]=hhh.HandleDamage(
-					damage, 
-					mod, 
-					flags, 
-					inflictor, 
-					source, 
-					towound, 
-					toburn, 
-					tostun, 
+			HDDamageHandler.GetHandlers(self,handlers);
+			for(int i=0;i<handlers.Size();i++){
+				let hhh=handlers[i];
+				if(hhh&&hhh.owner==self)
+				[damage,mod,flags,towound,toburn,tostun,tobreak]=hhh.HandleDamage(
+					damage,
+					mod,
+					flags,
+					inflictor,
+					source,
+					towound,
+					toburn,
+					tostun,
 					tobreak
 				);
 			}
@@ -150,96 +150,96 @@ extend class HDPlayerPawn{
 
 
 		//excess hp
-		if (mod=="maxhpdrain"){
-			damage = min(health - 1, damage);
+		if(mod=="maxhpdrain"){
+			damage=min(health-1,damage);
 			flags|=DMG_NO_PAIN|DMG_THRUSTLESS;
 		}
 		//bleeding
-		else if (
+		else if(
 			mod=="bleedout"||
 			mod=="internal"||
 			mod=="invisiblebleedout"
 		){
 			flags|=(DMG_NO_ARMOR|DMG_NO_PAIN|DMG_THRUSTLESS);
-			silentdeath = true;
+			silentdeath=true;
 
-			damage = min(health, damage);
-			if (!random(0, 127))burncount++;
+			damage=min(health,damage);
+			if(!random(0,127))burncount++;
 			
 			bool actuallybleeding=(mod!="internal");
-			if (actuallybleeding){
-				if (hd_nobleed){
-					woundcount = 0;
+			if(actuallybleeding){
+				if(hd_nobleed){
+					woundcount=0;
 					return 0;
 				}
 
-				bloodloss+=(originaldamage << 2);
+				bloodloss+=(originaldamage<<2);
 
-				if (
+				if(
 					!waterlevel
 					&&!checkliquidtexture()
-					&&bloodloss < HDCONST_MAXBLOODLOSS * 1.4
+					&&bloodloss<HDCONST_MAXBLOODLOSS*1.4
 				){
-					for(int i = 0;i < damage;i += 2){
-						a_spawnitemex("HDBloodTrailFloor", 
-							random(-12, 12), random(-12, 12), 0, 
-							0, 0, 0, 
-							0, SXF_NOCHECKPOSITION|SXF_USEBLOODCOLOR
+					for(int i=0;i<damage;i+=2){
+						a_spawnitemex("HDBloodTrailFloor",
+							random(-12,12),random(-12,12),0,
+							0,0,0,
+							0,SXF_NOCHECKPOSITION|SXF_USEBLOODCOLOR
 							|SXF_SETMASTER
 						);
 					}
 				}
 
-				if (level.time&(1|2))return -1;
-				if (bloodloss < HDCONST_MAXBLOODLOSS){
-					if (!(flags&DMG_FORCED))damage = clamp(damage >> 2, 1, health - 1);
-					if (!random(0, health)){
+				if(level.time&(1|2))return -1;
+				if(bloodloss<HDCONST_MAXBLOODLOSS){
+					if(!(flags&DMG_FORCED))damage=clamp(damage>>2,1,health-1);
+					if(!random(0,health)){
 						beatcap--;
-						if (!(level.time%4))bloodpressure--;
+						if(!(level.time%4))bloodpressure--;
 					}
 				}
-				if (damage < health)source = null;
+				if(damage<health)source=null;
 			}
-		}else if (
+		}else if(
 			mod=="hot"
 			||mod=="cold"
 		){
 			//burned
-			if (damage <= 1){
-				if (!random(0, 27))toburn++;
-				if (!random(0, 95))towound++;
+			if(damage<=1){
+				if(!random(0,27))toburn++;
+				if(!random(0,95))towound++;
 			}else{
-				toburn += int(max(damage * frandom(0.1, 0.6), random(0, 1)));
-				if (!random(0, 60))towound += max(1, damage * 3 / 100);
+				toburn+=int(max(damage*frandom(0.1,0.6),random(0,1)));
+				if(!random(0,60))towound+=max(1,damage*3/100);
 			}
-		}else if (
+		}else if(
 			mod=="electrical"
 		){
 			//electrocuted
-			toburn += int(max(damage * frandom(0.2, 0.5), random(0, 1)));
-			if (!random(0, 35))towound += max(1, (damage >> 4));
-			if (!random(0, 1))tostun += damage;
-		}else if (
+			toburn+=int(max(damage*frandom(0.2,0.5),random(0,1)));
+			if(!random(0,35))towound+=max(1,(damage>>4));
+			if(!random(0,1))tostun+=damage;
+		}else if(
 			mod=="balefire"
 		){
 			//balefired
-			toburn += int(damage * frandom(0.6, 1.1));
-			if (!random(0, 2))towound += max(1, damage >> 4);
-			if (random(1, 50)<damage * tmd)toaggravate++;
-			if (!(level.time&(1|2|4|8)))A_AlertMonsters();
-		}else if (
+			toburn+=int(damage*frandom(0.6,1.1));
+			if(!random(0,2))towound+=max(1,damage>>4);
+			if(random(1,50)<damage*tmd)toaggravate++;
+			if(!(level.time&(1|2|4|8)))A_AlertMonsters();
+		}else if(
 			mod=="teeth"
 			||mod=="claws"
 			||mod=="natural"
 		){
-			if (!random(0, mod=="teeth"?12:36))toaggravate++;
-			if (random(1, 15)<damage)towound++;
-			tostun += int(damage * frandom(0, 0.6));
-		}else if (
+			if(!random(0,mod=="teeth"?12:36))toaggravate++;
+			if(random(1,15)<damage)towound++;
+			tostun+=int(damage*frandom(0,0.6));
+		}else if(
 			mod=="GhostSquadAttack"
 		){
 			//do nothing here, rely on TalismanGhost.A_GhostShot
-		}else if (
+		}else if(
 			mod=="staples"
 			||mod=="falling"
 			||mod=="drowning"
@@ -248,74 +248,74 @@ extend class HDPlayerPawn{
 			//noarmour
 			flags|=DMG_NO_ARMOR;
 
-			if (mod=="falling"){
-				if (!source)return -1; //ignore regular fall damage
-				tostun += damage * random(8, 12);
+			if(mod=="falling"){
+				if(!source)return -1; //ignore regular fall damage
+				tostun+=damage*random(8,12);
 				damage>>=1;
 			}
-			else if (mod=="slime"&&!random(0, 99 - damage))toaggravate++;
-		}else if (
+			else if(mod=="slime"&&!random(0,99-damage))toaggravate++;
+		}else if(
 			mod=="slashing"
 		){
 			//swords, chainsaw, etc.
-			if (!random(0, 15))towound += max(1, damage * 4 / 100);
-		}else if (mod=="bashing"){
-			tostun += damage;
+			if(!random(0,15))towound+=max(1,damage*4/100);
+		}else if(mod=="bashing"){
+			tostun+=damage;
 			damage>>=2;
 		}else{
 			//anything else
-			if (!random(0, 15))towound += max(1, damage * 3 / 100);
+			if(!random(0,15))towound+=max(1,damage*3/100);
 		}
 
 
 
 		//abort if damage is less than zero
-		if (damage <= 0)return damage;
+		if(damage<=0)return damage;
 
 
 
 		//do more insidious damage from blunt impacts
-		if (
+		if(
 			mod=="falling"
 			||mod=="bashing"
 		){
-			int owc = random(1, 100);
-			if (owc < damage){
-				int agg=(random(-owc, owc)>>3);
-				if (agg > 0){
-					owc -= agg;
-					toaggravate += agg;
+			int owc=random(1,100);
+			if(owc<damage){
+				int agg=(random(-owc,owc)>>3);
+				if(agg>0){
+					owc-=agg;
+					toaggravate+=agg;
 				}
-				tobreak += owc;
+				tobreak+=owc;
 			}
 		}
 
 
 		//HDBulletActor has its separate wound handling
-		if (inflictor is "HDBulletActor")towound = 0;
+		if(inflictor is "HDBulletActor")towound=0;
 
 
 
 
 		//process all items that may affect damage after all the above
-		if (
+		if(
 			!(flags&DMG_FORCED)
-			&&damage < TELEFRAG_DAMAGE
+			&&damage<TELEFRAG_DAMAGE
 		){
-			HDDamageHandler.GetHandlers(self, handlers);
-			for(int i = 0;i < handlers.Size();i++){
-				let hhh = handlers[i];
-				if (hhh&&hhh.owner==self)
-				[damage, mod, flags, towound, toburn, tostun, tobreak, toaggravate]=hhh.HandleDamagePost(
-					damage, 
-					mod, 
-					flags, 
-					inflictor, 
-					source, 
-					towound, 
-					toburn, 
-					tostun, 
-					tobreak, 
+			HDDamageHandler.GetHandlers(self,handlers);
+			for(int i=0;i<handlers.Size();i++){
+				let hhh=handlers[i];
+				if(hhh&&hhh.owner==self)
+				[damage,mod,flags,towound,toburn,tostun,tobreak,toaggravate]=hhh.HandleDamagePost(
+					damage,
+					mod,
+					flags,
+					inflictor,
+					source,
+					towound,
+					toburn,
+					tostun,
+					tobreak,
 					toaggravate
 				);
 			}
@@ -325,35 +325,35 @@ extend class HDPlayerPawn{
 
 		//add to wounds and burns after team damage multiplier
 		//(super.damagemobj() takes care of the actual damage amount)
-		towound = int(towound * tmd);
-		toburn = int(toburn * tmd);
-		if (towound > 0){
-			lastthingthatwoundedyou = source;
-			woundcount += towound;
+		towound=int(towound*tmd);
+		toburn=int(toburn*tmd);
+		if(towound>0){
+			lastthingthatwoundedyou=source;
+			woundcount+=towound;
 		}
-		if (toburn > 0)burncount += toburn;
-		if (tostun > 0)stunned += tostun;
-		if (tobreak > 0)oldwoundcount += tobreak;
-		if (toaggravate > 0)aggravateddamage += toaggravate;
+		if(toburn>0)burncount+=toburn;
+		if(tostun>0)stunned+=tostun;
+		if(tobreak>0)oldwoundcount+=tobreak;
+		if(toaggravate>0)aggravateddamage+=toaggravate;
 
 		//stun the player randomly
-		if (
-			damage > 60
+		if(
+			damage>60
 			||(
-				!random(0, 5)
-				&&damage > 20
+				!random(0,5)
+				&&damage>20
 			)
 		){
-			tostun += damage;
+			tostun+=damage;
 		}
 
-		if (hd_debug&&player){
+		if(hd_debug&&player){
 			string st="the world";
-			if (inflictor)st = inflictor.getclassname();
-			A_Log(string.format("%s took %d %s damage from %s", 
-				player.getusername(), 
-				damage, 
-				mod, 
+			if(inflictor)st=inflictor.getclassname();
+			A_Log(string.format("%s took %d %s damage from %s",
+				player.getusername(),
+				damage,
+				mod,
 				st
 			));
 		}
@@ -361,56 +361,56 @@ extend class HDPlayerPawn{
 
 
 		//disintegrator mode keeps things simple
-		if (
+		if(
 			hd_disintegrator
 		)return super.DamageMobj(
-			inflictor, 
-			source, 
-			damage, 
-			mod, 
-			flags|DMG_NO_ARMOR, 
+			inflictor,
+			source,
+			damage,
+			mod,
+			flags|DMG_NO_ARMOR,
 			angle
 		);
 
 
 		//player survives at cost
-		if (
-			damage >= health
+		if(
+			damage>=health
 		){
-			if (
+			if(
 				mod!="internal"
 				&&mod!="bleedout"
 				&&mod!="invisiblebleedout"
-				&&damage < random(10, 100)
-				&&random(0, 5)
+				&&damage<random(10,100)
+				&&random(0,5)
 			){
-				int wnddmg = random(0, max(0, damage >> 2));
-				if (mod=="bashing")wnddmg>>=1;
-				damage = health - random(1, 3);
-				if (
+				int wnddmg=random(0,max(0,damage>>2));
+				if(mod=="bashing")wnddmg>>=1;
+				damage=health-random(1,3);
+				if(
 					mod=="hot"
 					||mod=="cold"
 				){
-					burncount += wnddmg;
-				}else if (
+					burncount+=wnddmg;
+				}else if(
 					mod=="slime"
 					||mod=="balefire"
 				){
-					aggravateddamage += wnddmg;
+					aggravateddamage+=wnddmg;
 				}else{
-					unstablewoundcount += wnddmg;
+					unstablewoundcount+=wnddmg;
 				}
 			}
 		}
 
 
 		//flinch
-		if (
+		if(
 			!(flags&DMG_NO_PAIN)
-			&&damage > 0
-			&&health > 0
+			&&damage>0
+			&&health>0
 		){
-			bool bash = mod=="bashing";
+			bool bash=mod=="bashing";
 			double jerkamt=
 				(
 					(
@@ -425,7 +425,7 @@ extend class HDPlayerPawn{
 						source==inflictor
 						||!inflictor
 					)
-				)?min(damage*(2.-strength)*3., 30.)
+				)?min(damage*(2.-strength)*3.,30.)
 				:(
 					mod=="electrical"
 					||(
@@ -442,77 +442,77 @@ extend class HDPlayerPawn{
 					mod=="claws"
 					||mod=="teeth"
 					||mod=="slashing"
-				)?1.+damage * 0.3
+				)?1.+damage*0.3
 				:1.5
 			;
-			if (jerkamt < 10)jerkamt /= max(1, bloodpressure >> 2);
-			let iii = inflictor;if (!iii)iii = source;
-			double jerkleft = 0;
-			double jerkdown = 0;
-			if (iii){
-				double aaaa = deltaangle(self.angle, angleto(iii));
-				if (aaaa > 1)jerkleft = jerkamt;
-				else if (aaaa<-1)jerkleft=-jerkamt;
+			if(jerkamt<10)jerkamt/=max(1,bloodpressure>>2);
+			let iii=inflictor;if(!iii)iii=source;
+			double jerkleft=0;
+			double jerkdown=0;
+			if(iii){
+				double aaaa=deltaangle(self.angle,angleto(iii));
+				if(aaaa>1)jerkleft=jerkamt;
+				else if(aaaa<-1)jerkleft=-jerkamt;
 
-				double zzzz=(iii.pos.z + iii.height * 0.5)-(pos.z + height * 0.9);
-				if (abs(zzzz)>10){
-					if (zzzz < 0)jerkdown = jerkamt;
+				double zzzz=(iii.pos.z+iii.height*0.5)-(pos.z+height*0.9);
+				if(abs(zzzz)>10){
+					if(zzzz<0)jerkdown=jerkamt;
 					else jerkdown=-jerkamt;
 				}
 			}
-			if (!jerkleft)jerkleft = frandom(-jerkamt, jerkamt);
-			if (!jerkdown)jerkdown = frandom(-jerkamt, jerkamt);
+			if(!jerkleft)jerkleft=frandom(-jerkamt,jerkamt);
+			if(!jerkdown)jerkdown=frandom(-jerkamt,jerkamt);
 			A_MuzzleClimb(
-				(0, 0), 
-				(frandom(0, jerkleft), frandom(0, jerkdown)), 
-				(frandom(0, jerkleft), frandom(0, jerkdown)), 
-				(0, 0)
+				(0,0),
+				(frandom(0,jerkleft),frandom(0,jerkdown)),
+				(frandom(0,jerkleft),frandom(0,jerkdown)),
+				(0,0)
 			);
-			AddBlackout(128, damage+(bash?32:16), 16);
+			AddBlackout(128,damage+(bash?32:16),16);
 		}
 
 
 		//finally call the real one but ignore all armour
-		int finaldmg = super.DamageMobj(
-			inflictor, 
-			source, 
-			damage, 
-			mod, 
-			flags|DMG_NO_ARMOR, 
+		int finaldmg=super.DamageMobj(
+			inflictor,
+			source,
+			damage,
+			mod,
+			flags|DMG_NO_ARMOR,
 			angle
 		);
 
 		//transfer pointers to corpse
-		if (deathcounter&&inflictor&&!inflictor.bismonster&&playercorpse){
-			if (inflictor.tracer==self)inflictor.tracer = playercorpse;
-			if (inflictor.target==self)inflictor.target = playercorpse;
-			if (inflictor.master==self)inflictor.master = playercorpse;
+		if(deathcounter&&inflictor&&!inflictor.bismonster&&playercorpse){
+			if(inflictor.tracer==self)inflictor.tracer=playercorpse;
+			if(inflictor.target==self)inflictor.target=playercorpse;
+			if(inflictor.master==self)inflictor.master=playercorpse;
 		}
 
-		//go into dying / collapsed mode
-		if (
-			health > 0
+		//go into dying/collapsed mode
+		if(
+			health>0
 			&&player
-			&&incapacitated < 1
+			&&incapacitated<1
 			&&(
-				health < random(-1, max((originaldamage >> 3), 3))
-				||tostun>(health << 2)
+				health<random(-1,max((originaldamage>>3),3))
+				||tostun>(health<<2)
 			)&&(
 				mod!="bleedout"
-				||bloodloss > random(2048, 3072)
+				||bloodloss>random(2048,3072)
 			)
-		)A_Incapacitated((originaldamage > 10)?HDINCAP_SCREAM:0, min(finaldmg << 5, originaldamage << 3));
+		)A_Incapacitated((originaldamage>10)?HDINCAP_SCREAM:0,min(finaldmg<<5,originaldamage<<3));
 
 
 		return finaldmg;
 	}
 	//disarm
 	static void Disarm(actor victim){
-		if (!victim.player)return;
-		let pwep = hdweapon(victim.player.readyweapon);
-		if (!pwep)return;
+		if(!victim.player)return;
+		let pwep=hdweapon(victim.player.readyweapon);
+		if(!pwep)return;
 		pwep.OnPlayerDrop();
-		if (
+		if(
 			pwep
 			&&pwep.owner==victim //onplayerdrop might change this
 			&&!pwep.bdontdisarm
@@ -526,33 +526,33 @@ extend class HDPlayerPawn{
 	pain.falling:
 	pain.staples:
 		---- A 0{
-			if (!random(0, 128))oldwoundcount++;
+			if(!random(0,128))oldwoundcount++;
 		}
 	painend:
 		#### G 3{
-			if (!inpain){
-				inpain = 3;
-				if (bloodpressure < 100)bloodpressure += 20;
-				if (beatmax > 12)beatmax = max(beatmax - randompick(10, 20), 8);
-//				AddBlackout(128, 16, 16);
-//				A_SetBlend("00 00 00", 0.8, 40, "00 00 00");
+			if(!inpain){
+				inpain=3;
+				if(bloodpressure<100)bloodpressure+=20;
+				if(beatmax>12)beatmax=max(beatmax-randompick(10,20),8);
+//				AddBlackout(128,16,16);
+//				A_SetBlend("00 00 00",0.8,40,"00 00 00");
 			}
-			if (incapacitated)frame = clamp(6 + abs(incapacitated >> 2), 6, 11);
+			if(incapacitated)frame=clamp(6+abs(incapacitated>>2),6,11);
 		}
 		---- A 3{
-			if (
+			if(
 				!incapacitated
-				||!random(0, 3)
-			)A_StartSound(painsound, CHAN_VOICE);
+				||!random(0,3)
+			)A_StartSound(painsound,CHAN_VOICE);
 		}
 		---- A 0 setstatelabel("spawn");
 	pain.slime:
 		#### G 3{
-			if (bloodpressure < 40)bloodpressure += 2;
-			if (beatmax > 20)beatmax = max(beatmax - 2, 18);
-			A_SetBlend("00 00 00", 0.8, 40, "00 00 00");
+			if(bloodpressure<40)bloodpressure+=2;
+			if(beatmax>20)beatmax=max(beatmax-2,18);
+			A_SetBlend("00 00 00",0.8,40,"00 00 00");
 		}
-		#### G 3 A_StartSound(painsound, CHAN_VOICE);
+		#### G 3 A_StartSound(painsound,CHAN_VOICE);
 		---- A 0 setstatelabel("spawn");
 	}
 }
@@ -562,12 +562,12 @@ extend class HDPlayerPawn{
 class DamageFloorChecker:Actor{
 	override void postbeginplay(){
 		super.postbeginplay();
-		sector sss = floorsector;
+		sector sss=floorsector;
 		A_Log(string.format(
-			"%i %s damage every %i tics with %i leak chance.", 
-			sss.damageamount, 
-			sss.damagetype, 
-			sss.damageinterval, 
+			"%i %s damage every %i tics with %i leak chance.",
+			sss.damageamount,
+			sss.damagetype,
+			sss.damageinterval,
 			sss.leakydamage
 		));
 		destroy();

@@ -14,13 +14,13 @@ class TripwireCheckerPuff:IdleDummy{
 	}
 }
 class Tripwire:HDWeapon{
-	class < inventory> grenadeammotype;
+	class<inventory> grenadeammotype;
 	property ammotype:grenadeammotype;
-	class < actor> throwtype;
+	class<actor> throwtype;
 	property throwtype:throwtype;
-	class < actor> spoontype;
+	class<actor> spoontype;
 	property spoontype:spoontype;
-	class < weapon> weptype;
+	class<weapon> weptype;
 	property weptype:weptype;
 	default{
 		+weapon.no_auto_switch +weapon.noalert +weapon.wimpy_weapon
@@ -34,23 +34,23 @@ class Tripwire:HDWeapon{
 		tripwire.spoontype "HDFragSpoon";
 		tripwire.weptype "HDFragGrenades";
 	}
-	override string, double getpickupsprite(){return "FRAGA0", 0.6;}
-	override void DrawHUDStuff(HDStatusBar sb, HDWeapon hdw, HDPlayerPawn hpl){
-		if (sb.hudlevel==1){
-			sb.drawimage("FRAGA0", (-52, -4), sb.DI_SCREEN_CENTER_BOTTOM, scale:(0.6, 0.6));
-			sb.drawnum(hpl.CountInv("HDFragGrenadeAmmo"), -45, -8, sb.DI_SCREEN_CENTER_BOTTOM);
+	override string,double getpickupsprite(){return "FRAGA0",0.6;}
+	override void DrawHUDStuff(HDStatusBar sb,HDWeapon hdw,HDPlayerPawn hpl){
+		if(sb.hudlevel==1){
+			sb.drawimage("FRAGA0",(-52,-4),sb.DI_SCREEN_CENTER_BOTTOM,scale:(0.6,0.6));
+			sb.drawnum(hpl.countinv("HDFragGrenadeAmmo"),-45,-8,sb.DI_SCREEN_CENTER_BOTTOM);
 		}
 		sb.drawwepnum(
-			hpl.CountInv("HDFragGrenadeAmmo"), 
-			(ENC_FRAG / HDCONST_MAXPOCKETSPACE)
+			hpl.countinv("HDFragGrenadeAmmo"),
+			(ENC_FRAG/HDCONST_MAXPOCKETSPACE)
 		);
-		sb.drawwepnum(hdw.weaponstatus[FRAGS_FORCE], 50, posy:-10, alwaysprecise:true);
-		if (!(hdw.weaponstatus[0]&FRAGF_SPOONOFF)){
-			sb.drawrect(-21, -19, 5, 4);
-			if (!(hdw.weaponstatus[0]&FRAGF_PINOUT))sb.drawrect(-25, -18, 3, 2);
+		sb.drawwepnum(hdw.weaponstatus[FRAGS_FORCE],50,posy:-10,alwaysprecise:true);
+		if(!(hdw.weaponstatus[0]&FRAGF_SPOONOFF)){
+			sb.drawrect(-21,-19,5,4);
+			if(!(hdw.weaponstatus[0]&FRAGF_PINOUT))sb.drawrect(-25,-18,3,2);
 		}else{
-			int timer = hdw.weaponstatus[FRAGS_TIMER];
-			if (timer%3)sb.drawwepnum(140 - timer, 140, posy:-15, alwaysprecise:true);
+			int timer=hdw.weaponstatus[FRAGS_TIMER];
+			if(timer%3)sb.drawwepnum(140-timer,140,posy:-15,alwaysprecise:true);
 		}
 	}
 	override string gethelptext(){
@@ -60,26 +60,26 @@ class Tripwire:HDWeapon{
 		;
 	}
 	override void DropOneAmmo(int amt){
-		if (owner){
-			amt = clamp(amt, 1, 10);
-			owner.A_DropInventory(grenadeammotype, 1);
+		if(owner){
+			amt=clamp(amt,1,10);
+			owner.A_DropInventory(grenadeammotype,1);
 		}
 	}
 	actor grenade;
 	actor gumspot;
 	action void UndoAll(){
-		if (invoker.grenade){
-			invoker.grenade.master = null;
-			invoker.grenade = null;
+		if(invoker.grenade){
+			invoker.grenade.master=null;
+			invoker.grenade=null;
 		}
-		if (invoker.gumspot){
+		if(invoker.gumspot){
 			invoker.gumspot.destroy();
-			A_Log("Setup aborted.", true);
+			A_Log("Setup aborted.",true);
 		}
 	}
 	override inventory CreateTossable(int amt){
 		UndoAll();
-		owner.A_DropInventory(grenadeammotype, owner.CountInv(grenadeammotype));
+		owner.A_DropInventory(grenadeammotype,owner.countinv(grenadeammotype));
 		owner.A_GiveInventory("HDFist");
 		owner.A_SelectWeapon("HDFist");
 		return null;
@@ -91,66 +91,66 @@ class Tripwire:HDWeapon{
 	deselect0:
 		TNT1 A 10{
 			UndoAll();
-			A_StartSound("weapons / pocket", 9);
-			if (CountInv("NulledWeapon"))A_SetTics(0);
+			A_StartSound("weapons/pocket",9);
+			if(countinv("NulledWeapon"))A_SetTics(0);
 		}goto super::deselect0;
 	select:
 		TNT1 A 10{
-			if (!CountInv(invoker.grenadeammotype)){
-				if (getcvar("hd_helptext"))A_Print("No grenades.");
+			if(!countinv(invoker.grenadeammotype)){
+				if(getcvar("hd_helptext"))A_Print("No grenades.");
 				A_SelectWeapon("HDFist");
-			}else if (getcvar("hd_helptext"))A_WeaponMessage("\cp\--- \cqTRIPWIRES \cp---\c-\n\n\nHit fire to set one end of the line, \n\nthen hit fire again to plant the grenade.\nby human hands.\n\nMove carefully.");
-			A_StartSound("weapons / pocket", 9);
-			if (CountInv("NulledWeapon"))A_SetTics(0);
+			}else if(getcvar("hd_helptext"))A_WeaponMessage("\cp\--- \cqTRIPWIRES \cp---\c-\n\n\nHit fire to set one end of the line,\n\nthen hit fire again to plant the grenade.\nby human hands.\n\nMove carefully.");
+			A_StartSound("weapons/pocket",9);
+			if(countinv("NulledWeapon"))A_SetTics(0);
 		}goto super::select;
 	ready:
 		TNT1 A 1{
-			if (!CountInv(invoker.grenadeammotype))A_SelectWeapon("HDFist");
+			if(!countinv(invoker.grenadeammotype))A_SelectWeapon("HDFist");
 			else A_SetCrosshair(0);
-			A_WeaponBusy(invoker.gumspot != null);
+			A_WeaponBusy(invoker.gumspot!=null);
 			A_WeaponReady(WRF_ALLOWUSER3);
 		}goto readyend;
 	fire:
 		TNT1 A 0{
 			flinetracedata gumline;
 			linetrace(
-				angle, 64, pitch, flags:0, 
-				offsetz:height - 8, 
+				angle,64,pitch,flags:0,
+				offsetz:height-8,
 				data:gumline
 			);
-			let othersector = hdmath.oppositesector(gumline.hitline, gumline.hitsector);
-			if (
+			let othersector=hdmath.oppositesector(gumline.hitline,gumline.hitsector);
+			if(
 				gumline.hittype==Trace_HitNone
 				||(
-					gumline.hittype != Trace_HitWall
-					&&gumline.hittype != Trace_HitFloor
-					&&gumline.hittype != Trace_HitCeiling
+					gumline.hittype!=Trace_HitWall
+					&&gumline.hittype!=Trace_HitFloor
+					&&gumline.hittype!=Trace_HitCeiling
 				)||hdf.linetracehitsky(gumline)
 			){
 				A_Log(string.format(
-					"You need to stick the %s on to something stable.", 
+					"You need to stick the %s on to something stable.",
 					invoker.gumspot?"wire":"grenade"
-				), true);
+				),true);
 				return;
 			}
-			if (!invoker.gumspot){
-				actor aaa = spawn("GumAndString", gumline.hitlocation - gumline.hitdir * 0.6, ALLOW_REPLACE);
-				aaa.target = self;aaa.master = self;aaa.angle = angle;
-				aaa.A_StartSound("tripwire / gumsplat", CHAN_BODY);
-				invoker.gumspot = aaa;
-				A_Log("Wire end secured. Now to set the grenade...", true);
+			if(!invoker.gumspot){
+				actor aaa=spawn("GumAndString",gumline.hitlocation-gumline.hitdir*0.6,ALLOW_REPLACE);
+				aaa.target=self;aaa.master=self;aaa.angle=angle;
+				aaa.A_StartSound("tripwire/gumsplat",CHAN_BODY);
+				invoker.gumspot=aaa;
+				A_Log("Wire end secured. Now to set the grenade...",true);
 			}else{
-				actor aaa = spawn(invoker.throwtype, gumline.hitlocation - gumline.hitdir * 2, ALLOW_REPLACE);
-				aaa.target = self;aaa.master = self;aaa.angle = angle;
-				aaa.A_StartSound("tripwire / fragclick", CHAN_BODY);
-				invoker.grenade = aaa;
-				invoker.gumspot.tracer = invoker.grenade;
-				invoker.grenade.tracer = invoker.gumspot;
-				invoker.grenade.master = self;
-				invoker.grenade.target = self;
-				A_Log("Grenade secured! Now be very, very careful...", true);
-				A_TakeInventory(invoker.grenadeammotype, 1, TIF_NOTAKEINFINITE);
-				invoker.gumspot = null;
+				actor aaa=spawn(invoker.throwtype,gumline.hitlocation-gumline.hitdir*2,ALLOW_REPLACE);
+				aaa.target=self;aaa.master=self;aaa.angle=angle;
+				aaa.A_StartSound("tripwire/fragclick",CHAN_BODY);
+				invoker.grenade=aaa;
+				invoker.gumspot.tracer=invoker.grenade;
+				invoker.grenade.tracer=invoker.gumspot;
+				invoker.grenade.master=self;
+				invoker.grenade.target=self;
+				A_Log("Grenade secured! Now be very, very careful...",true);
+				A_TakeInventory(invoker.grenadeammotype,1,TIF_NOTAKEINFINITE);
+				invoker.gumspot=null;
 			}
 		}goto nope;
 	}
@@ -169,54 +169,54 @@ class GumAndString:IdleDummy{
 		radius 0.5;height 0.5;
 	}
 	void GumTicker(){
-		if (
+		if(
 			!tracer&&
-			(trapisset||!master||master.health < 1)
+			(trapisset||!master||master.health<1)
 		){
 			destroy();
 			return;
 		}
 
 		//if gone into floor or ceiling, abort
-		if (floorz > pos.z||ceilingz < pos.z){
+		if(floorz>pos.z||ceilingz<pos.z){
 			ForceAbort();
 			return;
 		}
 
 		//check for the actual thing
-		if (tracer)A_FaceTracer(0, 0, flags:FAF_TOP, -1);
-		else if (master)A_FaceMaster(0, 0, flags:FAF_TOP, -1);
+		if(tracer)A_FaceTracer(0,0,flags:FAF_TOP,-1);
+		else if(master)A_FaceMaster(0,0,flags:FAF_TOP,-1);
 		flinetracedata wirecheck;
 		linetrace(
-			angle, 512, pitch, flags:0, 
-			offsetz:0, 
-			offsetside:0, 
+			angle,512,pitch,flags:0,
+			offsetz:0,
+			offsetside:0,
 			data:wirecheck
 		);
-		bool carefulplayer = false;
-		let atpl = HDPlayerPawn(wirecheck.hitactor);
-		if (
-			atpl && atpl != master && atpl.runwalksprint < 0
-			&& wirecheck.hitlocation.z - atpl.pos.z < 24
-			&& max(abs(atpl.vel.x), abs(atpl.vel.y), abs(atpl.vel.z))<5
+		bool carefulplayer=false;
+		let atpl=HDPlayerPawn(wirecheck.hitactor);
+		if(
+			atpl && atpl!=master && atpl.runwalksprint<0
+			&& wirecheck.hitlocation.z-atpl.pos.z<24
+			&& max(abs(atpl.vel.x),abs(atpl.vel.y),abs(atpl.vel.z))<5
 		){
-			carefulplayer = true;
-			atpl.stunned = max(atpl.stunned, 10);
+			carefulplayer=true;
+			atpl.stunned=max(atpl.stunned,10);
 		}
 
-		actor wiretripper = wirecheck.hitactor;
-		if (!master && !carefulplayer && wiretripper && wiretripper != tracer){
+		actor wiretripper=wirecheck.hitactor;
+		if(!master && !carefulplayer && wiretripper && wiretripper!=tracer){
 			vector3 vvv;
-			vvv = wiretripper.vel * 0.5;
-			PullPin(vvv.x, vvv.y, vvv.z);
+			vvv=wiretripper.vel*0.5;
+			PullPin(vvv.x,vvv.y,vvv.z);
 			return;
 		}
-		else if (tracer && wiretripper==tracer)master = null;
+		else if(tracer && wiretripper==tracer)master=null;
 
-		if (
+		if(
 			!wiretripper
 			||(tracer && wiretripper==master)
-			||(!tracer && wiretripper != master)
+			||(!tracer && wiretripper!=master)
 		){
 			ForceAbort();
 			return;
@@ -224,33 +224,33 @@ class GumAndString:IdleDummy{
 
 
 		//draw a line of particles
-		if (!tracer && !master)return;
+		if(!tracer && !master)return;
 
 		//set all the numbers
-		if (!trapisset){
-			if (tracer)ddd = tracer.pos+(0, 0, 4);
-			else ddd = master.pos+(0, 0, master.height - 8);
+		if(!trapisset){
+			if(tracer)ddd=tracer.pos+(0,0,4);
+			else ddd=master.pos+(0,0,master.height-8);
 
-			ddd -= pos;
-			stringlength = max(ddd.length(), 1);
-			bbb = stringlength * 0.3;
-			ddd /= bbb;
+			ddd-=pos;
+			stringlength=max(ddd.length(),1);
+			bbb=stringlength*0.3;
+			ddd/=bbb;
 
-			ii = min(bbb, 40)*0.0001;
+			ii=min(bbb,40)*0.0001;
 
-			if (tracer && !master)trapisset = true;
-		}else if (tracer && (tracer.pos+(0, 0, 4)-pos).length()>stringlength + 1){
+			if(tracer && !master)trapisset=true;
+		}else if(tracer && (tracer.pos+(0,0,4)-pos).length()>stringlength+1){
 			PullPin();
 			return;
 		}
 
 		vector3 ccc;
-		for(int i = 0;i < bbb;i++){
-			ccc = ddd * i * frandom(1 - ii, 1 + ii);
+		for(int i=0;i<bbb;i++){
+			ccc=ddd*i*frandom(1-ii,1+ii);
 			A_SpawnParticle(
-				"white", 
-				lifetime:1, size:0.5, 
-				xoff:ccc.x, yoff:ccc.y, zoff:ccc.z, 
+				"white",
+				lifetime:1,size:0.5,
+				xoff:ccc.x,yoff:ccc.y,zoff:ccc.z,
 				startalphaf:0.8
 			);
 		}
@@ -260,41 +260,41 @@ class GumAndString:IdleDummy{
 		//if those do, see how the DERP does it.
 		switch(stucktier){
 		case 1:
-			setz(stuckto.centerceiling() + stucktoheight);break;
+			setz(stuckto.centerceiling()+stucktoheight);break;
 		case -1:
-			setz(stuckto.centerfloor() + stucktoheight);break;
+			setz(stuckto.centerfloor()+stucktoheight);break;
 		default:
 			break;
 		}
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
-		trapisset = false;
-		stucktoheight = 0;
-		stucktier = 0;
+		trapisset=false;
+		stucktoheight=0;
+		stucktier=0;
 
 		//and now to find some shit
 		flinetracedata flt;
-		linetrace(angle, 1, pitch, flags:TRF_THRUACTORS, data:flt);
-		sector othersector = hdmath.oppositesector(flt.hitline, flt.hitsector);
+		linetrace(angle,1,pitch,flags:TRF_THRUACTORS,data:flt);
+		sector othersector=hdmath.oppositesector(flt.hitline,flt.hitsector);
 
-		if (othersector){
-			stuckto = othersector;
-			double otherfloorz = othersector.floorplane.zatpoint(flt.hitlocation.xy + flt.hitdir.xy);
-			double otherceilingz = othersector.ceilingplane.zatpoint(flt.hitlocation.xy + flt.hitdir.xy);
-			if (otherfloorz > flt.hitlocation.z){
+		if(othersector){
+			stuckto=othersector;
+			double otherfloorz=othersector.floorplane.zatpoint(flt.hitlocation.xy+flt.hitdir.xy);
+			double otherceilingz=othersector.ceilingplane.zatpoint(flt.hitlocation.xy+flt.hitdir.xy);
+			if(otherfloorz>flt.hitlocation.z){
 				stucktier=-1;
-				stucktoheight = flt.hitlocation.z - othersector.centerfloor();
-			}else if (otherceilingz < flt.hitlocation.z){
-				stucktier = 1;
-				stucktoheight = flt.hitlocation.z - othersector.centerceiling();
+				stucktoheight=flt.hitlocation.z-othersector.centerfloor();
+			}else if(otherceilingz<flt.hitlocation.z){
+				stucktier=1;
+				stucktoheight=flt.hitlocation.z-othersector.centerceiling();
 			}
-		}else if (flt.hittype==Trace_HitFloor){
-			brelativetofloor = true;
-			bmovewithsector = true;
-		}else if (flt.hittype==Trace_HitCeiling){
-			bceilinghugger = true;
-			bmovewithsector = true;
+		}else if(flt.hittype==Trace_HitFloor){
+			brelativetofloor=true;
+			bmovewithsector=true;
+		}else if(flt.hittype==Trace_HitCeiling){
+			bceilinghugger=true;
+			bmovewithsector=true;
 		}
 	}
 	states{
@@ -302,30 +302,30 @@ class GumAndString:IdleDummy{
 		BAL7 A 1 nodelay GumTicker();
 		wait;
 	}
-	void PullPin(double vvx = 0, double vvy = 0, double vvz = 0){
-		let trc = trippinggrenade(tracer);
-		if (!tracer)return;
-		actor ggg = trc.spawn(trc.rollertype, trc.pos, ALLOW_REPLACE);
-		ggg.target = trc.target;
-		ggg.vel=(pos - ggg.pos).unit();
-		actor hhh = trc.spawn(trc.spoontype, trc.pos, ALLOW_REPLACE);
-		hhh.vel = ggg.vel * 5;
-		ggg.vel *= 3;ggg.vel.z++;
-		ggg.A_StartSound("weapons / fragpinout", 8);
-		ggg.vel+=(vvx, vvy, vvz);
-		hhh.vel+=(vvx, vvy, vvz);
-		if (tracer)tracer.destroy();
+	void PullPin(double vvx=0,double vvy=0,double vvz=0){
+		let trc=trippinggrenade(tracer);
+		if(!tracer)return;
+		actor ggg=trc.spawn(trc.rollertype,trc.pos,ALLOW_REPLACE);
+		ggg.target=trc.target;
+		ggg.vel=(pos-ggg.pos).unit();
+		actor hhh=trc.spawn(trc.spoontype,trc.pos,ALLOW_REPLACE);
+		hhh.vel=ggg.vel*5;
+		ggg.vel*=3;ggg.vel.z++;
+		ggg.A_StartSound("weapons/fragpinout",8);
+		ggg.vel+=(vvx,vvy,vvz);
+		hhh.vel+=(vvx,vvy,vvz);
+		if(tracer)tracer.destroy();
 		destroy();
 	}
 	void ForceAbort(){
-		A_StartSound("tripwire / break", CHAN_AUTO);
-		let trc = trippinggrenade(tracer);
-		if (trc){
-			actor trcr = spawn(trc.rollertype, trc.pos, ALLOW_REPLACE);
-			trcr.A_StartSound("tripwire / break", CHAN_AUTO);
+		A_StartSound("tripwire/break",CHAN_AUTO);
+		let trc=trippinggrenade(tracer);
+		if(trc){
+			actor trcr=spawn(trc.rollertype,trc.pos,ALLOW_REPLACE);
+			trcr.A_StartSound("tripwire/break",CHAN_AUTO);
 			trc.destroy();
-		}else if (master)master.A_StartSound("tripwire / break", CHAN_AUTO);
-		if (master)master.A_Log("Welp, there goes that one. Try again?", true);
+		}else if(master)master.A_StartSound("tripwire/break",CHAN_AUTO);
+		if(master)master.A_Log("Welp, there goes that one. Try again?",true);
 		destroy();
 	}
 }
@@ -334,11 +334,11 @@ class TrippingGrenade:HDUPK{
 	double stucktoheight;
 	int stucktier;
 	int user_pitch;
-	class < actor> rollertype;
+	class<actor> rollertype;
 	property rollertype:rollertype;
-	class < actor> spoontype;
+	class<actor> spoontype;
 	property spoontype:spoontype;
-	class < inventory> droptype;
+	class<inventory> droptype;
 	property droptype:droptype;
 	default{
 		// SPECIAL MAPPING NOTE
@@ -351,43 +351,43 @@ class TrippingGrenade:HDUPK{
 		hdupk.pickupmessage "Picked up a grenade.";
 	}
 	override bool OnGrab(actor grabber){
-		if (tracer)tracer.destroy();
-		bnogravity = false;
-		bshootable = false;
-		stucktier = 999;
+		if(tracer)tracer.destroy();
+		bnogravity=false;
+		bshootable=false;
+		stucktier=999;
 		return true;
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
 
 		//add a gumwad if none exists
-		if (!tracer){
-			pitch = user_pitch;
+		if(!tracer){
+			pitch=user_pitch;
 			flinetracedata gum;
 			linetrace(
-				angle, 512, pitch, flags:TRF_THRUACTORS, 
-				offsetz:0, 
-				offsetside:0, 
+				angle,512,pitch,flags:TRF_THRUACTORS,
+				offsetz:0,
+				offsetside:0,
 				data:gum
 			);
-			if (gum.hittype != Trace_HitNone){
-				tracer = spawn("GumAndString", gum.hitlocation - gum.hitdir * 0.4, ALLOW_REPLACE);
-				tracer.tracer = self;
-				tracer.angle = angle;tracer.pitch = pitch;
+			if(gum.hittype!=Trace_HitNone){
+				tracer=spawn("GumAndString",gum.hitlocation-gum.hitdir*0.4,ALLOW_REPLACE);
+				tracer.tracer=self;
+				tracer.angle=angle;tracer.pitch=pitch;
 			}
-			angle += 180;pitch=-pitch;
+			angle+=180;pitch=-pitch;
 		}
 
-		stucktoheight = 0;
-		stucktier = 0;
+		stucktoheight=0;
+		stucktier=0;
 
 		//and now to find some shit
 		flinetracedata flt;
-		linetrace(angle, radius * HDCONST_SQRTTWO + 0.1, pitch, flags:TRF_THRUACTORS, data:flt);
+		linetrace(angle,radius*HDCONST_SQRTTWO+0.1,pitch,flags:TRF_THRUACTORS,data:flt);
 
 		//let it drop if neither planted by player nor actually touching a wall
 		//used to prevent mappers from accidentally leaving things hovering in the air
-		if (
+		if(
 			!flt.hitline
 			&&!target
 		){
@@ -395,66 +395,66 @@ class TrippingGrenade:HDUPK{
 			return;
 		}
 
-		sector othersector = hdmath.oppositesector(flt.hitline, flt.hitsector);
+		sector othersector=hdmath.oppositesector(flt.hitline,flt.hitsector);
 
-		if (othersector){
-			stuckto = othersector;
-			double otherfloorz = othersector.floorplane.zatpoint(flt.hitlocation.xy + flt.hitdir.xy);
-			double otherceilingz = othersector.ceilingplane.zatpoint(flt.hitlocation.xy + flt.hitdir.xy);
-			if (otherfloorz > flt.hitlocation.z){
+		if(othersector){
+			stuckto=othersector;
+			double otherfloorz=othersector.floorplane.zatpoint(flt.hitlocation.xy+flt.hitdir.xy);
+			double otherceilingz=othersector.ceilingplane.zatpoint(flt.hitlocation.xy+flt.hitdir.xy);
+			if(otherfloorz>flt.hitlocation.z){
 				stucktier=-1;
-				stucktoheight = flt.hitlocation.z - othersector.centerfloor();
-			}else if (otherceilingz < flt.hitlocation.z){
-				stucktier = 1;
-				stucktoheight = flt.hitlocation.z - othersector.centerceiling();
+				stucktoheight=flt.hitlocation.z-othersector.centerfloor();
+			}else if(otherceilingz<flt.hitlocation.z){
+				stucktier=1;
+				stucktoheight=flt.hitlocation.z-othersector.centerceiling();
 			}
-		}else if (flt.hittype==Trace_HitFloor){
-			brelativetofloor = true;
-			bmovewithsector = true;
-		}else if (flt.hittype==Trace_HitCeiling){
-			bceilinghugger = true;
-			bmovewithsector = true;
+		}else if(flt.hittype==Trace_HitFloor){
+			brelativetofloor=true;
+			bmovewithsector=true;
+		}else if(flt.hittype==Trace_HitCeiling){
+			bceilinghugger=true;
+			bmovewithsector=true;
 		}
 	}
 	void A_TrackStuckHeight(){
 		//set height
 		switch(stucktier){
 		case 1:
-			setz(stuckto.centerceiling() + stucktoheight);break;
+			setz(stuckto.centerceiling()+stucktoheight);break;
 		case -1:
-			setz(stuckto.centerfloor() + stucktoheight);break;
+			setz(stuckto.centerfloor()+stucktoheight);break;
 		case 999:
-			bceilinghugger = false;
-			bfloorhugger = false;
+			bceilinghugger=false;
+			bfloorhugger=false;
 			break;
 		default:
 			break;
 		}
 	}
 	override int damagemobj(
-		actor inflictor, actor source, int damage, 
-		name mod, int flags, double angle
+		actor inflictor,actor source,int damage,
+		name mod,int flags,double angle
 	){
-		if (bnointeraction)return -1; //this should not be necessary
-		if (!random(0, 9)){
-			actor ggg = spawn(rollertype, pos, ALLOW_REPLACE);
-			ggg.target = target;
-			if (tracer){
-				ggg.vel=(tracer.pos - ggg.pos).unit()*3+(0, 0, 1);
+		if(bnointeraction)return -1; //this should not be necessary
+		if(!random(0,9)){
+			actor ggg=spawn(rollertype,pos,ALLOW_REPLACE);
+			ggg.target=target;
+			if(tracer){
+				ggg.vel=(tracer.pos-ggg.pos).unit()*3+(0,0,1);
 				tracer.destroy();
-			}else ggg.vel=(random(-1, 1), random(-1, 1), 1);
-			ggg.A_StartSound("tripwire / fragpain", CHAN_AUTO);
-			actor hhh = spawn(spoontype, pos, ALLOW_REPLACE);
-			hhh.vel = ggg.vel * 2;
-			bshootable = false;
-			bnointeraction = true;
+			}else ggg.vel=(random(-1,1),random(-1,1),1);
+			ggg.A_StartSound("tripwire/fragpain",CHAN_AUTO);
+			actor hhh=spawn(spoontype,pos,ALLOW_REPLACE);
+			hhh.vel=ggg.vel*2;
+			bshootable=false;
+			bnointeraction=true;
 			destroy();return -1;
-		}else if (!random(0, 4)){
-			if (tracer)tracer.destroy();
-			actor aaa = spawn(droptype, pos, ALLOW_REPLACE);
-			aaa.vel = vel;
-			bshootable = false;
-			bnointeraction = true;
+		}else if(!random(0,4)){
+			if(tracer)tracer.destroy();
+			actor aaa=spawn(droptype,pos,ALLOW_REPLACE);
+			aaa.vel=vel;
+			bshootable=false;
+			bnointeraction=true;
 			destroy();return -1;
 		}else setstatelabel("spawn");
 		return -1;
@@ -479,7 +479,7 @@ class TripwireFrag:Tripwire{
 }
 class TrippingFrag:TrippingGrenade{
 	default{
-		//$Category "Misc / Hideous Destructor / Traps"
+		//$Category "Misc/Hideous Destructor/Traps"
 		//$Title "Tripwire Grenade"
 		//$Sprite "FRAGA0"
 
@@ -491,7 +491,7 @@ class TrippingFrag:TrippingGrenade{
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
-		pickupmessage = getdefaultbytype(droptype).pickupmessage();
+		pickupmessage=getdefaultbytype(droptype).pickupmessage();
 	}
 	states{
 	spawn:

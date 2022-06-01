@@ -3,22 +3,22 @@
 // ------------------------------------------------------------
 class HoopBubble:HDHumanoid replaces WolfensteinSS{
 	default{
-		seesound "wolfss / sight";
-		painsound "wolfss / pain";
-		deathsound "wolfss / death";
-		activesound "wolfss / active";
+		seesound "wolfss/sight";
+		painsound "wolfss/pain";
+		deathsound "wolfss/death";
+		activesound "wolfss/active";
 		tag "$cc_wolfss";
 
 		painchance 170;
 
 		obituary "%o invoked Godwin's Law.";
-		translation "192:207 = 103:111", "240:247 = 5:8";
+		translation "192:207=103:111","240:247=5:8";
 	}
 	override void postbeginplay(){
 		super.postbeginplay();
-		gunloaded = 31;
-		if (!bplayingid){
-			scale *= 0.81;
+		gunloaded=31;
+		if(!bplayingid){
+			scale*=0.81;
 		}
 		givearmour(1.);
 	}
@@ -26,158 +26,158 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 	double turnamount;
 	int gunloaded;
 	override void deathdrop(){
-		hdweapon wp = null;
-		if (!bhasdropped){
+		hdweapon wp=null;
+		if(!bhasdropped){
 			DropNewItem("HDHandgunRandomDrop");
-			bhasdropped = true;
-			if (wp = DropNewWeapon("HDSMG")){
+			bhasdropped=true;
+			if(wp=DropNewWeapon("HDSMG")){
 				wp.weaponstatus[SMGS_AUTO]=2;
-				wp.weaponstatus[SMGS_MAG]=random(0, 30);
+				wp.weaponstatus[SMGS_MAG]=random(0,30);
 				wp.weaponstatus[SMGS_CHAMBER]=2;
 			}
 			DropNewItem("HD9mMag30");
-		}else if (!bfriendly){
-			DropNewItem("HD9mMag30", 240);
-			DropNewItem("HD9mMag30", 128);
+		}else if(!bfriendly){
+			DropNewItem("HD9mMag30",240);
+			DropNewItem("HD9mMag30",128);
 		}
 	}
 	states{
 	spawn:
 		SSWV FF 1{
 			A_HDLook();
-			A_Recoil(frandom(-0.1, 0.1));
-			A_SetTics(random(10, 40));
+			A_Recoil(frandom(-0.1,0.1));
+			A_SetTics(random(10,40));
 		}
-		SSWV B 0 A_Jump(16, "spawnstretch");
-		SSWV B 0 A_Jump(116, "spawnwander");
-		SSWV B 8 A_Recoil(frandom(-0.2, 0.2));
+		SSWV B 0 A_Jump(16,"spawnstretch");
+		SSWV B 0 A_Jump(116,"spawnwander");
+		SSWV B 8 A_Recoil(frandom(-0.2,0.2));
 		loop;
 	spawnstretch:
 		SSWV E 1{
-			A_Recoil(frandom(-0.4, 0.4));
-			A_SetTics(random(30, 80));
-			if (!random(0, 3))A_Vocalize("grunt / active");
+			A_Recoil(frandom(-0.4,0.4));
+			A_SetTics(random(30,80));
+			if(!random(0,3))A_Vocalize("grunt/active");
 		}
 		---- A 0 setstatelabel("spawn");
 	spawnstill:
 		SSWV A 0 A_HDLook();
-		SSWV A 0 A_Recoil(frandom(-0.4, 0.4));
-		SSWV CD 5 A_SetAngle(angle + frandom(-4., 4.));
+		SSWV A 0 A_Recoil(frandom(-0.4,0.4));
+		SSWV CD 5 A_SetAngle(angle+frandom(-4.,4.));
 		SSWV A 0 A_HDLook();
-		SSWV A 0 A_Jump(192, 2);
-		SSWV A 0 A_Vocalize("grunt / active");
-		SSWV AB 5 A_SetAngle(angle + frandom(-4., 4.));
+		SSWV A 0 A_Jump(192,2);
+		SSWV A 0 A_Vocalize("grunt/active");
+		SSWV AB 5 A_SetAngle(angle+frandom(-4.,4.));
 		SSWV A 0 A_HDLook();
-		SSWV B 1 A_SetTics(random(10, 40));
+		SSWV B 1 A_SetTics(random(10,40));
 		---- A 0 setstatelabel("spawn");
 	spawnwander:
 		SSWV CDAB 5 A_HDWander();
 		---- A 0 setstatelabel("spawn");
 	see:
-		SSWV A 0 A_Jumpif (gunloaded < 2, "reload");
+		SSWV A 0 A_JumpIf(gunloaded<2,"reload");
 		SSWV ABCD 4 A_HDChase();
 		SSWV A 0 A_JumpIfTargetInLOS("see");
 		---- A 0 setstatelabel("roam");
 	roam:
-		#### E 3 A_Jump(60, "roam2");
-		#### E 0{spread = 1;}
-		#### EEEE 1 A_HDChase("melee", "turnaround", CHF_DONTMOVE);
-		#### E 0{spread = 0;}
-		#### EEEEEEEEEEEEE 1 A_HDChase("melee", "turnaround", CHF_DONTMOVE);
-		#### A 0 A_Jump(60, "roam");
+		#### E 3 A_Jump(60,"roam2");
+		#### E 0{spread=1;}
+		#### EEEE 1 A_HDChase("melee","turnaround",CHF_DONTMOVE);
+		#### E 0{spread=0;}
+		#### EEEEEEEEEEEEE 1 A_HDChase("melee","turnaround",CHF_DONTMOVE);
+		#### A 0 A_Jump(60,"roam");
 	roam2:
-		#### A 0 A_Jump(8, "see");
+		#### A 0 A_Jump(8,"see");
 		#### ABCD 5 A_HDChase(speedmult:0.6);
-		#### A 0 A_Jump(140, "Roam");
+		#### A 0 A_Jump(140,"Roam");
 		#### A 0 A_JumpIfTargetInLOS("see");
 		loop;
 	turnaround:
-		#### A 0 A_FaceTarget(15, 0);
-		#### E 2 A_JumpIfTargetInLOS("missile2", 40);
-		#### E 0{spread = 3;}
-		#### A 0 A_FaceTarget(15, 0);
-		#### E 0{spread = 6;}
-		#### E 2 A_JumpIfTargetInLOS("missile2", 40);
-		#### E 0{spread = 4;}
+		#### A 0 A_FaceTarget(15,0);
+		#### E 2 A_JumpIfTargetInLOS("missile2",40);
+		#### E 0{spread=3;}
+		#### A 0 A_FaceTarget(15,0);
+		#### E 0{spread=6;}
+		#### E 2 A_JumpIfTargetInLOS("missile2",40);
+		#### E 0{spread=4;}
 		#### ABCD 3 A_HDChase();
 		---- A 0 setstatelabel("see");
 	pain:
 		SSWV H 3;
 		SSWV H 3 A_Pain();
-		SSWV A 0 A_Jump(192, "see");
+		SSWV A 0 A_Jump(192,"see");
 		---- A 0 setstatelabel("see");
 	missile:
-		#### A 0 A_Jumpif (gunloaded < 1, "reload");
-		#### A 0 A_JumpIfTargetInLOS(3, 120);
+		#### A 0 A_JumpIf(gunloaded<1,"reload");
+		#### A 0 A_JumpIfTargetInLOS(3,120);
 		#### CDE 1 A_FaceTarget(90);
-		#### F 1 A_SetTics(random(4, 10)); //when they just start to aim, not for followup shots!
+		#### F 1 A_SetTics(random(4,10)); //when they just start to aim,not for followup shots!
 		#### A 0 A_JumpIfTargetInLOS("missile2");
-		#### A 0 A_CheckLOF("see", 
+		#### A 0 A_CheckLOF("see",
 			CLOFF_JUMPNONHOSTILE|CLOFF_SKIPTARGET|
 			CLOFF_MUSTBESOLID|
-			CLOFF_SKIPENEMY, 
-			0, 0, 0, 0, 44, 0
+			CLOFF_SKIPENEMY,
+			0,0,0,0,44,0
 		);
 	missile2:
 		#### A 0{
-			if (!target){
+			if(!target){
 				setstatelabel("spawn");
 				return;
 			}
-			double enemydist = distance3d(target);
-			if (enemydist < 200)turnamount = 50;
-			else if (enemydist < 600)turnamount = 30;
-			else turnamount = 10;
+			double enemydist=distance3d(target);
+			if(enemydist<200)turnamount=50;
+			else if(enemydist<600)turnamount=30;
+			else turnamount=10;
 		}goto turntoaim;
 	turntoaim:
-		#### F 2 A_FaceTarget(turnamount, turnamount);
+		#### F 2 A_FaceTarget(turnamount,turnamount);
 		#### A 0 A_JumpIfTargetInLOS(2);
 		---- A 0 setstatelabel("see");
-		#### A 0 A_JumpIfTargetInLOS(1, 10);
+		#### A 0 A_JumpIfTargetInLOS(1,10);
 		loop;
 		#### F 1{
-			A_FaceTarget(turnamount, turnamount);
-			A_SetTics(random(1, int(100 / clamp(turnamount, 1, turnamount + 1) + 4)));
-			spread = frandom(0.06, 0.27)*turnamount;
+			A_FaceTarget(turnamount,turnamount);
+			A_SetTics(random(1,int(100/clamp(turnamount,1,turnamount+1)+4)));
+			spread=frandom(0.06,0.27)*turnamount;
 		}
-		#### A 0 A_Jump(256, "shoot");
+		#### A 0 A_Jump(256,"shoot");
 	shoot:
 		SSWV G 1 bright light("SHOT"){
-			if (gunloaded < 1){
+			if(gunloaded<1){
 				setstatelabel("ohforfuckssake");
 				return;
 			}
-			pitch += frandom(0, spread)-frandom(0, spread);
-			angle += frandom(0, spread)-frandom(0, spread);
-			A_StartSound("weapons / smg", CHAN_WEAPON);
-			HDBulletActor.FireBullet(self, "HDB_9", speedfactor:1.1);
-			HDWeapon.EjectCasing(self, "HDSpent9mm", 11, -frandom(79, 81), frandom(7, 7.5));
+			pitch+=frandom(0,spread)-frandom(0,spread);
+			angle+=frandom(0,spread)-frandom(0,spread);
+			A_StartSound("weapons/smg",CHAN_WEAPON);
+			HDBulletActor.FireBullet(self,"HDB_9",speedfactor:1.1);
+			HDWeapon.EjectCasing(self,"HDSpent9mm",11,-frandom(79,81),frandom(7,7.5));
 			gunloaded--;
 		}
-		SSWV F 2 A_SpawnProjectile("HDSpent9mm", 40);
-		SSWV F 0 A_Jump(128, "shoot");
+		SSWV F 2 A_SpawnProjectile("HDSpent9mm",40);
+		SSWV F 0 A_Jump(128,"shoot");
 	shootend:
-		SSWV F 1 A_FaceTarget(0, 0);
-		SSWV F 4 A_Jump(132, "see");
+		SSWV F 1 A_FaceTarget(0,0);
+		SSWV F 4 A_Jump(132,"see");
 		SSWV F 6 A_CPosRefire();
 		loop;
 	ohforfuckssake:
 		SSWV F 8;
 	reload:
-		SSWV A 3 A_HDChase("melee", null, CHF_FLEE);
+		SSWV A 3 A_HDChase("melee",null,CHF_FLEE);
 		SSWV B 4{
-			A_StartSound("weapons / rifleclick2", 8);
-			if (gunloaded >= 0)A_SpawnProjectile("HDSMGEmptyMag", 38, 0, random(90, 120));
+			A_StartSound("weapons/rifleclick2",8);
+			if(gunloaded>=0)A_SpawnProjectile("HDSMGEmptyMag",38,0,random(90,120));
 			gunloaded=-1;
 		}
-		SSWV CD 3 A_HDChase("melee", null, CHF_FLEE);
+		SSWV CD 3 A_HDChase("melee",null,CHF_FLEE);
 		SSWV E 4{
-			A_StartSound("weapons / rifleload", 8);
+			A_StartSound("weapons/rifleload",8);
 			A_HDWander();
 		}
 		SSWV F 3{
-			A_StartSound("weapons / rifleclick2", 8);
-			gunloaded += 30;
+			A_StartSound("weapons/rifleclick2",8);
+			gunloaded+=30;
 			A_HDWander();
 		}
 		---- A 0 setstatelabel("see");
@@ -186,9 +186,9 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 		SSWV J 5 A_Scream();
 		SSWV KL 5;
 	dead:
-		SSWV L 3 A_Jumpif (abs(vel.z)<2, 1);
+		SSWV L 3 A_JumpIf(abs(vel.z)<2,1);
 		loop;
-		SSWV M 5 canraise A_Jumpif (abs(vel.z)>=2, "dead");
+		SSWV M 5 canraise A_JumpIf(abs(vel.z)>=2,"dead");
 		loop;
 	xxxdeath:
 		SSWV N 5;
@@ -196,16 +196,16 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 		SSWV PQRSTU 5;
 		---- A 0 setstatelabel("xdead");
 	xdeath:
-		SSWV N 5 A_SpawnItemEx("MegaBloodSplatter", 0, 0, 34, 0, 0, 0, 0, 160);
-		SSWV O 0 A_SpawnItemEx("MegaBloodSplatter", 0, 0, 34, 0, 0, 0, 0, 160);
+		SSWV N 5 A_SpawnItemEx("MegaBloodSplatter",0,0,34,0,0,0,0,160);
+		SSWV O 0 A_SpawnItemEx("MegaBloodSplatter",0,0,34,0,0,0,0,160);
 		SSWV O 5 A_XScream();
-		SSWV P 5 A_SpawnItemEx("MegaBloodSplatter", 0, 0, 34, 0, 0, 0, 0, 160);
-		SSWV Q 0 A_SpawnItemEx("MegaBloodSplatter", 0, 0, 34, 0, 0, 0, 0, 160);
+		SSWV P 5 A_SpawnItemEx("MegaBloodSplatter",0,0,34,0,0,0,0,160);
+		SSWV Q 0 A_SpawnItemEx("MegaBloodSplatter",0,0,34,0,0,0,0,160);
 		SSWV QRSTU 5;
 	xdead:
-		SSWV U 3 canraise A_Jumpif (abs(vel.z)<2, 1);
+		SSWV U 3 canraise A_JumpIf(abs(vel.z)<2,1);
 		wait;
-		SSWV V 5 canraise A_Jumpif (abs(vel.z)>=2, "xdead");
+		SSWV V 5 canraise A_JumpIf(abs(vel.z)>=2,"xdead");
 		wait;
 	raise:
 		SSWV M 4;
@@ -219,25 +219,25 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 		SSWV PON 4;
 		---- A 0 setstatelabel("see");
 	}
-	override void die(actor source, actor inflictor, int dmgflags){
-		if (
+	override void die(actor source,actor inflictor,int dmgflags){
+		if(
 			bplayingid
 			&&source
 			&&source==inflictor
 			&&source.player
 			&&HDFist(source.player.readyweapon)
 		){
-			source.A_StartSound("nazi / punched", 19450430, CHANF_OVERLAP);
-			let ppp = HDPlayerPawn(source);
-			if (!ppp)source.givebody(10);
+			source.A_StartSound("nazi/punched",19450430,CHANF_OVERLAP);
+			let ppp=hdplayerpawn(source);
+			if(!ppp)source.givebody(10);
 			else{
-				ppp.woundcount -= max(1, ppp.woundcount >> 2);
-				ppp.aggravateddamage -= max(1, ppp.aggravateddamage >> 3);
+				ppp.woundcount-=max(1,ppp.woundcount>>2);
+				ppp.aggravateddamage-=max(1,ppp.aggravateddamage>>3);
 				ppp.fatigue>>=1;
-				ppp.stunned = 0;
+				ppp.stunned=0;
 				ppp.givebody(6);
 			}
 		}
-		super.die(source, inflictor, dmgflags);
+		super.die(source,inflictor,dmgflags);
 	}
 }

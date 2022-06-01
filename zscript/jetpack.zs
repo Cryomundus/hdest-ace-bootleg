@@ -4,7 +4,7 @@
 class HDJetPack:HDCellWeapon{
 	default{
 		tag "jetpack";
-		hdweapon.barrelsize 22, 24, 14;
+		hdweapon.barrelsize 22,24,14;
 		inventory.pickupmessage "You got the jetpack!";
 		+inventory.invbar
 		+hdweapon.dontnull
@@ -16,60 +16,60 @@ class HDJetPack:HDCellWeapon{
 	}
 	override bool IsBeingWorn(){return owner&&owner.player&&owner.player.readyweapon==self;}
 	override inventory CreateTossable(int amt){
-		if (!player||player.readyweapon != self)return super.createtossable(amount);
+		if(!player||player.readyweapon!=self)return super.createtossable(amount);
 
 		HDArmour.ArmourChangeEffect(owner);
 		return super.createtossable(amt);
 	}
 	actor pods[4];
 	action void A_Pods(){
-		bool podson = invoker.weaponstatus[0]&JETPACKF_ON;
-		for(int i = 0;i < 4;i++){
-			if (!invoker.pods[i]){
-				invoker.pods[i]=spawn("HoverPod", pos);
-				invoker.pods[i].angle = 90 * i + 45;
-				invoker.pods[i].master = self;
+		bool podson=invoker.weaponstatus[0]&JETPACKF_ON;
+		for(int i=0;i<4;i++){
+			if(!invoker.pods[i]){
+				invoker.pods[i]=spawn("HoverPod",pos);
+				invoker.pods[i].angle=90*i+45;
+				invoker.pods[i].master=self;
 			}
-			if (podson)invoker.pods[i].A_StartSound("jetpack / fwoosh", CHAN_AUTO, CHANF_DEFAULT, 0.2, pitch:1.6 + 0.2*(level.time&(1|2)));
+			if(podson)invoker.pods[i].A_StartSound("jetpack/fwoosh",CHAN_AUTO,CHANF_DEFAULT,0.2,pitch:1.6+0.2*(level.time&(1|2)));
 		}
-		if (podson){
-			if (invoker.weaponstatus[JETPACKS_BATTERYCOUNTER]>JETPACK_COUNTERMAX){
+		if(podson){
+			if(invoker.weaponstatus[JETPACKS_BATTERYCOUNTER]>JETPACK_COUNTERMAX){
 				invoker.weaponstatus[JETPACKS_BATTERY]--;
 				invoker.weaponstatus[JETPACKS_BATTERYCOUNTER]=0;
 			}else invoker.weaponstatus[JETPACKS_BATTERYCOUNTER]++;
 		}
-		if (invoker.weaponstatus[JETPACKS_BATTERY]<1)invoker.weaponstatus[0]&=~JETPACKF_ON;
+		if(invoker.weaponstatus[JETPACKS_BATTERY]<1)invoker.weaponstatus[0]&=~JETPACKF_ON;
 
-		if (
-			HDPlayerPawn(self)
-			&&HDPlayerPawn(self).fallroll
+		if(
+			hdplayerpawn(self)
+			&&hdplayerpawn(self).fallroll
 		)DropInventory(invoker);
 	}
 	override string gethelptext(){
 		return
 		WEPHELP_FIRE.."  Ascend\n"
 		..WEPHELP_ALTFIRE.."  Forwards\n"
-		..WEPHELP_FIREMODE.."  On / Off\n"
+		..WEPHELP_FIREMODE.."  On/Off\n"
 		..WEPHELP_RELOADRELOAD
 		..WEPHELP_UNLOADUNLOAD
 		;
 	}
-	override void DrawHUDStuff(HDStatusBar sb, HDWeapon hdw, HDPlayerPawn hpl){
-		if (sb.hudlevel==1){
-			sb.drawbattery(-54, -4, sb.DI_SCREEN_CENTER_BOTTOM, reloadorder:true);
-			sb.drawnum(hpl.CountInv("HDBattery"), -46, -8, sb.DI_SCREEN_CENTER_BOTTOM, font.CR_BLACK);
+	override void DrawHUDStuff(HDStatusBar sb,HDWeapon hdw,HDPlayerPawn hpl){
+		if(sb.hudlevel==1){
+			sb.drawbattery(-54,-4,sb.DI_SCREEN_CENTER_BOTTOM,reloadorder:true);
+			sb.drawnum(hpl.countinv("HDBattery"),-46,-8,sb.DI_SCREEN_CENTER_BOTTOM,font.CR_BLACK);
 		}
-		if (!hdw.weaponstatus[1])sb.drawstring(
-			sb.mamountfont, "00000", (-16, -9), sb.DI_TEXT_ALIGN_RIGHT|
-			sb.DI_TRANSLATABLE|sb.DI_SCREEN_CENTER_BOTTOM, 
+		if(!hdw.weaponstatus[1])sb.drawstring(
+			sb.mamountfont,"00000",(-16,-9),sb.DI_TEXT_ALIGN_RIGHT|
+			sb.DI_TRANSLATABLE|sb.DI_SCREEN_CENTER_BOTTOM,
 			Font.CR_DARKGRAY
-		);else if (hdw.weaponstatus[1]>0)sb.drawwepnum(hdw.weaponstatus[1], 20);
+		);else if(hdw.weaponstatus[1]>0)sb.drawwepnum(hdw.weaponstatus[1],20);
 
 		string velmsg="velocity:  ";
-		if (hd_debug)velmsg = velmsg..owner.vel.z;
-		else velmsg = velmsg..owner.vel.z * HDCONST_MPSTODUPT.." m / s";
-		sb.drawstring(sb.pnewsmallfont, velmsg, 
-			(0, 24), sb.DI_TEXT_ALIGN_LEFT|sb.DI_SCREEN_LEFT_TOP, 
+		if(hd_debug)velmsg=velmsg..owner.vel.z;
+		else velmsg=velmsg..owner.vel.z*HDCONST_MPSTODUPT.." m/s";
+		sb.drawstring(sb.pnewsmallfont,velmsg,
+			(0,24),sb.DI_TEXT_ALIGN_LEFT|sb.DI_SCREEN_LEFT_TOP,
 			abs(owner.vel.z)>10?font.CR_RED:font.CR_WHITE
 		);
 	}
@@ -80,14 +80,14 @@ class HDJetPack:HDCellWeapon{
 	override void actualpickup(actor user){
 		super.actualpickup(user);
 		//put on the jetpack right away
-		if (
+		if(
 			user.player&&user.player.cmd.buttons&BT_USE
 			&&(
 				!HDWeapon(user.player.readyweapon)
 				||!HDWeapon(user.player.readyweapon).isbeingworn()
 			)
 		){
-			inventory slf = user.FindInventory(getclass());
+			inventory slf=user.findinventory(getclass());
 			user.UseInventory(slf);
 		}
 	}
@@ -101,14 +101,14 @@ class HDJetPack:HDCellWeapon{
 	select0:
 		TNT1 A 12{
 			invoker.weaponstatus[0]&=~JETPACKF_ON;
-			A_Overlay(10, "pods");
-			A_StartSound("jetpack / wear", CHAN_WEAPON);
+			A_Overlay(10,"pods");
+			A_StartSound("jetpack/wear",CHAN_WEAPON);
 		}
 		goto super::select0;
 	deselect0:
 		TNT1 A 14{
 			invoker.weaponstatus[0]&=~JETPACKF_ON;
-			A_StartSound("jetpack / wear", CHAN_WEAPON);
+			A_StartSound("jetpack/wear",CHAN_WEAPON);
 		}
 		goto super::deselect0;
 	ready:
@@ -118,31 +118,31 @@ class HDJetPack:HDCellWeapon{
 	user4:
 	unload:
 		TNT1 A 20{
-			int bat = invoker.weaponstatus[JETPACKS_BATTERY];
-			if (bat < 0){
+			int bat=invoker.weaponstatus[JETPACKS_BATTERY];
+			if(bat<0){
 				setweaponstate("nope");
 				return;
 			}
-			if (pressingunload())invoker.weaponstatus[0]|=JETPACKF_UNLOADONLY;
+			if(pressingunload())invoker.weaponstatus[0]|=JETPACKF_UNLOADONLY;
 			else invoker.weaponstatus[0]&=~JETPACKF_UNLOADONLY;
 
-			HDMagAmmo.SpawnMag(self, "HDBattery", bat);
+			HDMagAmmo.SpawnMag(self,"HDBattery",bat);
 			invoker.weaponstatus[JETPACKS_BATTERY]=-1;
 		}
-		TNT1 A 0 A_Jumpif (invoker.weaponstatus[0]&JETPACKF_UNLOADONLY, "nope");
+		TNT1 A 0 A_JumpIf(invoker.weaponstatus[0]&JETPACKF_UNLOADONLY,"nope");
 	reload:
-		TNT1 A 20 A_Jumpif (invoker.weaponstatus[JETPACKS_BATTERY]>=0, "unload");
+		TNT1 A 20 A_JumpIf(invoker.weaponstatus[JETPACKS_BATTERY]>=0,"unload");
 		TNT1 A 10{
-			let mmm = hdmagammo(FindInventory("HDBattery"));
-			if (!mmm||mmm.Amount < 1){setweaponstate("nope");return;}
+			let mmm=hdmagammo(findinventory("HDBattery"));
+			if(!mmm||mmm.amount<1){setweaponstate("nope");return;}
 			invoker.weaponstatus[JETPACKS_BATTERY]=mmm.TakeMag(true);
 		}
 		goto nope;
 
 	firemode:
-		TNT1 A 0 A_Jumpif (invoker.weaponstatus[0]&JETPACKF_ON, "turnoff");
+		TNT1 A 0 A_JumpIf(invoker.weaponstatus[0]&JETPACKF_ON,"turnoff");
 	turnon:
-		TNT1 A 10 A_StartSound("jetpack / on", CHAN_WEAPON);
+		TNT1 A 10 A_StartSound("jetpack/on",CHAN_WEAPON);
 		TNT1 A 0{invoker.weaponstatus[0]|=JETPACKF_ON;}
 		goto readyend;
 	turnoff:
@@ -154,80 +154,80 @@ class HDJetPack:HDCellWeapon{
 	fire:
 	hold:
 		TNT1 A 1{
-			if (invoker.weaponstatus[JETPACKS_BATTERY]<1)return;
-			if (!(invoker.weaponstatus[0]&JETPACKF_ON)){
+			if(invoker.weaponstatus[JETPACKS_BATTERY]<1)return;
+			if(!(invoker.weaponstatus[0]&JETPACKF_ON)){
 				setweaponstate("turnon");
 				return;
 			}
 			A_ClearRefire();
-			if (invoker.weaponstatus[JETPACKS_BATTERYCOUNTER]>JETPACK_COUNTERMAX){
+			if(invoker.weaponstatus[JETPACKS_BATTERYCOUNTER]>JETPACK_COUNTERMAX){
 				invoker.weaponstatus[JETPACKS_BATTERY]--;
 				invoker.weaponstatus[JETPACKS_BATTERYCOUNTER]=0;
 			}else invoker.weaponstatus[JETPACKS_BATTERYCOUNTER]+=JETPACK_COUNTERUSE;
-			double rawthrust = 0.00001 * min(invoker.weaponstatus[JETPACKS_BATTERY], 5);
-			double zzz = max(rawthrust, (16384 + floorz - pos.z)*
+			double rawthrust=0.00001*min(invoker.weaponstatus[JETPACKS_BATTERY],5);
+			double zzz=max(rawthrust,(16384+floorz-pos.z)*
 				(
-					(HDPlayerPawn(self)&&HDPlayerPawn(self).overloaded > 1)?
-					(rawthrust/(HDPlayerPawn(self).overloaded * 0.2 + 1))
+					(hdplayerpawn(self)&&hdplayerpawn(self).overloaded>1)?
+					(rawthrust/(hdplayerpawn(self).overloaded*0.2+1))
 				:rawthrust)
 			);
-			if (pressingaltfire()){
-				vel.xy+=(cos(angle), sin(angle))*zzz * 0.1;
-				zzz *= 0.9;
-			}else if (vel.xy!=(0, 0)){
-				if (vel.x > 0)vel.x -= min(0.1, vel.x);else vel.x -= max(-0.1, vel.x);
-				if (vel.y > 0)vel.y -= min(0.1, vel.y);else vel.y -= max(-0.1, vel.y);
+			if(pressingaltfire()){
+				vel.xy+=(cos(angle),sin(angle))*zzz*0.1;
+				zzz*=0.9;
+			}else if(vel.xy!=(0,0)){
+				if(vel.x>0)vel.x-=min(0.1,vel.x);else vel.x-=max(-0.1,vel.x);
+				if(vel.y>0)vel.y-=min(0.1,vel.y);else vel.y-=max(-0.1,vel.y);
 			}
-			vel.z += zzz;
+			vel.z+=zzz;
 			int chn=(level.time&(1|2));
-			for(int i = 0;i < 4;i++){
-				if (!!invoker.pods[i]){
-					let aaa = invoker.pods[i];
-					aaa.A_StartSound(!chn?"jetpack / bang":"jetpack / fwoosh", chn, volume:0.15, pitch:1 + 0.2 * chn);
-					if (!chn){
-						let bbb = spawn("HDExplosion", (aaa.pos.xy, aaa.pos.z - 20), ALLOW_REPLACE);
-						bbb.vel.z -= 20;
-						bbb.vel.xy += angletovector(aaa.angle + angle, 6);
-						bbb.deathsound = i==0?"jetpack / bang":"";
+			for(int i=0;i<4;i++){
+				if(!!invoker.pods[i]){
+					let aaa=invoker.pods[i];
+					aaa.A_StartSound(!chn?"jetpack/bang":"jetpack/fwoosh",chn,volume:0.15,pitch:1+0.2*chn);
+					if(!chn){
+						let bbb=spawn("HDExplosion",(aaa.pos.xy,aaa.pos.z-20),ALLOW_REPLACE);
+						bbb.vel.z-=20;
+						bbb.vel.xy+=angletovector(aaa.angle+angle,6);
+						bbb.deathsound=i==0?"jetpack/bang":"";
 					}
 				}
 			}
-			if (!chn)A_AlertMonsters();
+			if(!chn)A_AlertMonsters();
 
-			blockthingsiterator itt = blockthingsiterator.create(self, 128);
+			blockthingsiterator itt=blockthingsiterator.create(self,128);
 			while(itt.Next()){
-				actor it = itt.thing;
-				if (
+				actor it=itt.thing;
+				if(
 					it.bdontthrust
 					||it==self
 					||(!it.bsolid&&!it.bshootable)
 					||!it.mass
-					||it.pos.z > pos.z
+					||it.pos.z>pos.z
 				)continue;
-				double thrustamt = max(0, (1024 + it.pos.z - pos.z)*rawthrust)*10 / it.mass;
-				it.vel+=(it.pos - pos).unit()*thrustamt;
-				it.A_GiveInventory("Heat", int(thrustamt * frandom(1, 30)));
-				if (!random(0, 10)){
+				double thrustamt=max(0,(1024+it.pos.z-pos.z)*rawthrust)*10/it.mass;
+				it.vel+=(it.pos-pos).unit()*thrustamt;
+				it.A_GiveInventory("Heat",int(thrustamt*frandom(1,30)));
+				if(!random(0,10)){
 					HDActor.ArcZap(it);
-					it.damagemobj(invoker, self, int(thrustamt * frandom(10, 40)), "electrical");
+					it.damagemobj(invoker,self,int(thrustamt*frandom(10,40)),"electrical");
 				}
-				if (it)it.damagemobj(invoker, self, int(thrustamt * frandom(5, 30)), "bashing");
+				if(it)it.damagemobj(invoker,self,int(thrustamt*frandom(5,30)),"bashing");
 			}
 		}
-		TNT1 A 0 A_Jumpif (pressingfire()||pressingaltfire(), "hold");
+		TNT1 A 0 A_JumpIf(pressingfire()||pressingaltfire(),"hold");
 		goto nope;
 	}
 }
-const JETPACK_DIST = 16.;
+const JETPACK_DIST=16.;
 enum HoverNums{
-	JETPACKS_BATTERY = 1, 
-	JETPACKS_BATTERYCOUNTER = 2, 
+	JETPACKS_BATTERY=1,
+	JETPACKS_BATTERYCOUNTER=2,
 
-	JETPACKF_UNLOADONLY = 1, 
-	JETPACKF_ON = 2, 
+	JETPACKF_UNLOADONLY=1,
+	JETPACKF_ON=2,
 
-	JETPACK_COUNTERMAX = 100000, 
-	JETPACK_COUNTERUSE = JETPACK_COUNTERMAX / 80, 
+	JETPACK_COUNTERMAX=100000,
+	JETPACK_COUNTERUSE=JETPACK_COUNTERMAX/80,
 }
 class HoverPod:Actor{
 	default{
@@ -241,16 +241,16 @@ class HoverPod:Actor{
 	states{
 	spawn:
 		JPOD A 1 nodelay{
-			if (
+			if(
 				master
 				&&master.player
 				&&(master.player.readyweapon is "HDJetPack")
 			){
-				double podz = master.pos.z + master.height - 30;
-				if (hdweapon(master.player.readyweapon).weaponstatus[0]&JETPACKF_ON)podz += frandom(-0.5, 0.5);
+				double podz=master.pos.z+master.height-30;
+				if(hdweapon(master.player.readyweapon).weaponstatus[0]&JETPACKF_ON)podz+=frandom(-0.5,0.5);
 				setorigin((master.pos.xy+
-					angletovector(angle + master.angle, JETPACK_DIST), 
-				podz), true);
+					angletovector(angle+master.angle,JETPACK_DIST),
+				podz),true);
 			}else{
 				destroy();
 			}

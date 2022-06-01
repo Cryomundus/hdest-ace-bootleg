@@ -17,7 +17,7 @@ class HDPistolAmmo:HDRoundAmmo{
 		inventory.icon "TEN9A0";
 	}
 	override void SplitPickup(){
-		SplitPickupBoxableRound(10, 100, "HD9mBoxPickup", "TEN9A0", "PRNDA0");
+		SplitPickupBoxableRound(10,100,"HD9mBoxPickup","TEN9A0","PRNDA0");
 	}
 	override void GetItemsThatUseThis(){
 		itemsthatusethis.push("DERPUsable");
@@ -35,7 +35,7 @@ class HDPistolAmmo:HDRoundAmmo{
 
 class HD9mMag15:HDMagAmmo{
 	default{
-		//$Category "Ammo / Hideous Destructor/"
+		//$Category "Ammo/Hideous Destructor/"
 		//$Title "Pistol Magazine"
 		//$Sprite "CLP2A0"
 
@@ -47,9 +47,9 @@ class HD9mMag15:HDMagAmmo{
 		inventory.pickupmessage "Picked up a pistol magazine.";
 		hdpickup.refid HDLD_NIMAG15;
 	}
-	override string, string, name, double getmagsprite(int thismagamt){
-		string magsprite=(thismagamt > 0)?"CLP2NORM":"CLP2EMPTY";
-		return magsprite, "PBRSA0", "HDPistolAmmo", 0.6;
+	override string,string,name,double getmagsprite(int thismagamt){
+		string magsprite=(thismagamt>0)?"CLP2NORM":"CLP2EMPTY";
+		return magsprite,"PBRSA0","HDPistolAmmo",0.6;
 	}
 	override void GetItemsThatUseThis(){
 		itemsthatusethis.push("DERPUsable");
@@ -62,14 +62,14 @@ class HD9mMag15:HDMagAmmo{
 		stop;
 	spawnempty:
 		CLP2 B -1{
-			brollsprite = true;brollcenter = true;
-			roll = randompick(0, 0, 0, 0, 2, 2, 2, 2, 1, 3)*90;
+			brollsprite=true;brollcenter=true;
+			roll=randompick(0,0,0,0,2,2,2,2,1,3)*90;
 		}stop;
 	}
 }
 class HD9mMag30:HD9mMag15{
 	default{
-		//$Category "Ammo / Hideous Destructor/"
+		//$Category "Ammo/Hideous Destructor/"
 		//$Title "SMG Magazine"
 		//$Sprite "CLP3A0"
 
@@ -79,9 +79,9 @@ class HD9mMag30:HD9mMag15{
 		inventory.pickupmessage "Picked up an SMG magazine.";
 		hdpickup.refid HDLD_NIMAG30;
 	}
-	override string, string, name, double getmagsprite(int thismagamt){
-		string magsprite=(thismagamt > 0)?"CLP3A0":"CLP3B0";
-		return magsprite, "PBRSA0", "HDPistolAmmo", 2.;
+	override string,string,name,double getmagsprite(int thismagamt){
+		string magsprite=(thismagamt>0)?"CLP3A0":"CLP3B0";
+		return magsprite,"PBRSA0","HDPistolAmmo",2.;
 	}
 	override void GetItemsThatUseThis(){
 		itemsthatusethis.push("HDSMG");
@@ -92,8 +92,8 @@ class HD9mMag30:HD9mMag15{
 		stop;
 	spawnempty:
 		CLP3 B -1{
-			brollsprite = true;brollcenter = true;
-			roll = randompick(0, 0, 0, 0, 2, 2, 2, 2, 1, 3)*90;
+			brollsprite=true;brollcenter=true;
+			roll=randompick(0,0,0,0,2,2,2,2,1,3)*90;
 		}stop;
 	}
 }
@@ -101,12 +101,12 @@ class HD9mMag30:HD9mMag15{
 
 class HDSpent9mm:HDDebris{
 	default{
-		bouncesound "misc / casing3";scale 0.6;
+		bouncesound "misc/casing3";scale 0.6;
 	}
 	states{
 	spawn:
 		PBRS A 2 nodelay{
-			A_SetRoll(roll + 45, SPF_INTERPOLATE);
+			A_SetRoll(roll+45,SPF_INTERPOLATE);
 		}loop;
 	death:
 		PBRS # -1;
@@ -119,8 +119,8 @@ class HDLoose9mm:HDSpent9mm{
 	states{
 	death:
 		TNT1 A 1{
-			actor a = spawn("HDPistolAmmo", self.pos, ALLOW_REPLACE);
-			a.roll = self.roll;a.vel = self.vel;
+			actor a=spawn("HDPistolAmmo",self.pos,ALLOW_REPLACE);
+			a.roll=self.roll;a.vel=self.vel;
 		}stop;
 	}
 }
@@ -128,14 +128,14 @@ class HDLoose9mm:HDSpent9mm{
 class HDPistolEmptyMag:IdleDummy{
 	override void postbeginplay(){
 		super.postbeginplay();
-		HDMagAmmo.SpawnMag(self, "HD9mMag15", 0);
+		HDMagAmmo.SpawnMag(self,"HD9mMag15",0);
 		destroy();
 	}
 }
 class HDSMGEmptyMag:IdleDummy{
 	override void postbeginplay(){
 		super.postbeginplay();
-		HDMagAmmo.SpawnMag(self, "HD9mMag30", 0);
+		HDMagAmmo.SpawnMag(self,"HD9mMag30",0);
 		destroy();
 	}
 }
@@ -143,13 +143,13 @@ class HDSMGEmptyMag:IdleDummy{
 
 class HD9mBoxPickup:HDUPK{
 	default{
-		//$Category "Ammo / Hideous Destructor/"
+		//$Category "Ammo/Hideous Destructor/"
 		//$Title "Box of 9mm"
 		//$Sprite "9BOXA0"
 
 		scale 0.4;
-		hdupk.Amount 100;
-		hdupk.pickupsound "weapons / pocket";
+		hdupk.amount 100;
+		hdupk.pickupsound "weapons/pocket";
 		hdupk.pickupmessage "Picked up some 9mm ammo.";
 		hdupk.pickuptype "HDPistolAmmo";
 	}

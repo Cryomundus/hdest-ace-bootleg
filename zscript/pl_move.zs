@@ -1,106 +1,106 @@
 // ------------------------------------------------------------
 // Movement checks.
 // ------------------------------------------------------------
-const HDCONST_MAXFOCUSSCALE = 0.99;
+const HDCONST_MAXFOCUSSCALE=0.99;
 extend class HDPlayerPawn{
 	//input is no longer considered in CheckPitch since it's already in HD's TurnCheck.
 	override void CheckPitch(){
-		if (player.centering){
+		if(player.centering){
 			if (abs(Pitch)>2.){
 				Pitch*=(2./3.);
 			}else{
-				Pitch = 0.;
+				Pitch=0.;
 				player.centering = false;
-				if (PlayerNumber()==consoleplayer)LocalViewPitch = 0;
+				if(PlayerNumber()==consoleplayer)LocalViewPitch=0;
 			}
-		}else pitch = clamp(pitch, player.minpitch, player.maxpitch);
+		}else pitch=clamp(pitch,player.minpitch,player.maxpitch);
 	}
 	override void CalcHeight(){
-		if (
+		if(
 			CheckFrozen()
-			||(incapacitated&&health > 0)
+			||(incapacitated&&health>0)
 		)return;
 		super.CalcHeight();
 	}
 	override void CheckCrouch(bool totallyfrozen){}
 	void CrouchCheck(){
-		if (CheckFrozen())return;
-		let player = self.player;
-		UserCmd cmd = player.cmd;
-		if (
+		if(CheckFrozen())return;
+		let player=self.player;
+		UserCmd cmd=player.cmd;
+		if(
 			CanCrouch() //map settings check intentionally omitted
-			&&player.health > 0
+			&&player.health>0
 		){
-			int crouchdir = player.crouching;
-			if (
+			int crouchdir=player.crouching;
+			if(
 				cmd.buttons&BT_JUMP
 				&&player.onground
-			)crouchdir = 1;
-			else if (!crouchdir){
+			)crouchdir=1;
+			else if(!crouchdir){
 				crouchdir=(cmd.buttons&BT_CROUCH)?-1:1;
 			}
-			else if (cmd.buttons&BT_CROUCH){
-				player.crouching = 0;
+			else if(cmd.buttons&BT_CROUCH){
+				player.crouching=0;
 			}
-			if (
+			if(
 				crouchdir==1
-				&&player.crouchfactor < 1
-				&&pos.z + height < ceilingz
+				&&player.crouchfactor<1
+				&&pos.z+height<ceilingz
 			){
 				CrouchMove(1);
 			}
-			else if (
+			else if(
 				crouchdir==-1
-				&&player.crouchfactor > 0.5
+				&&player.crouchfactor>0.5
 			){
 				CrouchMove(-1);
 			}
 		}else player.Uncrouch();
-		player.crouchoffset=-(viewheight)*(1 - player.crouchfactor);
+		player.crouchoffset=-(viewheight)*(1-player.crouchfactor);
 	}
 	override void CrouchMove(int direction){
-		let player = self.player;
+		let player=self.player;
 		bool notpredicting=!(player.cheats&CF_PREDICTING);
 
 		//fuck it
-		if (!notpredicting)return;
+		if(!notpredicting)return;
 
 		double defaultheight = FullHeight;
 		double savedheight = Height;
-		if (savedheight==0)savedheight = defaultheight;
-		double crouchspeed = direction * CROUCHSPEED;
+		if(savedheight==0)savedheight=defaultheight;
+		double crouchspeed = direction*CROUCHSPEED;
 		double oldheight = player.viewheight;
-		double grav = getgravity();
-		double onground = player.onground;
+		double grav=getgravity();
+		double onground=player.onground;
 
-		crouchspeed *= max(
-			(health + 100)*0.6 * strength
-			-(direction==1?overloaded * 3:overloaded * 0.5)
-			-(fatigue > 20?fatigue * 2:fatigue)
+		crouchspeed*=max(
+			(health+100)*0.6*strength
+			-(direction==1?overloaded*3:overloaded*0.5)
+			-(fatigue>20?fatigue*2:fatigue)
 			-((stunned&&direction==1)?80:0)
-			, 20
+			,20
 		)*0.01;
 
-		player.crouchdir = direction;
-		player.crouchfactor += crouchspeed;
+		player.crouchdir=direction;
+		player.crouchfactor+=crouchspeed;
 
 		//check whether the move is ok
 		Height = defaultheight * player.crouchfactor;
 
-		if (!TryMove(Pos.XY, false, NULL)){
+		if(!TryMove(Pos.XY, false, NULL)){
 			Height = savedheight;
 			if (direction > 0){
 				// doesn't fit
 				player.crouchfactor -= crouchspeed;
 				return;
 			}
-		}else if (notpredicting){
-			if (!(level.time%10))fatigue++;
-			bool goingup = direction > 0;
+		}else if(notpredicting){
+			if(!(level.time%10))fatigue++;
+			bool goingup=direction>0;
 
 			//retract into your centre not just down
-			if (!onground){
-				addz((savedheight - Height)*0.5);
+			if(!onground){
+				addz((savedheight-Height)*0.5);
 			}
 		}
 		Height = savedheight;
@@ -109,10 +109,10 @@ extend class HDPlayerPawn{
 		player.viewheight = ViewHeight * player.crouchfactor;
 		player.crouchviewdelta = player.viewheight - ViewHeight;
 
-		// Check for eyes going above / below fake floor due to crouching motion.
+		// Check for eyes going above/below fake floor due to crouching motion.
 		CheckFakeFloorTriggers(pos.Z + oldheight, true);
 
-		if (notpredicting)gunbraced = false;
+		if(notpredicting)gunbraced=false;
 	}
 
 	double realpitch;
@@ -121,44 +121,44 @@ extend class HDPlayerPawn{
 
 	override void MovePlayer(){
 		let player = self.player;
-		if (!player)return;
+		if(!player)return;
 		UserCmd cmd = player.cmd;
 		bool notpredicting = !(player.cheats & CF_PREDICTING);
 
 		//update lastpitch and lastangle if teleported
-		if (teleported){
-			lastpitch = pitch;
-			lastangle = angle;
+		if(teleported){
+			lastpitch=pitch;
+			lastangle=angle;
 		}
 
 		//cache cvars as necessary
-		if (!hd_nozoomlean)cachecvars();
+		if(!hd_nozoomlean)cachecvars();
 
 
 		//set up leaning
-		int leanmove = 0;
-		double leanamt = leaned?(10./(3 + overloaded)):0;
-		if (notpredicting){
-			if (
+		int leanmove=0;
+		double leanamt=leaned?(10./(3+overloaded)):0;
+		if(notpredicting){
+			if(
 				hdweapon(player.readyweapon)
 			){
-				leanamt *= 8./max(8., hdweapon(player.readyweapon).gunmass());
+				leanamt*=8./max(8.,hdweapon(player.readyweapon).gunmass());
 			}
-			if (
+			if(
 				cmdleanmove&HDCMD_LEFT
 				&&(
-					leaned <= 0
+					leaned<=0
 					||cmdleanmove&HDCMD_RIGHT
 				)
 			)leanmove--;
-			if (
+			if(
 				cmdleanmove&HDCMD_RIGHT
 				&&(
-					leaned >= 0
+					leaned>=0
 					||cmdleanmove&HDCMD_LEFT
 				)
 			)leanmove++;
-			if (
+			if(
 				!leanmove
 				&&(
 					cmdleanmove&HDCMD_STRAFE
@@ -168,131 +168,131 @@ extend class HDPlayerPawn{
 					)
 				)
 			){
-				if (cmd.sidemove < 0&&leaned <= 0)leanmove--;
-				if (cmd.sidemove > 0&&leaned >= 0)leanmove++;
-				cmd.sidemove = 0;
+				if(cmd.sidemove<0&&leaned<=0)leanmove--;
+				if(cmd.sidemove>0&&leaned>=0)leanmove++;
+				cmd.sidemove=0;
 			}
 		}
 
 
-		TurnCheck(notpredicting, player.readyweapon);
+		TurnCheck(notpredicting,player.readyweapon);
 
 
 
 		player.onground = (pos.z <= floorz) || bOnMobj || bMBFBouncer || (player.cheats & CF_NOCLIP2);
 
-		// killough 10 / 98:
+		// killough 10/98:
 		//
 		// We must apply thrust to the player and bobbing separately, to avoid
 		// anomalies. The thrust applied to bobbing is always the same strength on
 		// ice, because the player still "works just as hard" to move, while the
 		// thrust applied to the movement varies with 'movefactor'.
 
-		if (
+		if(
 			!movehijacked
 			&&(cmd.forwardmove||cmd.sidemove||leanmove)
 		){
-			double forwardmove = 0;double sidemove = 0;
-			double bobfactor = 0;
-			double friction = 0;double movefactor = 0;
-			double fm = 0;double sm = 0;
+			double forwardmove=0;double sidemove=0;
+			double bobfactor=0;
+			double friction=0;double movefactor=0;
+			double fm=0;double sm=0;
 
 			[friction, movefactor] = GetFriction();
-			bobfactor = heightmult*(friction < ORIG_FRICTION ? movefactor : ORIG_FRICTION_FACTOR);
+			bobfactor = heightmult*(friction<ORIG_FRICTION ? movefactor : ORIG_FRICTION_FACTOR);
 
 			//bobbing adjustments
-			if (stunned)bobfactor *= 4.;
-			else if (cansprint && runwalksprint > 0)bobfactor *= 1.6;
-			else if (runwalksprint < 0||mustwalk){
-				if (player.crouchfactor==1)bobfactor *= 0.4;
-				else bobfactor *= 0.7;
+			if(stunned)bobfactor*=4.;
+			else if(cansprint && runwalksprint>0)bobfactor*=1.6;
+			else if(runwalksprint<0||mustwalk){
+				if(player.crouchfactor==1)bobfactor*=0.4;
+				else bobfactor*=0.7;
 			}
 
-			if (!player.onground && !bNoGravity && !waterlevel){
+			if(!player.onground && !bNoGravity && !waterlevel){
 				// [RH] allow very limited movement if not on ground.
-				movefactor *= level.aircontrol;
-				bobfactor *= level.aircontrol;
+				movefactor*=level.aircontrol;
+				bobfactor*=level.aircontrol;
 			}
 
-			//"override double, double TweakSpeeds()"...
-			double basespeed = speed * 12.;
-			if (cmd.forwardmove){
-				fm = basespeed;
-				if (cmd.forwardmove < 0)fm*=-0.8;
+			//"override double,double TweakSpeeds()"...
+			double basespeed=speed*12.;
+			if(cmd.forwardmove){
+				fm=basespeed;
+				if(cmd.forwardmove<0)fm*=-0.8;
 			}
-			if (cmd.sidemove > 0)sm = basespeed;
-			else if (cmd.sidemove < 0)sm=-basespeed;
-			if (!player.morphTics){
-				double factor = 1.;
-				for(let it = Inv;it;it = it.Inv){
+			if(cmd.sidemove>0)sm=basespeed;
+			else if(cmd.sidemove<0)sm=-basespeed;
+			if(!player.morphTics){
+				double factor=1.;
+				for(let it=Inv;it;it=it.Inv){
 					factor *= it.GetSpeedFactor();
 				}
-				fm *= factor;
-				sm *= factor;
+				fm*=factor;
+				sm*=factor;
 			}
 
-			// When crouching, speed <s > and bobbing</s> have to be reduced
-			if (CanCrouch() && player.crouchfactor != 1 && runwalksprint >= 0){
+			// When crouching, speed <s>and bobbing</s> have to be reduced
+			if(CanCrouch() && player.crouchfactor != 1 && runwalksprint>=0){
 				fm *= player.crouchfactor;
 				sm *= player.crouchfactor;
 			}
 
-			if (fm&&sm)movefactor *= HDCONST_ONEOVERSQRTTWO;
+			if(fm&&sm)movefactor*=HDCONST_ONEOVERSQRTTWO;
 
-			if (heightmult&&heightmult != 1)movefactor /= heightmult;
+			if(heightmult&&heightmult!=1)movefactor/=heightmult;
 
 			//So far we'll stick with modelling people who can still walk.
 			//Mobility aids may be added later.
 			//What is a wheelchair but an unarmoured mech?
-			if (
-				strength > 1.
-				||runwalksprint >= 0
-			)movefactor*=(0.3 * strength + 0.7);
+			if(
+				strength>1.
+				||runwalksprint>=0
+			)movefactor*=(0.3*strength+0.7);
 
-			if (!canmovelegs)movefactor *= 0.1;
+			if(!canmovelegs)movefactor*=0.1;
 
 			forwardmove = fm * movefactor * (35 / TICRATE);
 			sidemove = sm * movefactor * (35 / TICRATE);
 
-			if (forwardmove){
+			if(forwardmove){
 				Bob(Angle, cmd.forwardmove * bobfactor / 256., true);
 				ForwardThrust(forwardmove, Angle);
 			}
-			if (sidemove){
+			if(sidemove){
 				let a = Angle - 90;
 				Bob(a, cmd.sidemove * bobfactor / 256., false);
 				Thrust(sidemove, a);
 			}
-			if (
+			if(
 				leanmove
 				&&notpredicting
 				&&!isfrozen()
 			){
-				bool zrk = HDZerk.IsZerk(self);
-				bool poscmd = leanmove > 0;
+				bool zrk=HDZerk.IsZerk(self);
+				bool poscmd=leanmove>0;
 				let a = Angle - 90;
-				leaned = clamp(poscmd?leaned + 1:leaned - 1, -8, 8);
-				if (zrk){
-					leaned = clamp(poscmd?leaned + 1:leaned - 1, -8, 8);
-					leanamt *= 2;
+				leaned=clamp(poscmd?leaned+1:leaned-1,-8,8);
+				if(zrk){
+					leaned=clamp(poscmd?leaned+1:leaned-1,-8,8);
+					leanamt*=2;
 				}
-				if (!poscmd)leanamt=-leanamt;
-				if (abs(leaned)<8){
+				if(!poscmd)leanamt=-leanamt;
+				if(abs(leaned)<8){
 					TryMove(
-						pos.xy+(cos(a), sin(a))*leanamt, 
+						pos.xy+(cos(a),sin(a))*leanamt,
 						false
 					);
 				}
 			}
 
-			if (
+			if(
 				notpredicting
 				&&(forwardmove||sidemove)
 			){
 				PlayRunning();
 			}
 
-			if (player.cheats & CF_REVERTPLEASE){
+			if(player.cheats & CF_REVERTPLEASE){
 				player.cheats &= ~CF_REVERTPLEASE;
 				player.camera = player.mo;
 			}
@@ -303,36 +303,36 @@ extend class HDPlayerPawn{
 
 
 		//undo leaning
-		if (notpredicting){
-			if (!leanmove&&leaned){
-				let a = angle + 90;
-				if (leaned > 0)leaned--;
-				else if (leaned < 0){
+		if(notpredicting){
+			if(!leanmove&&leaned){
+				let a=angle+90;
+				if(leaned>0)leaned--;
+				else if(leaned<0){
 					leaned++;
 					leanamt=-leanamt;
 				}
 				TryMove(
-					pos.xy+(cos(a), sin(a))*leanamt, 
+					pos.xy+(cos(a),sin(a))*leanamt,
 					false
 				);
 			}
-			toroll=(leaned > 0?leaned:-leaned)*leanamt;
+			toroll=(leaned>0?leaned:-leaned)*leanamt;
 		}
 
 
 		//turn view roll upside down to conform to movement roll
-		double arp = abs(realpitch);
-		if (
-			arp <= 270
-			&&arp > 90
-		)toroll = 180;
-		else if (roll==180)toroll = 0;
+		double arp=abs(realpitch);
+		if(
+			arp<=270
+			&&arp>90
+		)toroll=180;
+		else if(roll==180)toroll=0;
 
-		if (toroll!=-999)A_SetRoll(toroll, SPF_INTERPOLATE);
+		if(toroll!=-999)A_SetRoll(toroll,SPF_INTERPOLATE);
 
 
 		//if done in ticker, fails to show difference during TurnCheck
-		lastvel = vel;
+		lastvel=vel;
 	}
 	int leaned;
 	int cmdleanmove;
@@ -340,158 +340,158 @@ extend class HDPlayerPawn{
 
 
 	//rolling
-	const HDCONST_ROLLMAXSTEPHEIGHT = 5.;
+	const HDCONST_ROLLMAXSTEPHEIGHT=5.;
 	void RollCheck(){
-		if (
+		if(
 			fallroll
 			||(
 				abs(realpitch)>=90
 				&&abs(realpitch)<=270
 			)
 		){
-			lastpitch = pitch;
-			lastangle = roll==180?(normalize180(angle + 180)):angle;
-			feetangle = lastangle;
-			stunned = max(stunned, 15);
-			totallyblocked = true;
-			double chenc = max(0, overloaded);
-			double invchenc = max(0.3, 2.0 - chenc)*clamp(abs(fallroll >> 5), 1, 20);
-			double addrealpitch = clamp(abs(fallroll) + frandom(-4, 3)*chenc, 10, 50);
-			vector2 rollpush=(cos(angle), sin(angle))*invchenc * 0.3;
-			player.crouchfactor = max(player.crouchfactor - 0.3, 0.5);
-			player.crouching = min(player.crouching, 0);
-			maxstepheight = heightmult * HDCONST_ROLLMAXSTEPHEIGHT;
-			if (!(fallroll&(1|2|4)))fatigue++;
+			lastpitch=pitch;
+			lastangle=roll==180?(normalize180(angle+180)):angle;
+			feetangle=lastangle;
+			stunned=max(stunned,15);
+			totallyblocked=true;
+			double chenc=max(0,overloaded);
+			double invchenc=max(0.3,2.0-chenc)*clamp(abs(fallroll>>5),1,20);
+			double addrealpitch=clamp(abs(fallroll)+frandom(-4,3)*chenc,10,50);
+			vector2 rollpush=(cos(angle),sin(angle))*invchenc*0.3;
+			player.crouchfactor=max(player.crouchfactor-0.3,0.5);
+			player.crouching=min(player.crouching,0);
+			maxstepheight=heightmult*HDCONST_ROLLMAXSTEPHEIGHT;
+			if(!(fallroll&(1|2|4)))fatigue++;
 
 			//limit rolls against geometry
-			vector2 testrp=(fallroll > 0?2:-2)*rollpush;
-			bool blocked=!checkmove(pos.xy + testrp);
-			if (
-				testrp==(0, 0)
+			vector2 testrp=(fallroll>0?2:-2)*rollpush;
+			bool blocked=!checkmove(pos.xy+testrp);
+			if(
+				testrp==(0,0)
 				||blocked
 				||(
 					//actually blocked but the checkmove didn't pick it up
-					vel.xy==(0, 0)
-					&&lastvel.xy!=(0, 0)
+					vel.xy==(0,0)
+					&&lastvel.xy!=(0,0)
 					&&fallroll
 				)
 			){
-				if (blocked)vel.z += abs(fallroll * 0.06);
-				fallroll = clamp(fallroll, -10, 10);
+				if(blocked)vel.z+=abs(fallroll*0.06);
+				fallroll=clamp(fallroll,-10,10);
 			}
 
-			//[MC 2021 - 07 - 13] as of 4.6.0 there is an unavoidable flicker
+			//[MC 2021-07-13] as of 4.6.0 there is an unavoidable flicker
 			//as some interpolation is forced onto the 180 turn.
 			//I am neither able to locate the source in HD nor replicate it
 			//outside of HD. This may be related to the interpolation that
 			//is being overhauled after 4.6.0 so I don't want to try too hard
 			//to work around it.
-			//[MC 2021 - 07 - 13] Solution 1: do not interpolate pitch while rolling.
+			//[MC 2021-07-13] Solution 1: do not interpolate pitch while rolling.
 			//Solution 2: add a tiny angle change each flip.
 			// Note re: 2: the +- direction is IMPORTANT. I have no idea why.
 
 			let didRoll = fallroll;
-			if (fallroll > 0){
+			if(fallroll>0){
 				fallroll--;
-				realpitch += addrealpitch;
-				if (realpitch > 270){
-					realpitch = realpitch - 360;
-					angle = normalize180(angle + 180);
-					roll = 0;
+				realpitch+=addrealpitch;
+				if(realpitch>270){
+					realpitch=realpitch-360;
+					angle=normalize180(angle+180);
+					roll=0;
 				}
-				if (realpitch > 90){
-					if (oldrealpitch <= 90){
-						angle = normalize180(angle + 180);
-						roll = 180;
+				if(realpitch>90){
+					if(oldrealpitch<=90){
+						angle=normalize180(angle+180);
+						roll=180;
 					}
 					rollpush=-rollpush;
 
-					A_SetPitch(normalize180(-realpitch + 180), SPF_INTERPOLATE);
-					A_SetAngle(normalize180(angle + 0.0001), SPF_INTERPOLATE);  //see above note
+					A_SetPitch(normalize180(-realpitch+180),SPF_INTERPOLATE);
+					A_SetAngle(normalize180(angle+0.0001),SPF_INTERPOLATE);  //see above note
 
-					fallroll = max(fallroll, 5);
+					fallroll=max(fallroll,5);
 				}else{
-					A_SetPitch(normalize180(realpitch), SPF_INTERPOLATE);
-					A_SetAngle(normalize180(angle - 0.0001), SPF_INTERPOLATE);  //see above note
+					A_SetPitch(normalize180(realpitch),SPF_INTERPOLATE);
+					A_SetAngle(normalize180(angle-0.0001),SPF_INTERPOLATE);  //see above note
 
 					//try to face forwards not up
-					if (
+					if(
 						!fallroll
-						&&realpitch < 0
+						&&realpitch<0
 					){
-						player.crouching = player.crouchdir; //reset to normal
-						double aac=-realpitch * 0.18;
-						muzzleclimb1.y += aac;
-						muzzleclimb2.y += aac;
-						muzzleclimb3.y += aac;
-						muzzleclimb4.y += aac;
+						player.crouching=player.crouchdir; //reset to normal
+						double aac=-realpitch*0.18;
+						muzzleclimb1.y+=aac;
+						muzzleclimb2.y+=aac;
+						muzzleclimb3.y+=aac;
+						muzzleclimb4.y+=aac;
 					}
 				}
-			}else if (fallroll < 0){
+			}else if(fallroll<0){
 				fallroll++;
-				realpitch -= addrealpitch;
-				if (realpitch<=-270){
-					realpitch = realpitch + 360;
-					angle = normalize180(angle + 180);
-					roll = 0;
+				realpitch-=addrealpitch;
+				if(realpitch<=-270){
+					realpitch=realpitch+360;
+					angle=normalize180(angle+180);
+					roll=0;
 				}
-				if (realpitch<-90){
-					if (oldrealpitch>=-90){
-						angle = normalize180(angle + 180);
-						roll = 180;
+				if(realpitch<-90){
+					if(oldrealpitch>=-90){
+						angle=normalize180(angle+180);
+						roll=180;
 					}
 
-					A_SetPitch(normalize180(-realpitch - 180), SPF_INTERPOLATE);
-					A_SetAngle(normalize180(angle - 0.0001), SPF_INTERPOLATE);  //see above note
+					A_SetPitch(normalize180(-realpitch-180),SPF_INTERPOLATE);
+					A_SetAngle(normalize180(angle-0.0001),SPF_INTERPOLATE);  //see above note
 
-					fallroll = min(fallroll, -5);
+					fallroll=min(fallroll,-5);
 				}else{
 					rollpush=-rollpush;
 
-					A_SetPitch(normalize180(realpitch), SPF_INTERPOLATE);
-					A_SetAngle(normalize180(angle + 0.0001), SPF_INTERPOLATE);  //see above note
+					A_SetPitch(normalize180(realpitch),SPF_INTERPOLATE);
+					A_SetAngle(normalize180(angle+0.0001),SPF_INTERPOLATE);  //see above note
 
 					//try to face forwards not down
-					if (
+					if(
 						!fallroll
-						&&realpitch > 0
+						&&realpitch>0
 					){
-						player.crouching = player.crouchdir; //reset to normal
-						double aac=-realpitch * 0.1;
-						muzzleclimb1.y += aac;
-						muzzleclimb2.y += aac;
-						muzzleclimb3.y += aac;
-						muzzleclimb4.y += aac;
+						player.crouching=player.crouchdir; //reset to normal
+						double aac=-realpitch*0.1;
+						muzzleclimb1.y+=aac;
+						muzzleclimb2.y+=aac;
+						muzzleclimb3.y+=aac;
+						muzzleclimb4.y+=aac;
 					}
 				}
 			}
 
 			// reset angles after all other thinkers tick
-			if (didRoll)new('HDGrossImmerseCompatHack').Init(self);
+			if(didRoll)new('HDGrossImmerseCompatHack').Init(self);
 
 			//fumble weapon
-			let hdw = hdweapon(player.readyweapon);
-			if (
+			let hdw=hdweapon(player.readyweapon);
+			if(
 				hdw
 				&&hdw.bweaponbusy
-				&&!random(0, 40)
+				&&!random(0,40)
 			)Disarm(self);
 
-			oldrealpitch = realpitch;
-			if (
-				realpitch <= 90
+			oldrealpitch=realpitch;
+			if(
+				realpitch<=90
 				&&realpitch>=-90
-			)realpitch = pitch;
+			)realpitch=pitch;
 
-			if (player.onground){
-				vel.xy += rollpush;
-				A_SetInventory("HDFireDouse", CountInv("HDFireDouse")
-					+random(1, CheckLiquidTexture()?5:2)
+			if(player.onground){
+				vel.xy+=rollpush;
+				A_SetInventory("HDFireDouse",countinv("HDFireDouse")
+					+random(1,CheckLiquidTexture()?5:2)
 				);
 			}
 			return;
 		}else{
-			fallroll = 0;
+			fallroll=0;
 		}
 	}
 }
@@ -525,27 +525,27 @@ class HDGrossImmerseCompatHack : Thinker{
 
 extend class HDHandlers{
 	//handler for receiving direct button lean input
-	void Lean(HDPlayerPawn ppp, int dir){
-		if (!ppp.player)return;
-		int cmdleanmove = ppp.cmdleanmove;
-		if (dir==999){
+	void Lean(hdplayerpawn ppp,int dir){
+		if(!ppp.player)return;
+		int cmdleanmove=ppp.cmdleanmove;
+		if(dir==999){
 			cmdleanmove|=HDCMD_STRAFE;
-		}else if (dir==99){
+		}else if(dir==99){
 			cmdleanmove&=~HDCMD_RIGHT;
-		}else if (dir==-99){
+		}else if(dir==-99){
 			cmdleanmove&=~HDCMD_LEFT;
-		}else if (dir==1){
+		}else if(dir==1){
 			cmdleanmove|=HDCMD_RIGHT;
-		}else if (dir==-1){
+		}else if(dir==-1){
 			cmdleanmove|=HDCMD_LEFT;
-		}else cmdleanmove = 0;
-		ppp.cmdleanmove = cmdleanmove;
+		}else cmdleanmove=0;
+		ppp.cmdleanmove=cmdleanmove;
 	}
 }
 enum leanmovecmd{
-	HDCMD_STRAFE = 1, 
-	HDCMD_LEFT = 2, 
-	HDCMD_RIGHT = 4, 
+	HDCMD_STRAFE=1,
+	HDCMD_LEFT=2,
+	HDCMD_RIGHT=4,
 }
 
 

@@ -3,7 +3,7 @@
 // ------------------------------------------------------------
 const HDMUGSHOT_DEFAULT="*";
 extend class HDWeapon{
-	action void A_PlaySkinSound(int which, sound fallback, int channel = CHAN_VOICE, int flags = 0){
+	action void A_PlaySkinSound(int which,sound fallback,int channel=CHAN_VOICE,int flags=0){
 		HDPlayerPawn.PlaySkinSound(self, which, fallback, channel, flags);
 	}
 }
@@ -14,62 +14,62 @@ extend class HDPlayerPawn{
 	int fistsprite;
 	vector2 skinscale;
 	sound
-		tauntsound, 
-		xdeathsound, 
-		gruntsound, 
-		landsound, 
-		medsound, 
+		tauntsound,
+		xdeathsound,
+		gruntsound,
+		landsound,
+		medsound,
 		gibbedsound;
 		//painsound
 		//deathsound
 
 	enum HDSkinVals{
-		HDSKIN_SPRITE = 0, 
-		HDSKIN_VOICE = 1, 
-		HDSKIN_MUG = 2, 
-		HDSKIN_FIST = 3, 
+		HDSKIN_SPRITE=0,
+		HDSKIN_VOICE=1,
+		HDSKIN_MUG=2,
+		HDSKIN_FIST=3,
 	}
 	//to be called in the ticker
-	void ApplyUserSkin(bool forced = false){
-		if (!player)return;
+	void ApplyUserSkin(bool forced=false){
+		if(!player)return;
 
 		//voodoo dolls don't have direct access to cvars
-		if (player.mo != self)hd_skin = CVar.GetCVar("hd_skin", player);
-		if (!hd_skin)return; //this shouldn't happen
+		if(player.mo!=self)hd_skin=CVar.GetCVar("hd_skin",player);
+		if(!hd_skin)return; //this shouldn't happen
 
 		//apply sprite
-		if (player.crouchfactor < 0.75)sprite = crouchsprite;else sprite = standsprite;
-		if (standsprite==crouchsprite)scale.y = skinscale.y * player.crouchfactor;
+		if(player.crouchfactor<0.75)sprite=crouchsprite;else sprite=standsprite;
+		if(standsprite==crouchsprite)scale.y=skinscale.y*player.crouchfactor;
 
 		//retrieve values from cvar
-		string skinput = hd_skin.getstring();
-		if (!forced&&skinput==lastskin)return;
-		lastskin = skinput;  //update old for future comparisons
+		string skinput=hd_skin.getstring();
+		if(!forced&&skinput==lastskin)return;
+		lastskin=skinput;  //update old for future comparisons
 
-		skinput = skinput.makelower();
-		skinput.replace(" ", "");
-		skinput.replace("none", "");
-		skinput.replace("default", "");
+		skinput=skinput.makelower();
+		skinput.replace(" ","");
+		skinput.replace("none","");
+		skinput.replace("default","");
 
-		array < string> skinname;skinname.clear();
-		skinput.split(skinname, ", ");
+		array<string> skinname;skinname.clear();
+		skinput.split(skinname,",");
 
 		//I'd rather do this than to spam up everything below with null checks
 		while(skinname.size()<4){
 			skinname.push("");
 		}
 
-		class < HDSkin> skinclass="HDSkin";  //initialize default
+		class<HDSkin> skinclass="HDSkin";  //initialize default
 
 		//find an actor class that matches
-		if (skinname[HDSKIN_SPRITE]!=""){
-			for(int i = 0;i < allactorclasses.size();i++){
-				let aac = allactorclasses[i];
-				if (
-					(class < HDSkin>)(aac)
+		if(skinname[HDSKIN_SPRITE]!=""){
+			for(int i=0;i<allactorclasses.size();i++){
+				let aac=allactorclasses[i];
+				if(
+					(class<HDSkin>)(aac)
 					&&aac.getclassname()==skinname[HDSKIN_SPRITE]
 				){
-					skinclass=(class < HDSkin>)(aac);
+					skinclass=(class<HDSkin>)(aac);
 					break;
 				}
 			}
@@ -77,31 +77,31 @@ extend class HDPlayerPawn{
 
 
 		//set the sprites
-		let defskinclass = getdefaultbytype(skinclass);
-		let dds = defskinclass.spawnstate;
-		standsprite = dds.sprite;
-		dds = defskinclass.resolvestate("crouch");
-		crouchsprite = dds.sprite;
-		skinscale = defskinclass.scale;
-		scale = skinscale * heightmult;
-		translation = defskinclass.translate?65536 + playernumber():0;
+		let defskinclass=getdefaultbytype(skinclass);
+		let dds=defskinclass.spawnstate;
+		standsprite=dds.sprite;
+		dds=defskinclass.resolvestate("crouch");
+		crouchsprite=dds.sprite;
+		skinscale=defskinclass.scale;
+		scale=skinscale*heightmult;
+		translation=defskinclass.translate?65536+playernumber():0;
 
 		//set blood colour if different
-		if (defskinclass.bloodcolor != bloodcolor){
-			let aaa = spawn(skinclass, (32000, 32000, 0));
-			if (aaa){
+		if(defskinclass.bloodcolor!=bloodcolor){
+			let aaa=spawn(skinclass,(32000,32000,0));
+			if(aaa){
 				copybloodcolor(aaa);
 				aaa.destroy();
 			}
 		}
 
 		//set the fist sprites
-		if (skinname[HDSKIN_FIST].length()==4)skinname[HDSKIN_FIST]=skinname[HDSKIN_FIST].."A0";
-		fistsprite = getspriteindex(skinname[HDSKIN_FIST]);
-		if (fistsprite < 0){
-			dds = defskinclass.resolvestate("fist");
-			if (dds.sprite==getspriteindex("SHTFA0"))fistsprite=-1;  //this is the default for HDSkin
-			else fistsprite = dds.sprite;
+		if(skinname[HDSKIN_FIST].length()==4)skinname[HDSKIN_FIST]=skinname[HDSKIN_FIST].."A0";
+		fistsprite=getspriteindex(skinname[HDSKIN_FIST]);
+		if(fistsprite<0){
+			dds=defskinclass.resolvestate("fist");
+			if(dds.sprite==getspriteindex("SHTFA0"))fistsprite=-1;  //this is the default for HDSkin
+			else fistsprite=dds.sprite;
 		}
 
 
@@ -110,18 +110,18 @@ extend class HDPlayerPawn{
 		sound testsound="player/"..skinname[HDSKIN_VOICE].."/pain";
 
 		//set the sounds
-		if (
+		if(
 			int(testsound)<=0
 			||skinname[HDSKIN_VOICE]==""
 		){
-			tauntsound = defskinclass.tauntsound;
-			xdeathsound = defskinclass.xdeathsound;
-			gruntsound = defskinclass.gruntsound;
-			landsound = defskinclass.landsound;
-			medsound = defskinclass.medsound;
-			gibbedsound = defskinclass.gibbedsound;
-			deathsound = defskinclass.deathsound;
-			painsound = defskinclass.painsound;
+			tauntsound=defskinclass.tauntsound;
+			xdeathsound=defskinclass.xdeathsound;
+			gruntsound=defskinclass.gruntsound;
+			landsound=defskinclass.landsound;
+			medsound=defskinclass.medsound;
+			gibbedsound=defskinclass.gibbedsound;
+			deathsound=defskinclass.deathsound;
+			painsound=defskinclass.painsound;
 		}else{
 			tauntsound="player/"..skinname[HDSKIN_VOICE].."/taunt";
 			xdeathsound="player/"..skinname[HDSKIN_VOICE].."/xdeath";
@@ -135,68 +135,68 @@ extend class HDPlayerPawn{
 
 
 		//set the mugshot
-		if (
-			TexMan.CheckForTexture(skinname[HDSKIN_MUG].."st00", TexMan.Type_Any).Exists()
-		)mugshot = skinname[HDSKIN_MUG];
-		else if (
-			TexMan.CheckForTexture(defskinclass.mug.."st00", TexMan.Type_Any).Exists()
-		)mugshot = defskinclass.mug;
-		else mugshot = HDMUGSHOT_DEFAULT;
+		if(
+			TexMan.CheckForTexture(skinname[HDSKIN_MUG].."st00",TexMan.Type_Any).Exists()
+		)mugshot=skinname[HDSKIN_MUG];
+		else if(
+			TexMan.CheckForTexture(defskinclass.mug.."st00",TexMan.Type_Any).Exists()
+		)mugshot=defskinclass.mug;
+		else mugshot=HDMUGSHOT_DEFAULT;
 	}
-	static void PlaySkinSound(actor plr, int which, sound fallback, int channel = CHAN_VOICE, int flags = 0){
-		let ppp = HDPlayerPawn(plr);
+	static void PlaySkinSound(actor plr,int which,sound fallback,int channel=CHAN_VOICE,int flags=0){
+		let ppp=hdplayerpawn(plr);
 		sound sss;
-		if (ppp)switch(which){
-		case SKINSOUND_TAUNT:sss = ppp.tauntsound;break;
-		case SKINSOUND_XDEATH:sss = ppp.xdeathsound;break;
-		case SKINSOUND_GRUNT:sss = ppp.gruntsound;break;
-		case SKINSOUND_LAND:sss = ppp.landsound;break;
-		case SKINSOUND_MEDS:sss = ppp.medsound;break;
-		case SKINSOUND_GIBBED:sss = ppp.gibbedsound;break;
+		if(ppp)switch(which){
+		case SKINSOUND_TAUNT:sss=ppp.tauntsound;break;
+		case SKINSOUND_XDEATH:sss=ppp.xdeathsound;break;
+		case SKINSOUND_GRUNT:sss=ppp.gruntsound;break;
+		case SKINSOUND_LAND:sss=ppp.landsound;break;
+		case SKINSOUND_MEDS:sss=ppp.medsound;break;
+		case SKINSOUND_GIBBED:sss=ppp.gibbedsound;break;
 		default:return;
 		}
-		else sss = fallback;
-		plr.A_StartSound(sss, channel, flags);
+		else sss=fallback;
+		plr.A_StartSound(sss,channel,flags);
 	}
 }
 
 enum skinsoundtype{
-	SKINSOUND_TAUNT, 
-	SKINSOUND_XDEATH, 
-	SKINSOUND_GRUNT, 
-	SKINSOUND_LAND, 
-	SKINSOUND_MEDS, 
-	SKINSOUND_GIBBED, 
+	SKINSOUND_TAUNT,
+	SKINSOUND_XDEATH,
+	SKINSOUND_GRUNT,
+	SKINSOUND_LAND,
+	SKINSOUND_MEDS,
+	SKINSOUND_GIBBED,
 };
 
 extend class HDHandlers{
-	void ShowSkins(HDPlayerPawn ppp){
-		string bbb="\ccSyntax:  \cdhd_skin skinclass, soundclass, mug, fist\cc\nAvailable player skins (classname, soundclass (if any), mugshot (if any)):\cg";
-		for(int i = 0;i < allactorclasses.size();i++){
-			if (
+	void ShowSkins(hdplayerpawn ppp){
+		string bbb="\ccSyntax:  \cdhd_skin skinclass,soundclass,mug,fist\cc\nAvailable player skins (classname, soundclass (if any), mugshot (if any)):\cg";
+		for(int i=0;i<allactorclasses.size();i++){
+			if(
 				allactorclasses[i] is "HDSkin"
 				&&allactorclasses[i]!="HDSkin"
 			){
-				let aac = getdefaultbytype((class < hdskin>)(allactorclasses[i]));
-				bbb = bbb.."\n  "..aac.getclassname()
+				let aac=getdefaultbytype((class<hdskin>)(allactorclasses[i]));
+				bbb=bbb.."\n  "..aac.getclassname()
 				.."  "..aac.soundclass
 				.."  "..aac.mug;
 				
 			}
 		}
-		bbb = bbb.."\cc\nType  '\cdhd_skin \"\"\cc' in the console to reset.";
-		ppp.A_Log(bbb, true);
+		bbb=bbb.."\cc\nType  '\cdhd_skin \"\"\cc' in the console to reset.";
+		ppp.A_Log(bbb,true);
 	}
 }
 
 //base skin actor
 class HDSkin:Actor{
 	sound
-		tauntsound, 
-		xdeathsound, 
-		gruntsound, 
-		landsound, 
-		medsound, 
+		tauntsound,
+		xdeathsound,
+		gruntsound,
+		landsound,
+		medsound,
 		gibbedsound;
 	property tauntsound:tauntsound;
 	property xdeathsound:xdeathsound;
@@ -235,14 +235,14 @@ class HDSkin:Actor{
 //test
 class HDTestSkin:HDSkin{
 	default{
-		hdskin.tauntsound "grunt / sight";
-		hdskin.xdeathsound "grunt / death3";
-		hdskin.gruntsound "grunt / active";
-		hdskin.landsound "player / hdguy / land";
-		hdskin.medsound "grunt / pain";
-		hdskin.gibbedsound "player / hdguy / taunt";//"misc / gibbed";
-		deathsound "grunt / death";
-		painsound "grunt / pain";
+		hdskin.tauntsound "grunt/sight";
+		hdskin.xdeathsound "grunt/death3";
+		hdskin.gruntsound "grunt/active";
+		hdskin.landsound "player/hdguy/land";
+		hdskin.medsound "grunt/pain";
+		hdskin.gibbedsound "player/hdguy/taunt";//"misc/gibbed";
+		deathsound "grunt/death";
+		painsound "grunt/pain";
 		hdskin.mug "STC";
 		bloodcolor "ff cc 22";
 xscale 0.4;
@@ -261,15 +261,15 @@ yscale 1.3;
 //assets not included
 class HDQuakeSkin:HDSkin{
 	default{
-		hdskin.tauntsound "player / quakeguy / taunt";
-		hdskin.xdeathsound "player / quakeguy / xdeath";
-		hdskin.gruntsound "player / quakeguy / grunt";
-		hdskin.landsound "player / quakeguy / land";
-		hdskin.medsound "player / quakeguy / meds";
-		hdskin.gibbedsound "player / quakeguy / gibbed";
+		hdskin.tauntsound "player/quakeguy/taunt";
+		hdskin.xdeathsound "player/quakeguy/xdeath";
+		hdskin.gruntsound "player/quakeguy/grunt";
+		hdskin.landsound "player/quakeguy/land";
+		hdskin.medsound "player/quakeguy/meds";
+		hdskin.gibbedsound "player/quakeguy/gibbed";
 		hdskin.soundclass "quakeguy";
-		deathsound "player / quakeguy / death";
-		painsound "player / quakeguy / pain";
+		deathsound "player/quakeguy/death";
+		painsound "player/quakeguy/pain";
 		//hdskin.mug "QGF";
 	}
 	states{
@@ -280,13 +280,13 @@ class HDQuakeSkin:HDSkin{
 }
 
 //and a SNDINFO
-player / quakeguy / taunt   dstauntm
-player / quakeguy / xdeath  dsqdiehi
-player / quakeguy / grunt   dsqnoway
-player / quakeguy / land    dsland
-player / quakeguy / meds    dsqpain
-player / quakeguy / gibbed  dsqgib
-player / quakeguy / death   dsqdeth
-player / quakeguy / pain    dsqpain
+player/quakeguy/taunt   dstauntm
+player/quakeguy/xdeath  dsqdiehi
+player/quakeguy/grunt   dsqnoway
+player/quakeguy/land    dsland
+player/quakeguy/meds    dsqpain
+player/quakeguy/gibbed  dsqgib
+player/quakeguy/death   dsqdeth
+player/quakeguy/pain    dsqpain
 */
 
