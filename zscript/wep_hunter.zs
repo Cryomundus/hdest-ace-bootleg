@@ -16,7 +16,7 @@ class Hunter:HDShotgun{
 		inventory.pickupmessage "You got the pump-action shotgun!";
 		hdweapon.barrelsize 30,0.5,2;
 		hdweapon.refid HDLD_HUNTER;
-		tag "$TAG_HUNTER";
+		tag "hunter";
 		obituary "$OB_MPSHOTGUN";
 
 		hdweapon.loadoutcodes "
