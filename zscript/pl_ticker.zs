@@ -118,7 +118,12 @@ extend class HDPlayerPawn{
 		if(!player.readyweapon)A_SelectWeapon("HDFist");
 
 		//gross hack, but i have no way of telling when a savegame is being loaded
-		if(!countinv("PortableLiteAmp"))Shader.SetEnabled(player,"NiteVis",false);
+		if(
+			player
+			&&player.mo
+			&&player==players[consoleplayer]
+			&&!countinv("PortableLiteAmp")
+		)PPShader.SetEnabled("NiteVis",false);
 
 		//same thing with scope camera
 		if(!scopecamera)scopecamera=spawn("ScopeCamera",pos,ALLOW_REPLACE);

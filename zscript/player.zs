@@ -387,6 +387,7 @@ extend class HDPlayerPawn{
 		gunbraced=false;
 
 		GiveBasics();
+		GetOverlayGivers(OverlayGivers);
 
 		A_WeaponOffset(0,30); //reset the weaponoffset so weapon floatiness in playerturn works after level change
 
@@ -404,9 +405,12 @@ extend class HDPlayerPawn{
 			&&cvar.getcvar("hd_consolidate",player).getbool()
 		)ConsolidateAmmo();
 
-		if(player){
+		if(
+			player
+			&&player.mo
+			&&player==players[consoleplayer]
+		){
 			Shader.SetEnabled(player,"NiteVis",false);
-			Shader.SetEnabled(player,"NiteVisRed",false);
 			if(getage()>10)showgametip();
 		}
 	}

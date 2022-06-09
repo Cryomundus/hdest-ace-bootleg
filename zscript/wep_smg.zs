@@ -211,7 +211,7 @@ class HDSMG:HDWeapon{
 		#### A 1;
 		#### A 0{
 			if(invoker.weaponstatus[SMGS_CHAMBER]==1){
-				A_EjectCasing("HDSpent9mm",11,-frandom(79,81),frandom(7,7.5));
+				A_EjectCasing("HDSpent9mm",12,frandom(-1,2),frandom(0.2,0.3),frandom(0,0.2),spawnsidespeed:-frandom(7,7.5));
 				invoker.weaponstatus[SMGS_CHAMBER]=0;
 			}
 			if(invoker.weaponstatus[SMGS_MAG]>0){

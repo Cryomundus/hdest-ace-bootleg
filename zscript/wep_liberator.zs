@@ -473,7 +473,8 @@ class LiberatorRifle:AutoReloadingThingy{
 		if(invoker.weaponstatus[LIBS_CHAMBER]==1){
 			if(invoker.weaponstatus[0]&LIBF_NOBULLPUP){
 				bool lefty=invoker.weaponstatus[0]&LIBF_LEFTY;
-				brsss=A_EjectCasing("HDSpent7mm",11,(lefty?1:-1)*frandom(34,42),frandom(5,5.5));
+				int lll=(lefty?1:-1);
+				brsss=A_EjectCasing("HDSpent7mm",11,lll,frandom(5,5.5),frandom(0,0.1),spawnsidespeed:frandom(0,2*lll));
 				brsss.bseesdaggers=lefty;
 				brsss.vel+=vel;
 				brsss.A_StartSound(brsss.bouncesound,volume:0.4);

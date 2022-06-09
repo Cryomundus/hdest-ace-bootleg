@@ -30,7 +30,7 @@ class GrabThinker:Thinker{
 		if(ticker<4){
 			pickobj.setorigin(
 				0.5*(
-					(picktarget.pos+(0,0,picktarget.height*0.8))
+					(picktarget.pos.xy,picktarget.pos.z+picktarget.height*0.8)
 					+pickobj.pos
 				),true
 			);
@@ -447,6 +447,29 @@ class HDPickup:CustomInventory{
 		}
 	}
 
+	bool IsConsolePlayer(){
+		return
+			owner
+			&&owner.player
+			&&owner.player.mo
+			&&owner.player==players[consoleplayer]
+		;
+	}
+	void SetShader(string shaderName,bool enabled){
+		if(IsConsolePlayer())PPShader.SetEnabled(shaderName,enabled);
+	}
+	void SetShaderU1f(string shaderName,string uniformName,float value){
+		if(IsConsolePlayer())PPShader.SetUniform1f(shaderName,uniformName,value);
+	}
+	void SetShaderU2f(string shaderName,string uniformName,vector2 value){
+		if(IsConsolePlayer())PPShader.SetUniform2f(shaderName,uniformName,value);
+	}
+	void SetShaderU3f(string shaderName,string uniformName,vector3 value){
+		if(IsConsolePlayer())PPShader.SetUniform3f(shaderName,uniformName,value);
+	}
+	void SetShaderU1i(string shaderName,string uniformName,int value){
+		if(IsConsolePlayer())PPShader.SetUniform1i(shaderName,uniformName,value);
+	}
 
 	//for the status bar
 	virtual ui int getsbarnum(int flags=0){return -1000000;}

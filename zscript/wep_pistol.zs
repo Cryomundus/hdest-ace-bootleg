@@ -228,9 +228,9 @@ class HDPistol:HDHandgun replaces Pistol{
 			int psch=invoker.weaponstatus[PISS_CHAMBER];
 			invoker.weaponstatus[PISS_CHAMBER]=0;
 			if(psch==2){
-				A_EjectCasing("HDPistolAmmo",12,-frandom(89,92),frandom(2,3),frandom(0,0.5));
+				A_EjectCasing("HDPistolAmmo",12,frandom(-1,2),frandom(0,0.2),frandom(0.4,0.5),spawnsidespeed:-frandom(2,3));
 			}else if(psch==1){
-				A_EjectCasing("HDSpent9mm",12,-frandom(89,92),frandom(6,7),frandom(0,1));
+				A_EjectCasing("HDSpent9mm",12,-random(-1,2),frandom(0.4,0.7),frandom(0.8,1),spawnsidespeed:-frandom(6,7));
 			}
 			if(invoker.weaponstatus[PISS_MAG]>0){
 				invoker.weaponstatus[PISS_CHAMBER]=2;
@@ -262,7 +262,7 @@ class HDPistol:HDHandgun replaces Pistol{
 			);
 		}
 		#### C 0{
-			A_EjectCasing("HDSpent9mm",12,-frandom(89,92),frandom(6,7),frandom(0,1));
+			A_EjectCasing("HDSpent9mm",12,frandom(-1,2),frandom(0.4,0.7),frandom(0.8,1),spawnsidespeed:-frandom(6,7));
 			invoker.weaponstatus[PISS_CHAMBER]=0;
 			if(invoker.weaponstatus[PISS_MAG]<1){
 				A_StartSound("weapons/pistoldry",8,CHANF_OVERLAP,0.9);

@@ -449,24 +449,18 @@ class BossRifle:HDWeapon{
 		BARG D 2 offset(6,42){
 			//eject
 			int chm=invoker.weaponstatus[BOSSS_CHAMBER];
+			class<actor> rndtp=chm==1?"HDSpent7mm":"HDLoose7mm";
 			double cp=cos(pitch);
 			double sp=sin(pitch);
-			if(chm>1){
-				A_SpawnItemEx(
-					"HDLoose7mm",cp*8,1,height-7-sp*8,
-					cp*cos(angle-80)*4+vel.x,
-					cp*sin(angle-80)*4+vel.y,
-					-sp*4+vel.z,
-					0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-				);
-			}else if(chm==1){
-				A_SpawnItemEx(
-					"HDSpent7mm",cp*8,1,height-7-sp*8,
-					cp*cos(angle-80)*6+vel.x,
-					cp*sin(angle-80)*6+vel.y,
-					-sp*6+vel.z,
-					0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-				);
+			actor rrr=null;
+			if(chm>=1){
+				vector3 gunofs=HDMath.RotateVec3D((10,-1,0),angle,pitch);
+				actor rrr=spawn(rndtp,(pos.xy,pos.z+height*0.85)+gunofs+viewpos.offset);
+				rrr.target=self;
+				rrr.angle=angle;
+				rrr.vel=HDMath.RotateVec3D((1,-4,2),angle,pitch);
+				if(chm==1)rrr.vel*=1.3;
+				rrr.vel+=vel;
 			}
 			//cycle new
 			if(invoker.weaponstatus[BOSSS_MAG]>0){  

@@ -303,6 +303,24 @@ struct HDMath{
 		return l1-l2;
 	}
 
+	//basically so stuff launched up and to the side can go flying backwards
+	static vector3 RotateVec3D(
+		vector3 startvec,
+		double angle,
+		double pitch
+	){
+		vector3 endvec=startvec;
+
+		if(startvec.z||pitch){
+			vector2 sideways=actor.rotatevector((startvec.x,startvec.z),-pitch);
+			endvec.z=sideways.y;
+			endvec.x=sideways.x;
+		}
+		endvec.xy=actor.rotatevector(endvec.xy,angle);
+
+		return endvec;
+	}
+
 	//angle between any two vec2s
 	static double angleto(vector2 v1,vector2 v2,bool absolute=false){
 		let diff=absolute?v2-v1:level.Vec2Diff(v1,v2);

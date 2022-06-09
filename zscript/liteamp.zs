@@ -24,7 +24,7 @@ class PortableLiteAmp:HDMagAmmo replaces Infrared{
 	override void DetachFromOwner(){
 		if(owner&&owner.player){
 			UndoFullbright();
-			Shader.SetEnabled(owner.player,"NiteVis",false);
+			SetShader("NiteVis",false);
 			if(worn)owner.A_SetBlend("01 00 00",0.8,16);
 		}
 		worn=false;
@@ -63,12 +63,17 @@ class PortableLiteAmp:HDMagAmmo replaces Infrared{
 		if(!owner||!owner.player)return;
 		if(owner.player.fixedcolormap!=NITEVIS_INVULNCOLORMAP)owner.player.fixedcolormap=playerinfo.NUMCOLORMAPS+1;
 		owner.player.fixedlightlevel=1;
-		Shader.SetEnabled(owner.player,"NiteVis",false);
+		SetShader("NiteVis",false);
 	}
 	void UndoFullbright(){
 		if(!owner||!owner.player)return;
 		if(owner.player.fixedcolormap!=NITEVIS_INVULNCOLORMAP)owner.player.fixedcolormap=playerinfo.NOFIXEDCOLORMAP;
 		owner.player.fixedlightlevel=-1;
+	}
+	override void Tick(){
+		super.Tick();
+		if(!owner||owner.health<1)worn=false;
+		if(!worn)SetShader("NiteVis",false);
 	}
 	override void DoEffect(){
 		super.DoEffect();
@@ -140,18 +145,18 @@ class PortableLiteAmp:HDMagAmmo replaces Infrared{
 				UndoFullbright();
 				nv=clamp(amplitude,-nv,nv);
 				spent+=int(max(1,abs(nv*0.1)));
-				Shader.SetEnabled(owner.player,"NiteVis",true);
-				Shader.SetUniform1f(owner.player,"NiteVis","exposure",nv);
-				Shader.SetUniform1f(owner.player,"NiteVis","timer",level.maptime);
-				Shader.SetUniform1i(owner.player,"NiteVis","u_resfactor",resfactor);
-				Shader.SetUniform1i(owner.player,"NiteVis","u_hscan",hscan);
-				Shader.SetUniform1i(owner.player,"NiteVis","u_vscan",vscan);
-				Shader.SetUniform1i(owner.player,"NiteVis","u_scanfactor",scanfactor);
-				Shader.SetUniform1f(owner.player,"NiteVis","u_scanstrength",scanstrength);
-				Shader.SetUniform1i(owner.player,"NiteVis","u_posterize",posterize);
-				Shader.SetUniform3f(owner.player,"NiteVis","u_posfilter",posfilter);
-				Shader.SetUniform1f(owner.player,"NiteVis","u_whiteclip",whiteclip);
-				Shader.SetUniform1f(owner.player,"NiteVis","u_desat",desat);
+				SetShader("NiteVis",true);
+				SetShaderU1f("NiteVis","exposure",nv);
+				SetShaderU1f("NiteVis","timer",level.maptime);
+				SetShaderU1i("NiteVis","u_resfactor",resfactor);
+				SetShaderU1i("NiteVis","u_hscan",hscan);
+				SetShaderU1i("NiteVis","u_vscan",vscan);
+				SetShaderU1i("NiteVis","u_scanfactor",scanfactor);
+				SetShaderU1f("NiteVis","u_scanstrength",scanstrength);
+				SetShaderU1i("NiteVis","u_posterize",posterize);
+				SetShaderU3f("NiteVis","u_posfilter",posfilter);
+				SetShaderU1f("NiteVis","u_whiteclip",whiteclip);
+				SetShaderU1f("NiteVis","u_desat",desat);
 			}
 
 			//flicker
@@ -161,7 +166,7 @@ class PortableLiteAmp:HDMagAmmo replaces Infrared{
 //				A_LogInt(bkn);
 				if(!random[rand1](0,max(0,random[rand1](1,bkn)))){
 					UndoFullbright();
-					Shader.SetEnabled(owner.player,"NiteVis",false);
+					SetShader("NiteVis",false);
 				}
 			}
 
@@ -170,7 +175,7 @@ class PortableLiteAmp:HDMagAmmo replaces Infrared{
 
 		}else{
 			UndoFullbright();
-			Shader.SetEnabled(owner.player,"NiteVis",false);
+			SetShader("NiteVis",false);
 		}
 	}
 	enum NiteVis{

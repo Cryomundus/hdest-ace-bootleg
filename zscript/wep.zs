@@ -447,7 +447,8 @@ class HDWeapon:Weapon{
 		double spawnangle,
 		double spawnspeed,
 		double spawnupspeed=0,
-		double spawnheight=0.82
+		double spawnheight=0.82,
+		double spawnsidespeed=0
 	){
 		return HDWeapon.EjectCasing(
 			self,
@@ -456,7 +457,8 @@ class HDWeapon:Weapon{
 			spawnangle,
 			spawnspeed,
 			spawnupspeed,
-			spawnheight
+			spawnheight,
+			spawnsidespeed
 		);
 	}
 	static actor EjectCasing(
@@ -466,28 +468,22 @@ class HDWeapon:Weapon{
 		double spawnangle,
 		double spawnspeed,
 		double spawnupspeed=0,
-		double spawnheight=0.82
+		double spawnheight=0.82,
+		double spawnsidespeed=0
 	){
 		double cp=cos(shooter.pitch);
 		double sp=sin(shooter.pitch);
 		vector2 forwardvec=(cos(shooter.angle),sin(shooter.angle));
-		actor aaa=spawn(type,(
+		vector3 spawnpos=(
 			shooter.pos.xy+cp*forwardvec*spawndist,
 			shooter.pos.z+shooter.height*spawnheight-sp*spawndist
-		)+shooter.viewpos.offset);
-		spawnangle=shooter.angle+spawnangle;
-		aaa.vel=shooter.vel;
-		aaa.vel.xy+=(cos(spawnangle),sin(spawnangle))*spawnspeed;
+		);
+		if(!!shooter.viewpos)spawnpos+=shooter.viewpos.offset;
+		actor aaa=spawn(type,spawnpos);
+		spawnangle+=shooter.angle;
 		aaa.angle=shooter.angle;
 		aaa.pitch=shooter.pitch;
-
-		if(spawnupspeed){
-			vector2 vvv=(0,spawnupspeed);
-			vvv=rotatevector(vvv,-shooter.pitch);
-			aaa.vel.xy+=vvv.x*forwardvec;
-			aaa.vel.z+=vvv.y;
-		}
-
+		aaa.vel=shooter.vel+HDMath.RotateVec3D((spawnspeed,spawnsidespeed,spawnupspeed),spawnangle,aaa.pitch);
 		return aaa;
 	}
 

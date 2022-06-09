@@ -229,7 +229,7 @@ class ZombieStormtrooper:HDHumanoid{
 			if(firemode==-2){
 				A_StartSound("weapons/smg",CHAN_WEAPON);
 				HDBulletActor.FireBullet(self,"HDB_9",speedfactor:1.1);
-				HDWeapon.EjectCasing(self,"HDSpent9mm",11,-frandom(79,81),frandom(7,7.5));
+				HDWeapon.EjectCasing(self,"HDSpent9mm",12,frandom(-1,2),frandom(0.2,0.3),frandom(0,0.2),spawnsidespeed:-frandom(7,7.5));
 				pitch+=frandom(-0.2,0.1)*spread;
 				angle+=frandom(-0.2,0.1)*spread;
 			}else{

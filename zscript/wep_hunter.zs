@@ -16,8 +16,9 @@ class Hunter:HDShotgun{
 		inventory.pickupmessage "You got the pump-action shotgun!";
 		hdweapon.barrelsize 30,0.5,2;
 		hdweapon.refid HDLD_HUNTER;
-		tag "hunter";
+		tag "$TAG_HUNTER";
 		obituary "$OB_MPSHOTGUN";
+
 		hdweapon.loadoutcodes "
 			\cutype - 0-2, export/regular/hacked
 			\cufiremode - 0-2, pump/semi/auto, subject to the above
@@ -109,8 +110,7 @@ class Hunter:HDShotgun{
 		vector2 bobb=bob*2;
 //		bobb.y=clamp(bobb.y,-8,8);
 		sb.drawimage(
-			"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP,
-			alpha:0.9
+			"frntsite",(0,0)+bobb,sb.DI_SCREEN_CENTER|sb.DI_ITEM_TOP
 		);
 		sb.SetClipRect(cx,cy,cw,ch);
 		sb.drawimage(
@@ -152,26 +152,32 @@ class Hunter:HDShotgun{
 		if(careful)cockdir=(-cp,cp,-5);
 		else cockdir=(0,-cp*5,sin(pitch)*frandom(4,6));
 		cockdir.xy=rotatevector(cockdir.xy,angle);
-		actor fbs;bool gbg;
+		bool pocketed=false;
 		if(chm>1){
 			if(careful&&!A_JumpIfInventory("HDShellAmmo",0,"null")){
 				HDF.Give(self,"HDShellAmmo",1);
-			}else{
-				[gbg,fbs]=A_SpawnItemEx("HDFumblingShell",
-					cos(pitch)*8,0,height-8-sin(pitch)*8,
-					vel.x+cockdir.x,vel.y+cockdir.y,vel.z+cockdir.z,
-					0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-				);
+				pocketed=true;
 			}
 		}else if(chm>0){	
 			cockdir*=frandom(1.,1.3);
-			[gbg,fbs]=A_SpawnItemEx("HDSpentShell",
-				cos(pitch)*8,frandom(-0.1,0.1),height-8-sin(pitch)*8,
-				vel.x+cockdir.x,vel.y+cockdir.y,vel.z+cockdir.z,
-				0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-			);
 		}
-		if(fbs)fbs.setorigin(fbs.pos+viewpos.offset,false);
+
+		if(
+			!pocketed
+			&&chm>=1
+		){
+			vector3 gunofs=HDMath.RotateVec3D((9,-1,-2),angle,pitch);
+			actor rrr=null;
+
+			if(chm>1)rrr=spawn("HDFumblingShell",(pos.xy,pos.z+height*0.85)+gunofs+viewpos.offset);
+			else rrr=spawn("HDSpentShell",(pos.xy,pos.z+height*0.85)+gunofs+viewpos.offset);
+
+			rrr.target=self;
+			rrr.angle=angle;
+			rrr.vel=HDMath.RotateVec3D((1,-5,0.2),angle,pitch);
+			if(chm==1)rrr.vel*=1.3;
+			rrr.vel+=vel;
+		}
 	}
 	action void A_CheckPocketSaddles(){
 		if(invoker.weaponstatus[SHOTS_SIDESADDLE]<1)invoker.weaponstatus[0]|=HUNTF_FROMPOCKETS;
@@ -729,4 +735,3 @@ class HunterRandom:IdleDummy{
 		}stop;
 	}
 }
-
