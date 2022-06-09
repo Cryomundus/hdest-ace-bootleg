@@ -344,7 +344,7 @@ class PickupManager:HDWeapon{
 				}
 				sb.drawtexture(ddi,(0,-smallfont.getheight()*4),
 					sb.DI_ITEM_BOTTOM|sb.DI_SCREEN_CENTER,
-					scale:ddv
+					box:(70, 45),scale:ddv
 				);
 			}
 		}
