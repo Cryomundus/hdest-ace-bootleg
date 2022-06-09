@@ -143,7 +143,7 @@ class SecondBloodSticker:HDWoundFixer{
 			if(invoker.weaponstatus[SBS_INJECTCOUNTER]>30){
 				A_TakeInjector("SecondBlood");
 				patient.A_GiveInventory("BloodBagWorn");
-				A_StartSound("bloodbag/inject",CHAN_WEAPON,CHANF_OVERLAP);
+				A_StartSound("bloodpack/inject",CHAN_WEAPON,CHANF_OVERLAP);
 				A_SetBlend("7a 3a 18",0.1,4);
 				A_MuzzleClimb(0,2);
 				hdweaponselector.select(self,"HDFist");

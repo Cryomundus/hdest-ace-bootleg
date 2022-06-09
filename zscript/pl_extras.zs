@@ -450,7 +450,7 @@ extend class HDPlayerPawn{
 			jumptimer=20+(unstablewoundcount>>1);
 			stunned+=25;
 			double kickback=strength;
-			bool db=doordestroyer.destroydoor(self,frandom(32,72)*strength,frandom(0,frandom(1,16)*strength),ofsz:24);
+			bool db=doordestroyer.destroydoor(self,frandom(0,frandom(0,72))*strength,frandom(0,frandom(0,16)*strength),ofsz:24);
 			if(!random(0,db?7:3)){
 				jumptimer+=20;
 				damagemobj(self,self,random(1,5),"Bashing");

@@ -171,6 +171,7 @@ class Hunter:HDShotgun{
 				0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
 			);
 		}
+		if(fbs)fbs.setorigin(fbs.pos+viewpos.offset,false);
 	}
 	action void A_CheckPocketSaddles(){
 		if(invoker.weaponstatus[SHOTS_SIDESADDLE]<1)invoker.weaponstatus[0]|=HUNTF_FROMPOCKETS;
