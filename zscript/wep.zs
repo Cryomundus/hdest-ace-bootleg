@@ -478,7 +478,6 @@ class HDWeapon:Weapon{
 			shooter.pos.xy+cp*forwardvec*spawndist,
 			shooter.pos.z+shooter.height*spawnheight-sp*spawndist
 		);
-		if(!!shooter.viewpos)spawnpos+=shooter.viewpos.offset;
 		actor aaa=spawn(type,spawnpos);
 		spawnangle+=shooter.angle;
 		aaa.angle=shooter.angle;
