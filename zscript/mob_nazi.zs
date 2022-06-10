@@ -7,7 +7,7 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 		painsound "wolfss/pain";
 		deathsound "wolfss/death";
 		activesound "wolfss/active";
-		tag "$cc_wolfss";
+		tag "wolfenstein ss";
 
 		painchance 170;
 
