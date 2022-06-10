@@ -437,6 +437,26 @@ extend class HDPlayerPawn{
 			}
 		}
 
+		//move pivot point a little behind the player's view
+		anglechange=normalize180(anglechange);
+		if(
+			!teleported
+			&&!incapacitated
+			&&player.onground
+		){
+			bool ongun=gunbraced&&!barehanded&&isFocussing;
+			if(abs(anglechange)>(ongun?0.05:0.7)){
+				int dir=((anglechange>0)||ongun)?90:-90;
+				double aad=angle+anglechange+dir;
+				trymove(self.pos.xy+(cos(aad),sin(aad))*(ongun?-0.3*anglechange:0.6),false);
+			}
+			double ptchch=clamp(abs(pitchchange),0,10); //THE CLAMP IS A BANDAID
+			if(ptchch>1 && abs(pitch)<30){  
+				trymove(pos.xy-(cos(angle)*ptchch,sin(angle)*ptchch)*0.1,false);
+				PlayRunning();
+			}
+		}
+
 		//reset blocked check for a fresh start
 		totallyblocked=false;
 

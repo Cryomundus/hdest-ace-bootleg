@@ -323,10 +323,6 @@ extend class HDPlayerPawn{
 			)PlayRunning();
 		}
 
-		double voff=heightmult*(4+12.*(0.5-player.crouchfactor)*pitch*-0.02);
-		setviewpos(((cos(angle),sin(angle))*voff,pitch*0.02),VPSF_ABSOLUTEOFFSET);
-
-
 		//see if player is intentionally walking, running or sprinting
 		//-1 = walk, 0 = run, 1 = sprint
 		if(input & BT_SPEED)runwalksprint=1;
