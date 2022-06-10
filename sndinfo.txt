@@ -147,6 +147,7 @@ bandage/rip       dsclaw
 bandage/rustle    dspocket
 bloodpack/open    dsgopen
 bloodpack/shake   dspocket
+bloodpack/inject  dschlp $pitchset bloodpack/inject 1.4
 
 roundmaker/chug1  dsthubm
 roundmaker/chug2  dsgopen
