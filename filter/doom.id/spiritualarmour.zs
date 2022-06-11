@@ -3,6 +3,8 @@
 //-------------------------------------------------
 class SpiritualArmour : HDDamageHandler replaces ShieldCore
 {
+	private int EtherealTicker;
+
 	Default
 	{
 		//$Category "Items/Hideous Destructor/Magic"
@@ -27,13 +29,13 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		Use:
 			TNT1 A 0;
 			Fail;
-		spawn: 
+		Spawn: 
 			BON2 A 6 A_SetTics(random(7, 144));
 			BON2 BC 6 A_SetTics(random(1, 2));
 			BON2 D 6 Light("ARMORBONUS") A_SetTics(random(0, 4));
 			BON2 CB 6 A_SetTics(random(1, 3));
 			loop;
-		pickup: 
+		Pickup: 
 			TNT1 A 0
 			{
 				A_GiveInventory("PowerFrightener");
@@ -65,6 +67,22 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		ps.replace("  ", " ");
 		ps.replace("\n"..pscol.." ", "\n"..pscol);
 		return ps;
+	}
+
+	override void DoEffect()
+	{
+		EtherealTicker--;
+		if (EtherealTicker == 0)
+		{
+			owner.bSHOOTABLE = true;
+			owner.bTHRUACTORS = false;
+			if (Amount <= 0)
+			{
+				Destroy();
+				return;
+			}
+		}
+		Inventory.DoEffect();
 	}
 
 	//called from HDPlayerPawn and HDMobBase's DamageMobj
@@ -104,18 +122,12 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 
 		//Console.Printf("%i, %i, %i, %i, %i, %i", damage, towound, toburn, tostun, tobreak, toaggravate);
 
-		towound = 0;
-		toburn = 0;
-		tobreak = 0;
-		toaggravate = 0;
-
-		bool breakLayer = false;
+		let hdp = HDPlayerPawn(victim);
 		if (damage < 144)
 		{
 			damage = max(damage >> 2, 1);
 			tostun = min(tostun >> 2, 7);
 
-			let hdp = HDPlayerPawn(victim);
 			if (hdp && hdp.inpain > 0)
 			{
 				hdp.inpain = max(hdp.inpain, 3);
@@ -124,18 +136,14 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		}
 		else
 		{
-			breakLayer = true;
 			damage = 0;
 			tostun = 0;
-
-			if (--Amount <= 0)
-			{
-				Destroy();
-			}
+			EtherealTicker = 35 * 4;
+			owner.bSHOOTABLE = false;
+			owner.bTHRUACTORS = true;
+			Amount--;
 		}
 
-		return damage, mod, flags, towound, toburn, tostun, tobreak, toaggravate;
+		return damage, mod, flags, 0, 0, tostun, 0, 0;
 	}
 }
-
-
