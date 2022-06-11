@@ -425,7 +425,7 @@ extend class HDPlayerPawn{
 						source==inflictor
 						||!inflictor
 					)
-				)?min(damage*(2.-strength)*3.,30.)
+				)?min(damage*(2.-strength)*1.5,20.)
 				:(
 					mod=="electrical"
 					||(
