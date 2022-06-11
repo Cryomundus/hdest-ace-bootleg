@@ -120,6 +120,7 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		{
 			damage = 0;
 			tostun = 0;
+			owner.GiveBody(100);
 			owner.A_GiveInventory('SpiritualArmourPower');
 			Amount--;
 		}
