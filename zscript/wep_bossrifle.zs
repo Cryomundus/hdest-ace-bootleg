@@ -455,7 +455,7 @@ class BossRifle:HDWeapon{
 			actor rrr=null;
 			if(chm>=1){
 				vector3 gunofs=HDMath.RotateVec3D((10,-1,0),angle,pitch);
-				actor rrr=spawn(rndtp,(pos.xy,pos.z+height*0.85)+gunofs+viewpos.offset);
+				actor rrr=spawn(rndtp,(pos.xy,pos.z+height*0.85)+gunofs);
 				rrr.target=self;
 				rrr.angle=angle;
 				rrr.vel=HDMath.RotateVec3D((1,-4,2),angle,pitch);
