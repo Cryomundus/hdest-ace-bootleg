@@ -253,10 +253,6 @@ class HDFist:HDWeaponGrabber replaces Fist{
 		zerk=HDZerk.IsZerk(owner);
 		if(zerk){
 			strength*=1.2;
-			if(!random[zrkbs](0,70)){
-				static const string zrkbs[]={"kill","k i l l","k I L L","K\n   I\n       L\n          L","Kill.","KILL","k i l l","Kill!","K  I  L  L","kill...","Kill...","k i l l . . .","      kill","  ... kill ...","kill,","kiiiilllll!!!","kill~","kill <3","kill uwu"};
-				hdp.usegametip("\cr"..zrkbs[random(0,zrkbs.size()-1)]);
-			}
 		}
 	}
 	action void A_DontFreedoomFrameB(){
@@ -406,7 +402,6 @@ class HDFist:HDWeaponGrabber replaces Fist{
 					givebody(10);
 					if(onr){
 						onr.fatigue-=onr.fatigue>>2;
-						onr.usegametip("\cfK I L L !");
 					}
 				}else{
 					A_StartSound("weapons/zerkding",CHAN_WEAPON,CHANF_OVERLAP|CHANF_LOCAL);

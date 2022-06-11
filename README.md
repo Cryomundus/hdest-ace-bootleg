@@ -45,6 +45,7 @@ For the most part this build is the same as the master branch at any given time.
 	- You don't need to bash reload to repair *ERPs;
 	- Inventory icons are forcefully scaled to fit.
 	- Zerk cooloff is a bit shorter and health regeneration amount is increased.
+	- No zerk messages.
 - Miscellaneous:
 	- Corruption Cards support. Somewhat. Removes cards that do not mix well with CC.
 
