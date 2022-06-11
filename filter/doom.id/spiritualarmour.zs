@@ -3,8 +3,6 @@
 //-------------------------------------------------
 class SpiritualArmour : HDDamageHandler replaces ShieldCore
 {
-	private int EtherealTicker;
-
 	Default
 	{
 		//$Category "Items/Hideous Destructor/Magic"
@@ -69,22 +67,6 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		return ps;
 	}
 
-	override void DoEffect()
-	{
-		EtherealTicker--;
-		if (EtherealTicker == 0)
-		{
-			owner.bSHOOTABLE = true;
-			owner.bTHRUACTORS = false;
-			if (Amount <= 0)
-			{
-				Destroy();
-				return;
-			}
-		}
-		Inventory.DoEffect();
-	}
-
 	//called from HDPlayerPawn and HDMobBase's DamageMobj
 	override int, Name, int, int, int, int, int HandleDamage(int damage, name mod, int flags, actor inflictor, actor source, int towound, int toburn, int tostun, int tobreak)
 	{
@@ -138,12 +120,57 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		{
 			damage = 0;
 			tostun = 0;
-			EtherealTicker = 35 * 4;
-			owner.bSHOOTABLE = false;
-			owner.bTHRUACTORS = true;
+			owner.A_GiveInventory('SpiritualArmourPower');
 			Amount--;
 		}
 
 		return damage, mod, flags, 0, 0, tostun, 0, 0;
+	}
+}
+
+class SpiritualArmourPower : Powerup
+{
+	override void InitEffect()
+	{
+		Super.InitEffect();
+
+		ToggleFlags(true);
+
+		if (owner.pos.z <= owner.floorz)
+		{
+			owner.vel.z = 4;
+		}
+	}
+
+	override void EndEffect()
+	{
+		Super.EndEffect();
+		if (!owner || !owner.player)
+		{
+			return;
+		}
+
+		ToggleFlags(false);
+	}
+
+	private void ToggleFlags(bool val)
+	{
+		owner.bFLY = val;
+		owner.bNOGRAVITY = val;
+		owner.bSHADOW = val;
+		owner.bSHOOTABLE = !val;
+	}
+
+	override Color GetBlend()
+	{
+		return Color(int(BlendColor.a * (EffectTics / double(default.EffectTics))), BlendColor.r, BlendColor.g, BlendColor.b);
+	}
+
+	Default
+	{
+		Powerup.Duration -4;
+		Powerup.Color "59e85b", 0.3;
+		+INVENTORY.NOSCREENBLINK
+		+INVENTORY.ALWAYSPICKUP
 	}
 }
