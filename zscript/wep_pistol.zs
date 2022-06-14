@@ -284,8 +284,10 @@ class HDPistol:HDHandgun replaces Pistol{
 				)pnr.fatigue++;
 				A_GiveInventory("IsMoving",5);
 				A_Refire("fire");
-			}else A_Refire();
-		}goto ready;
+			}
+		}
+		#### A 0;
+		goto nope;
 	flash:
 		PI2F A 0 A_JumpIf(invoker.wronghand,2);
 		PISF A 0;

@@ -29,6 +29,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Checkin names are not multiplied in co-op;
 	- Firing weapons while zerked does not zoom in/out so much;
 	- Scopes aren't tiny on WADs that supply their own CONFONT (1) lump.
+	- Fixed an obscure bug where the pistol firing animation would hang when holding down the fire button.
 - Various tweaks:
 	- Archviles only need 4 times to be pained in order to die instead of 6.
 	- You can pick stuff up while incapped;
