@@ -408,22 +408,22 @@ class Babuin:HDMobBase{
 		SRG2 A 0 A_CheckFreedoomSprite();
 		#### A 0 A_Jump(256,"see");
 	ungib:
-		TROO U 6;
-		TROO UT 8;
-		TROO SRQ 6;
-		TROO PO 4;
+		SRG2 U 6;
+		SRG2 UT 8;
+		SRG2 SRQ 6;
+		SRG2 PO 4;
 		SRG2 A 0 A_CheckFreedoomSprite();
 		#### A 0 A_Jump(256,"see");
 	xdeath:
-		TROO O 0 A_XScream();
-		TROO OPQ 4{spawn("MegaBloodSplatter",pos+(0,0,34),ALLOW_REPLACE);}
-		TROO RST 4;
+		SRG2 O 0 A_XScream();
+		SRG2 OPQ 4{spawn("MegaBloodSplatter",pos+(0,0,34),ALLOW_REPLACE);}
+		SRG2 RST 4;
 		goto xdead;
 	xxxdeath:
-		TROO O 4 A_XScream();
-		TROO PQRST 4;
+		SRG2 O 4 A_XScream();
+		SRG2 PQRST 4;
 	xdead:
-		TROO T 5 canraise{
+		SRG2 T 5 canraise{
 			if(abs(vel.z)<2)frame++;
 		}loop;
 	}

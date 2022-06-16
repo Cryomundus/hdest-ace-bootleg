@@ -267,7 +267,7 @@ class NinjaPirate:HDMobBase{ //replaces Spectre{
 		TNT1 A 0 A_SetTranslucent(0,0);
 		#### A 0 A_Jump(256,"see");
 	ungib:
-		TROO U 6{
+		SARG U 6{
 			cloaked=false;
 			if(alpha<1.){
 				A_SetTranslucent(1);
@@ -278,23 +278,23 @@ class NinjaPirate:HDMobBase{ //replaces Spectre{
 				SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM
 			);
 		}
-		TROO UT 8;
-		TROO SRQ 6;
-		TROO PO 4;
+		SARG UT 8;
+		SARG SRQ 6;
+		SARG PO 4;
 		#### A 0 A_Jump(256,"see");
 	xdeath:
-		TROO O 0 A_XScream();
-		TROO O 0 A_NoBlocking();
-		TROO OPQ 4 spawn("MegaBloodSplatter",pos+(0,0,34),ALLOW_REPLACE);
-		TROO RST 4;
+		SARG O 0 A_XScream();
+		SARG O 0 A_NoBlocking();
+		SARG OPQ 4 spawn("MegaBloodSplatter",pos+(0,0,34),ALLOW_REPLACE);
+		SARG RST 4;
 		goto xdead;
 	xxxdeath:
-		TROO O 0 A_XScream();
-		TROO O 4 A_NoBlocking();
-		TROO PQRST 4;
+		SARG O 0 A_XScream();
+		SARG O 4 A_NoBlocking();
+		SARG PQRST 4;
 	xdead:
-		TROO T 0 A_FadeIn(0.01);
-		TROO T 5 canraise{
+		SARG T 0 A_FadeIn(0.01);
+		SARG T 5 canraise{
 			if(abs(vel.z)<2)frame++;
 		}loop;
 	}
