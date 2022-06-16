@@ -37,6 +37,7 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 			TNT1 A 0
 			{
 				A_GiveInventory("PowerFrightener");
+				A_TakeInventory("HDBlurSphere");
 				let hdp = HDPlayerPawn(self);
 				if (hdp)
 				{

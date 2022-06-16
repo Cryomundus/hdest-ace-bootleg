@@ -10,6 +10,7 @@ For the most part this build is the same as the master branch at any given time.
 - New bronto;
 - New wound system;
 - Breakable windows;
+- New blur. It's trash, get over it;
 - Woke shit. Keep your politics and personal views out of games and mods.
 
 ### Things that are different
@@ -31,6 +32,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Scopes aren't tiny on WADs that supply their own CONFONT (1) lump.
 	- Fixed an obscure bug where the pistol firing animation would hang when holding down the fire button.
 - Various tweaks:
+	- Rebalanced spiritual armor. Reduces damage under 144 by a factor of 4 but does not prevent dying. Any damage above that gets completely nullified but you lose a layer and become ethereal for several seconds.
 	- Archviles only need 4 times to be pained in order to die instead of 6.
 	- You can pick stuff up while incapped;
 	- Living actor climbing is less insufferable;
