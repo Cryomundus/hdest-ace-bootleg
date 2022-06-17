@@ -121,7 +121,7 @@ class HDImpBall:HDFireball{
 					&&(!target||blockingmobj!=target.target)
 				)blockingmobj.givebody(random(1,10));
 				else{
-					tracer=blockingmobj;
+					if(!blockingline)tracer=blockingmobj;
 					blockingmobj.damagemobj(self,target,random(6,18),"electrical");
 				}
 			}

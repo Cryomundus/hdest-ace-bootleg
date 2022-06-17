@@ -403,16 +403,17 @@ extend class HDPlayerPawn{
 					if(oldrealpitch<=90){
 						angle=normalize180(angle+180);
 						roll=180;
+						if(player.onground)A_StartSound(landsound,CHAN_BODY,CHANF_OVERLAP,volume:0.5,pitch:0.8);
 					}
 					rollpush=-rollpush;
 
 					A_SetPitch(normalize180(-realpitch+180),SPF_INTERPOLATE);
-					A_SetAngle(normalize180(angle+0.0001),SPF_INTERPOLATE);  //see above note
+					A_SetAngle(normalize180(angle+0.0001),SPF_INTERPOLATE);
 
 					fallroll=max(fallroll,5);
 				}else{
 					A_SetPitch(normalize180(realpitch),SPF_INTERPOLATE);
-					A_SetAngle(normalize180(angle-0.0001),SPF_INTERPOLATE);  //see above note
+					A_SetAngle(normalize180(angle-0.0001),SPF_INTERPOLATE);
 
 					//try to face forwards not up
 					if(
@@ -439,17 +440,18 @@ extend class HDPlayerPawn{
 					if(oldrealpitch>=-90){
 						angle=normalize180(angle+180);
 						roll=180;
+						if(player.onground)A_StartSound(landsound,CHAN_BODY,CHANF_OVERLAP,volume:0.5,pitch:0.8);
 					}
 
 					A_SetPitch(normalize180(-realpitch-180),SPF_INTERPOLATE);
-					A_SetAngle(normalize180(angle-0.0001),SPF_INTERPOLATE);  //see above note
+					A_SetAngle(normalize180(angle-0.0001),SPF_INTERPOLATE);
 
 					fallroll=min(fallroll,-5);
 				}else{
 					rollpush=-rollpush;
 
 					A_SetPitch(normalize180(realpitch),SPF_INTERPOLATE);
-					A_SetAngle(normalize180(angle+0.0001),SPF_INTERPOLATE);  //see above note
+					A_SetAngle(normalize180(angle+0.0001),SPF_INTERPOLATE);
 
 					//try to face forwards not down
 					if(

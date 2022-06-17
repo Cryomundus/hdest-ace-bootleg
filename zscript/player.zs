@@ -410,7 +410,7 @@ extend class HDPlayerPawn{
 			&&player.mo
 			&&player==players[consoleplayer]
 		){
-			Shader.SetEnabled(player,"NiteVis",false);
+			PPShader.SetEnabled("NiteVis",false);
 			if(getage()>10)showgametip();
 		}
 	}
