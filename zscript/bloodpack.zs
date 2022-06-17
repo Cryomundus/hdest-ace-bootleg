@@ -56,7 +56,7 @@ class SecondBloodSticker:HDWoundFixer{
 			A_ClearRefire();
 		}goto nope;
 	reload:
-		TNT1 A 14 {HDPlayerPawn.CheckStrip(self,self);}
+		TNT1 A 14 {HDPlayerPawn.CheckStrip(self,null);}
 		TNT1 A 0 A_Refire();
 		goto readyend;
 	ready:

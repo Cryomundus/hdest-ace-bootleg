@@ -65,7 +65,6 @@ class GrabThinker:Thinker{
 				pt
 				&&(
 					pt.BeforePockets(picktarget)
-					||pt.CheckConflictingWornLayer(picktarget)
 				)
 			){
 				destroy();
@@ -355,6 +354,9 @@ class HDPickup:CustomInventory{
 		return HDPickerUpper(other);
 	}
 
+	// [Ace] Just because something has a layer does not mean it's currently worn.
+	virtual bool IsBeingWorn() { return false; }
+
 	//called on level resets, etc.
 	virtual void Consolidate(){}
 
@@ -529,35 +531,8 @@ class HDPickup:CustomInventory{
 		),true);
 	}
 
-
-	// If two wearable classes have the same layer number, they should be
-	// considered to be occupying the same place and unable to be combined.
-	// If you've set up the CheckStrip() checks properly,
-	// this check should never come up as true.
-	bool CheckConflictingWornLayer(actor other,bool bugreport=false){
-		if(!wornlayer||!other)return false;
-		for(inventory iii=other.inv;iii!=null;iii=iii.inv){
-			let hdp=hdpickup(iii);
-			if(
-				hdp
-				&&hdp!=self
-				&&hdp.wornlayer==wornlayer
-			){
-				if(bugreport)console.printf("\cgERROR: "..gettag().." wornlayer property conflicts with "..hdp.gettag()..". Please report this bug to the modder responsible.");
-				return true;
-			}
-		}return false;
-	}
-
-
 	override void AttachToOwner(actor other){
 		super.AttachToOwner(other);
-
-		//in case it's added in a loadout
-		if(CheckConflictingWornLayer(owner,true)){
-			amount=0;
-			return;
-		}
 
 		if(overlaypriority){
 			let hpl=HDPlayerPawn(owner);

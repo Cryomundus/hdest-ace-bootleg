@@ -804,11 +804,11 @@ class HDBackpack : HDWeapon{
 	override Inventory CreateTossable(int amt)
 	{
 		Storage.UpdateStorage(self, null);
-		if (!player || player.ReadyWeapon != self)
+		if (!owner.player || owner.player.ReadyWeapon != self)
 		{
 			return Super.CreateTossable(amt);
 		}
-		if (!HDPlayerPawn.CheckStrip(owner,self))
+		if (HDPlayerPawn.CheckStrip(owner, self) != CSResult_Nothing)
 		{
 			return null;
 		}

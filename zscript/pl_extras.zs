@@ -501,7 +501,7 @@ extend class HDPlayerPawn{
 							jumptimer=20+(unstablewoundcount>>1);
 							kbmo.vel+=(kv.x,kv.y,2.)*forc/kbmo.mass;
 							kbmo.A_StartSound("misc/punch",CHAN_BODY,CHANF_OVERLAP);
-							HDPlayerPawn.CheckStrip(kbmo,kbmo);
+							HDPlayerPawn.CheckStrip(kbmo,null);
 							kicked=true;
 						}
 					}else if(

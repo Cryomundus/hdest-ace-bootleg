@@ -5,169 +5,172 @@
 //put your socks on before your shoes.
 //any wearable gadget should be added to this function.
 //see backpack for the minimum setup required.
-extend class HDPlayerPawn{
-	//returns whether the selected layer can be removed
+enum CheckStripResult
+{
+	CSResult_Invalid,
+	CSResult_OnCooldown,
+	CSResult_Nothing,
+	CSResult_LayerBlocked
+}
+
+enum CheckStripFlags
+{
+	CSF_Remove = 1
+}
+
+extend class HDPlayerPawn
+{
 	int striptime;
-	static bool CheckStrip(
-		actor caller,
-		actor checkitem,
-		bool remove=true
-	){
-		let hdp=hdplayerpawn(caller);
-		if(hdp&&hdp.striptime>0)return false;
+	static int CheckStrip(Actor caller, Inventory checkitem, int flags = CSF_Remove)
+	{
+		if (!checkitem && !(flags & CSF_Remove))
+		{
+			return CSResult_Invalid;
+		}
 
-		let cp=hdpickup(checkitem);
-		let cw=hdweapon(checkitem);
-		if(
-			!cp
-			&&!cw
-			&&checkitem!=caller
-		)return true;
+		let hdp = HDPlayerPawn(caller);
+		if (hdp && hdp.striptime > 0)
+		{
+			return CSResult_OnCooldown;
+		}
 
-		//set checkitem to the same as caller to strip everything
-		int which=cp?cp.wornlayer:cw?cw.wornlayer:1;
+		let pkp = HDPickup(checkitem);
+		let wpn = HDWeapon(checkitem);
 
-		inventory preventory=null;
+		Inventory preventory = null;
 
 		//the thing in your hands in front of you is always the top layer
-		if(
-			caller.player
-			&&hdweapon(caller.player.readyweapon)
-			&&hdweapon(caller.player.readyweapon).isbeingworn()
-		)preventory=caller.player.readyweapon;
-		else{
+		if (caller.player && HDWeapon(caller.player.ReadyWeapon) && HDWeapon(caller.player.ReadyWeapon).IsBeingWorn())
+		{
+			preventory = caller.player.ReadyWeapon;
+		}
+		else
+		{
+			for (let next = caller.inv; next != null; next = next.inv)
+			{
+				if (next == checkitem)
+				{
+					continue;
+				}
 
-			//go through inventory for things being worn
-			for(let item=caller.inv;item!=NULL;item=item.inv){
-				if(item==checkitem)continue;
+				let wornPkp = HDPickup(next);
+				let wornWpn = HDWeapon(next);
 
-				let hp=HDPickup(item);
-				let hw=HDWeapon(item);
-				if(
-					(hp&&hp.wornlayer>=which)
-					||(
-						hw
-						&&hw.wornlayer>=which
-						&&hw.isbeingworn()
-					)
-				){
-					if(
-						!preventory
-						||(
-							hdpickup(preventory)
-							&&(
-								(hp&&hdpickup(preventory).wornlayer<hp.wornlayer)
-								||(hw&&hdpickup(preventory).wornlayer<hw.wornlayer)
-							)
-						)
-					)preventory=item;
+				if (!wornPkp && !wornWpn)
+				{
+					continue;
+				}
+
+				int wornLayer = wornPkp ? wornPkp.wornlayer : wornWpn.wornlayer;
+				if (!checkitem)
+				{
+					if (wornLayer != 0 || wornWpn && wornWpn.IsBeingWorn())
+					{
+						preventory = next;
+					}
+				}
+				else if (pkp || wpn)
+				{
+					int layer = pkp ? pkp.wornlayer : wpn.wornlayer;
+					if (layer != 0 && wornLayer != 0 && wornLayer >= layer && (wornPkp && wornPkp.IsBeingWorn() || wornWpn && wornWpn.IsBeingWorn()))
+					{
+						preventory = next;
+					}
 				}
 			}
 		}
 
-
-		if(preventory){
-			if(remove){
-				caller.dropinventory(preventory);
-				caller.A_Log("Removing "..preventory.gettag().." first.",true);
-				if(hdp)hdp.striptime=25;
+		if (preventory)
+		{
+			if (flags & CSF_Remove)
+			{
+				caller.DropInventory(preventory);
+				caller.A_Log("Removing "..preventory.GetTag().." first.", true);
+				if (hdp)
+				{
+					hdp.striptime = 25;
+				}
 			}
-			return false;
+			return CSResult_LayerBlocked;
 		}
-		return true;
+		return CSResult_Nothing;
 	}
 }
-enum StripArmourLevels{
-	STRIP_ARMOUR=1000,
-	STRIP_RADSUIT=2000,
-	STRIP_BACKPACK=3000,
+
+enum StripArmourLevels
+{
+	STRIP_ARMOUR = 1000, 
+	STRIP_RADSUIT = 2000, 
+	STRIP_BACKPACK = 3000, 
 }
-
-
-
 
 //Inventory items that affect bullets and damage before they are finally inflicted on any HDMobBase or HDPlayerPawn
 //New class to avoid searching through all your ammo, consumables, etc. each time
-class HDDamageHandler:HDPickup{
+class HDDamageHandler:HDPickup
+{
 	//determines order in which damage handlers are called
 	//higher is earlier
 	double priority;
 	property priority: priority;
 
-	default{
-		-inventory.invbar
-		-hdpickup.fitsinbackpack
-		+hdpickup.notinpockets
-		+hdpickup.nevershowinpickupmanager
+	Default
+	{
+		-INVENTORY.INVBAR
+		-HDPICKUP.FITSINBACKPACK
+		+HDPICKUP.NOTINPOCKETS
+		+HDPICKUP.NEVERSHOWINPICKUPMANAGER
 	}
 
 	//called from HDPlayerPawn and HDMobBase's DamageMobj
 	//should modify amount and kind of damage
-	virtual int,name,int,int,int,int,int HandleDamage(
-		int damage,
-		name mod,
-		int flags,
-		actor inflictor,
-		actor source,
-		int towound=0,
-		int toburn=0,
-		int tostun=0,
-		int tobreak=0
-	){
-		return damage,mod,flags,towound,toburn,tostun,tobreak;
+	virtual int, name, int, int, int, int, int HandleDamage(int damage, name mod, int flags, actor inflictor, actor source, int towound = 0, int toburn = 0, int tostun = 0, int tobreak = 0)
+	{
+		return damage, mod, flags, towound, toburn, tostun, tobreak;
 	}
-	virtual int,name,int,int,int,int,int,int HandleDamagePost(
-		int damage,
-		name mod,
-		int flags,
-		actor inflictor,
-		actor source,
-		int towound=0,
-		int toburn=0,
-		int tostun=0,
-		int tobreak=0,
-		int toaggravate=0
-	){
-		return damage,mod,flags,towound,toburn,tostun,tobreak,toaggravate;
+	virtual int, name, int, int, int, int, int, int HandleDamagePost(int damage, name mod, int flags, actor inflictor, actor source, int towound = 0, int toburn = 0, int tostun = 0, int tobreak = 0, int toaggravate = 0)
+	{
+		return damage, mod, flags, towound, toburn, tostun, tobreak, toaggravate;
 	}
 
 	//called from HDBulletActor's OnHitActor
 	//should modify the bullet itself - then let it inflict damage
-	virtual double,double OnBulletImpact(
-		HDBulletActor bullet,
-		double pen,
-		double penshell,
-		double hitangle,
-		double deemedwidth,
-		vector3 hitpos,
-		vector3 vu,
-		bool hitactoristall
-	){
-		return pen,penshell;
+	virtual double, double OnBulletImpact(HDBulletActor bullet, double pen, double penshell, double hitangle, double deemedwidth, vector3 hitpos, vector3 vu, bool hitactoristall)
+	{
+		return pen, penshell;
 	}
 
 	//get a list of damage handlers from an actor's inventory
 	//higher priority numbers are listed (and thus processed) before lower numbers
-	static void GetHandlers(
-		actor owner,
-		out array<HDDamageHandler> handlers
-	){
+	static void GetHandlers(actor owner, out array<HDDamageHandler> handlers)
+	{
 		handlers.Clear();
-		if(!owner)return;
+		if (!owner)
+		{
+			return;
+		}
 
-		for(let item=owner.inv;item!=NULL;item=item.inv){
-			let handler=HDDamageHandler(item);
-			if(!handler)continue;
+		for (let item = owner.inv; item != NULL; item = item.inv)
+		{
+			let handler = HDDamageHandler(item);
+			if (!handler)
+			{
+				continue;
+			}
 
-			bool didInsert=false;
-			for(int i=0;i<handlers.Size();i++){
-				if(handlers[i].priority < handler.priority){
-					handlers.Insert(i,handler);
+			bool didInsert = false;
+			for (int i = 0; i < handlers.Size(); i++)
+			{
+				if (handlers[i].priority < handler.priority)
+				{
+					handlers.Insert(i, handler);
 					didInsert = true;
 					break;
 				}
 			}
-			if(!didInsert)handlers.Push(handler);
+			if (!didInsert)
+			{
+				handlers.Push(handler);
+			}
 		}
 	}
 }

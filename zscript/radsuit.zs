@@ -32,6 +32,10 @@ class WornRadsuit:HDDamageHandler{
 	override double RestrictSpeed(double speedcap){
 		return min(speedcap,1.8);
 	}
+	override bool IsBeingWorn()
+	{
+		return true;
+	}
 	override void DisplayOverlay(hdstatusbar sb,hdplayerpawn hpl){
 		sb.SetSize(0,320,200);
 		sb.BeginHUD(forcescaled:true);
@@ -182,6 +186,7 @@ class PortableRadsuit:HDPickup replaces RadSuit{
 		hdpickup.bulk ENC_RADSUIT;
 		tag "environment suit";
 		hdpickup.refid HDLD_RADSUIT;
+		HDPickup.WornLayer STRIP_RADSUIT;
 	}
 	override void DetachFromOwner(){
 		owner.A_TakeInventory("PortableRadsuit");
