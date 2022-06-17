@@ -3,6 +3,109 @@
 //-------------------------------------------------
 class SpiritualArmour : HDDamageHandler replaces ShieldCore
 {
+	static string FromPsalter()
+	{
+		string psss = Wads.ReadLump(Wads.CheckNumForName("psalms", 0));
+		array<string> pss; pss.clear();
+		psss.split(pss, "Psalm ");
+		pss.delete(0); //don't get anything before "Psalm 1:1"
+		string ps = pss[random(0, pss.size() - 1)];
+		ps = ps.mid(ps.indexof(" ") + 1);
+		ps = pscol..ps;
+		ps.replace("/", "\n"..pscol);
+		ps.replace("|", " ");
+		ps.replace("  ", " ");
+		ps.replace("\n"..pscol.." ", "\n"..pscol);
+		return ps;
+	}
+
+	override void DoEffect()
+	{
+		if (AccumulatedDamage > 0)
+		{
+			AccumulatedDamage--;
+		}
+		Super.DoEffect();
+	}
+
+	//called from HDPlayerPawn and HDMobBase's DamageMobj
+	override int, Name, int, int, int, int, int HandleDamage(int damage, name mod, int flags, actor inflictor, actor source, int towound, int toburn, int tostun, int tobreak)
+	{
+		if (mod == "bleedout")
+		{
+			damage = -1;
+			mod = "internal";
+			let hdp = hdplayerpawn(owner);
+			if (hdp)
+			{
+				hdp.woundcount = 0;
+			}
+		}
+		return damage, mod, flags, towound, toburn, tostun, tobreak;
+	}
+
+	override int, Name, int, int, int, int, int, int HandleDamagePost(int damage, name mod, int flags, actor inflictor, actor source, int towound, int toburn, int tostun, int tobreak, int toaggravate)
+	{
+		let victim = owner;
+		if (!victim)
+		{
+			return damage, mod, flags, towound, toburn, tostun, tobreak, toaggravate;
+		}
+
+		if (damage == TELEFRAG_DAMAGE && source == victim)
+		{
+			GoAwayAndDie();
+			return damage, mod, flags, towound, toburn, tostun, tobreak, toaggravate;
+		}
+
+		if (!random(0, 7))
+		{
+			HDBleedingWound.Inflict(source, random(1, 3), 1, false, victim);
+		}
+
+		//Console.Printf("%i, %i, %i, %i, %i, %i", damage, towound, toburn, tostun, tobreak, toaggravate);
+
+		let hdp = HDPlayerPawn(victim);
+		if (damage < 144)
+		{
+			int blocked = max(damage >> Amount, 1);
+
+			// [Ace] So the way this works is that more layers means you get a ridiculous amount of damage reduction, but you are also much more prone to losing a layer.
+			// The amount of damage blocked gets added up, so the more damage you absorb, the faster it builds up. It goes down over time at the rate of 1 per tic.
+			AccumulatedDamage += damage - blocked;
+
+			damage = blocked;
+			tostun = min(tostun >> Amount, 7);
+
+			if (hdp && hdp.inpain > 0)
+			{
+				hdp.inpain = max(hdp.inpain, 3);
+				hdp.stunned = min(hdp.stunned, 350);
+			}
+
+			if (AccumulatedDamage > 777)
+			{
+				AccumulatedDamage = 0;
+				owner.GiveBody(100);
+				owner.A_GiveInventory('SpiritualArmourPower');
+				Amount--;
+			}
+		}
+		else
+		{
+			damage = 0;
+			tostun = 0;
+			owner.GiveBody(100);
+			owner.A_GiveInventory('SpiritualArmourPower');
+			Amount--;
+		}
+
+		return damage, mod, flags, 0, 0, tostun, 0, 0;
+	}
+
+	const pscol = "\cr";
+	int AccumulatedDamage;
+
 	Default
 	{
 		//$Category "Items/Hideous Destructor/Magic"
@@ -49,84 +152,6 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 				}
 			}
 			stop;
-	}
-
-	const pscol = "\cr";
-	static string FromPsalter()
-	{
-		string psss = Wads.ReadLump(Wads.CheckNumForName("psalms", 0));
-		array<string> pss; pss.clear();
-		psss.split(pss, "Psalm ");
-		pss.delete(0); //don't get anything before "Psalm 1:1"
-		string ps = pss[random(0, pss.size() - 1)];
-		ps = ps.mid(ps.indexof(" ") + 1);
-		ps = pscol..ps;
-		ps.replace("/", "\n"..pscol);
-		ps.replace("|", " ");
-		ps.replace("  ", " ");
-		ps.replace("\n"..pscol.." ", "\n"..pscol);
-		return ps;
-	}
-
-	//called from HDPlayerPawn and HDMobBase's DamageMobj
-	override int, Name, int, int, int, int, int HandleDamage(int damage, name mod, int flags, actor inflictor, actor source, int towound, int toburn, int tostun, int tobreak)
-	{
-		if (mod == "bleedout")
-		{
-			damage = -1;
-			mod = "internal";
-			let hdp = hdplayerpawn(owner);
-			if (hdp)
-			{
-				hdp.woundcount = 0;
-			}
-		}
-		return damage, mod, flags, towound, toburn, tostun, tobreak;
-	}
-
-	override int, Name, int, int, int, int, int, int HandleDamagePost(int damage, name mod, int flags, actor inflictor, actor source, int towound, int toburn, int tostun, int tobreak, int toaggravate)
-	{
-		let victim = owner;
-		if (!victim)
-		{
-			return damage, mod, flags, towound, toburn, tostun, tobreak, toaggravate;
-		}
-
-		if (damage == TELEFRAG_DAMAGE && source == victim)
-		{
-			GoAwayAndDie();
-			return damage, mod, flags, towound, toburn, tostun, tobreak, toaggravate;
-		}
-
-		if (!random(0, 7))
-		{
-			HDBleedingWound.Inflict(source, random(1, 3), 1, false, victim);
-		}
-
-		//Console.Printf("%i, %i, %i, %i, %i, %i", damage, towound, toburn, tostun, tobreak, toaggravate);
-
-		let hdp = HDPlayerPawn(victim);
-		if (damage < 144)
-		{
-			damage = max(damage >> Amount, 1);
-			tostun = min(tostun >> Amount, 7);
-
-			if (hdp && hdp.inpain > 0)
-			{
-				hdp.inpain = max(hdp.inpain, 3);
-				hdp.stunned = min(hdp.stunned, 350);
-			}
-		}
-		else
-		{
-			damage = 0;
-			tostun = 0;
-			owner.GiveBody(100);
-			owner.A_GiveInventory('SpiritualArmourPower');
-			Amount--;
-		}
-
-		return damage, mod, flags, 0, 0, tostun, 0, 0;
 	}
 }
 
