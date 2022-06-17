@@ -152,10 +152,6 @@ class HDWeapon:Weapon{
 			{
 				prop /= hdp.strength;
 			}
-			if (hdp.gunbraced)
-			{
-				prop /= 2.0;
-			}
 			hdp.recoilfov -= prop;
 		}
 	}
