@@ -525,7 +525,7 @@ class HDExplosion:IdleDummy{
 	death:
 		MISL B 0 nodelay{
 			if(max(abs(pos.x),abs(pos.y),abs(pos.z))>=32768){destroy();return;}
-			vel.z+=4;
+			vel.z+=2;
 			A_StartSound(deathsound,CHAN_BODY);
 			let xxx=spawn("HDExplosionLight",pos);
 			xxx.target=self;
