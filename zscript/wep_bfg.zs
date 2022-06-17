@@ -44,7 +44,40 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			a.vel+=caller.vel*0.9-spot*0.03;
 		}
 	}
+	actor ShootBall(actor inflictor,actor source){
+		inflictor.bfrightening=true;
+		inflictor.A_StartSound("weapons/bfgfwoosh",CHAN_WEAPON,CHANF_OVERLAP);
+		weaponstatus[BFGS_CHARGE]=0;
+		weaponstatus[BFGS_BATTERY]=0;
+		weaponstatus[0]&=~BFGF_CRITICAL;
+		if(random(0,7))weaponstatus[0]&=~BFGF_DEMON;
+
+		vector3 ballvel=(cos(inflictor.pitch)*(cos(inflictor.angle),sin(inflictor.angle)),-sin(inflictor.pitch));
+
+		vector3 spawnpos=(inflictor.pos.xy,inflictor.pos.z+inflictor.height*0.8)+ballvel*6;
+		if(inflictor.viewpos)spawnpos+=inflictor.viewpos.offset;
+
+		let bbb=spawn("BFGBallTail",spawnpos);
+		if(bbb){
+			bbb.target=source;
+			bbb.pitch=inflictor.pitch;
+			bbb.angle=inflictor.angle;
+			bbb.vel=inflictor.vel+ballvel*4.;
+		}
+		bbb=spawn("BFGBalle",spawnpos);
+		if(bbb){
+			bbb.target=source;
+			bbb.master=source;
+			bbb.pitch=inflictor.pitch;
+			bbb.angle=inflictor.angle;
+			bbb.vel=inflictor.vel+ballvel*12.;
+		}
+		return bbb;
+	}
 	override bool IsBeingWorn(){return weaponstatus[0]&BFGF_STRAPPED;}
+	override void ForceBasicAmmo(){
+		ForceOneBasicAmmo("HDBattery",2);
+	}
 	override inventory CreateTossable(int amt){
 		if(
 			weaponstatus[0]&BFGF_STRAPPED
@@ -246,11 +279,10 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 				else invoker.weaponstatus[BFGS_CHARGE]++;
 				if(!random(0,60))invoker.weaponstatus[0]|=BFGF_DEMON;
 			}
-			if(invoker.weaponstatus[BFGS_BATTERY]==20)A_SetTics(5);
 			if(health<40){
-				A_SetTics(4);
+				A_SetTics(2);
 				if(health>16)damagemobj(invoker,self,1,"internal");
-			}
+			}else if(invoker.weaponstatus[BFGS_BATTERY]==20)A_SetTics(2);
 			A_WeaponBusy(false);
 			A_StartSound("weapons/bfgcharge",CHAN_WEAPON);
 			BFG9k.Spark(self,1,height-10);
@@ -263,7 +295,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		}
 		loop;
 	chargeend:
-		#### B 2{
+		#### B 1{
 			BFG9k.Spark(self,1,height-10);
 			A_StartSound("weapons/bfgcharge",(invoker.weaponstatus[BFGS_TIMER]>6)?CHAN_AUTO:CHAN_WEAPON);
 			A_WeaponReady(WRF_ALLOWRELOAD|WRF_NOFIRE|WRF_DISABLESWITCH);
@@ -271,7 +303,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			invoker.weaponstatus[BFGS_TIMER]++;
 		}
 		#### B 0{
-			if(invoker.weaponstatus[BFGS_TIMER]>21)A_Refire("shoot");
+			if(invoker.weaponstatus[BFGS_TIMER]>14)A_Refire("shoot");
 			else A_Refire("chargeend");
 		}goto ready;
 	shoot:
@@ -280,7 +312,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			invoker.weaponstatus[0]|=BFGF_CRITICAL;
 			invoker.weaponstatus[BFGS_CRITTIMER]=15;
 			A_StartSound("weapons/bfgf",CHAN_WEAPON);
-			A_GiveInventory("PowerFrightener");
+			bfrightening=true;
 		}
 		#### B 3{
 			invoker.weaponstatus[BFGS_CRITTIMER]--;
@@ -299,28 +331,8 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		}
 		#### B 2{
 			A_ZoomRecoil(0.2);
-			A_StartSound("weapons/bfgfwoosh",CHAN_WEAPON,CHANF_OVERLAP);
-			A_GiveInventory("PowerFrightener",1);
-
-			invoker.weaponstatus[BFGS_CHARGE]=0;
-			invoker.weaponstatus[BFGS_BATTERY]=0;
-			invoker.weaponstatus[0]&=~BFGF_CRITICAL;
 			A_GunFlash();
-			if(random(0,7))invoker.weaponstatus[0]&=~BFGF_DEMON;
-			A_SpawnItemEx("BFGBallTail",0,0,height-12,
-				cos(pitch)*cos(angle)*4+vel.x,
-				cos(pitch)*sin(angle)*4+vel.y,
-				-sin(pitch)*4+vel.z,
-				0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-			);
-			A_SpawnItemEx("BFGBalle",0,0,height-12,
-				cos(pitch)*cos(angle)*13+vel.x,
-				cos(pitch)*sin(angle)*13+vel.y,
-				-sin(pitch)*13+vel.z,
-				0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|
-				SXF_TRANSFERPITCH|SXF_SETMASTER
-			);
-			A_GiveInventory("PowerFrightener",1);
+			invoker.ShootBall(self,self);
 		}
 		#### B 0 A_JumpIf(invoker.weaponstatus[0]&BFGF_STRAPPED,"recoilstrapped");
 		#### B 6 A_ChangeVelocity(-2,0,3,CVF_RELATIVE);
@@ -452,7 +464,10 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 					invoker.weaponstatus[BFGS_BATTERY]>=0
 					&&invoker.weaponstatus[BFGS_CHARGE]>=0
 				)
-			){setweaponstate("reload3");return;}
+			){
+				setweaponstate("reload3");
+				return;
+			}
 			int batslot=(
 				invoker.weaponstatus[BFGS_BATTERY]<0
 				&&invoker.weaponstatus[BFGS_CHARGE]<0
@@ -464,7 +479,14 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			}else{
 				invoker.weaponstatus[batslot]=mmm.TakeMag(true);
 			}
-		}loop;
+		}
+		#### C 0 A_JumpIf(
+				!countinv("HDBattery")
+				||invoker.weaponstatus[BFGS_BATTERY]>=0
+			,
+			"reload3"
+		);
+		loop;
 	reload3:
 		#### C 12 offset(0,38) A_StartSound("weapons/bfgopen",8);
 		#### C 16 offset(0,37) A_StartSound("weapons/bfgclick2",8);
@@ -500,21 +522,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			invoker.A_StartSound("weapons/bfgfwoosh",CHAN_AUTO);
 			invoker.weaponstatus[0]&=~BFGF_CRITICAL; //DO NOT DELETE THIS
 			invoker.weaponstatus[BFGS_CHARGE]=0;invoker.weaponstatus[BFGS_BATTERY]=0;
-
-			if(random(0,7))invoker.weaponstatus[0]&=~BFGF_DEMON;
-			A_SpawnItemEx("BFGBallTail",0,0,height-12,
-				cos(pitch)*cos(angle)*4+vel.x,
-				cos(pitch)*sin(angle)*4+vel.y,
-				-sin(pitch)*4+vel.z,
-				0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-			);
-			A_SpawnItemEx("BFGBalle",0,0,height-12,
-				cos(pitch)*cos(angle)*13+vel.x,
-				cos(pitch)*sin(angle)*13+vel.y,
-				-sin(pitch)*13+vel.z,
-				0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|
-				SXF_TRANSFERPITCH|SXF_TRANSFERPOINTERS
-			);
+			invoker.ShootBall(invoker,invoker.lastenemy);
 		}
 		BFUG A 0{
 			invoker.A_ChangeVelocity(-cos(pitch)*4,0,sin(pitch)*4,CVF_RELATIVE);

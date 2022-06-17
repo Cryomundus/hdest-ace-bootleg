@@ -233,6 +233,7 @@ class HDWeapon:Weapon{
 		let newwep=GetSpareWeapon(onr,doselect:isreadyweapon);
 		hdweapon(thrown).bjustchucked=true;
 		thrown.target=onr;
+		thrown.lastenemy=onr;
 		if(throw){
 			thrown.bmissile=true;
 			thrown.bBOUNCEONWALLS=true;
