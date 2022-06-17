@@ -457,6 +457,22 @@ extend class HDPlayerPawn{
 			}
 		}
 
+		//move pivot point a little ahead of the player's view if braced
+		anglechange=normalize180(anglechange);
+		if(
+			!teleported
+			&&!incapacitated
+			&&player.onground
+			&&gunbraced
+			&&!barehanded
+			&&isFocussing
+		){
+			if(abs(anglechange)>0.05){
+				double aad=angle+anglechange+90;
+				trymove(self.pos.xy+(cos(aad),sin(aad))*(-0.3*anglechange),false);
+			}
+		}
+
 		//reset blocked check for a fresh start
 		totallyblocked=false;
 
