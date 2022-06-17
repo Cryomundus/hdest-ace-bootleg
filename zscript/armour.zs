@@ -344,7 +344,7 @@ class HDArmourWorn : HDDamageHandler
 
 	override Inventory CreateTossable(int amt)
 	{
-		if (!HDPlayerPawn.CheckStrip(owner, self))
+		if (HDPlayerPawn.CheckStrip(owner, self) != CSResult_Nothing)
 		{
 			return null;
 		}

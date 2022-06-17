@@ -211,9 +211,7 @@ class PortableRadsuit:HDPickup replaces RadSuit{
 			&&other.player.cmd.buttons&BT_USE
 			&&!other.findinventory("WornRadsuit")
 		){
-			wornlayer=STRIP_RADSUIT;
-			bool intervening=!HDPlayerPawn.CheckStrip(other,self,false);
-			wornlayer=0;
+			bool intervening = HDPlayerPawn.CheckStrip(other,self,false) != CSResult_Nothing;
 
 			if(intervening)return false;
 
@@ -255,11 +253,11 @@ class PortableRadsuit:HDPickup replaces RadSuit{
 		TNT1 A 0{
 			let owrs=wornradsuit(findinventory("wornradsuit"));
 			if(owrs){
-				if(!HDPlayerPawn.CheckStrip(self,owrs))return;
+				if(HDPlayerPawn.CheckStrip(self,owrs) != CSResult_Nothing)return;
 			}else{
 				invoker.wornlayer=STRIP_RADSUIT+1;
-				if(!HDPlayerPawn.CheckStrip(self,invoker)){
-					invoker.wornlayer=0;
+				if(HDPlayerPawn.CheckStrip(self,invoker) != CSResult_Nothing){
+					invoker.wornlayer=STRIP_RADSUIT;
 					return;
 				}
 				invoker.wornlayer=0;

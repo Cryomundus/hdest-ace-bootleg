@@ -1310,7 +1310,7 @@ class HDBackpack : HDWeapon{
 		+HDWEAPON.FITSINBACKPACK
 		+HDWEAPON.ALWAYSSHOWSTATUS
 		+HDWEAPON.IGNORELOADOUTAMOUNT
-		+hdweapon.hinderlegs
+		+HDWEAPON.HINDERLEGS
 		Weapon.SelectionOrder 1010;
 		Inventory.Icon "BPAKA0";
 		Inventory.PickupMessage "Picked up a backpack to help fill your life with ammo!";
@@ -1318,7 +1318,7 @@ class HDBackpack : HDWeapon{
 		Tag "Backpack";
 		HDWeapon.RefId HDLD_BACKPAK;
 		HDBackpack.MaxCapacity HDCONST_BPMAX;
-		HDWeapon.wornlayer STRIP_BACKPACK;
+		HDWeapon.WornLayer STRIP_BACKPACK;
 	}
 	
 	States

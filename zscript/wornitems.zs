@@ -40,7 +40,7 @@ extend class HDPlayerPawn
 		Inventory preventory = null;
 
 		//the thing in your hands in front of you is always the top layer
-		if (caller.player && HDWeapon(caller.player.ReadyWeapon) && HDWeapon(caller.player.ReadyWeapon).IsBeingWorn())
+		if (caller.player && HDWeapon(caller.player.ReadyWeapon) && HDWeapon(caller.player.ReadyWeapon).IsBeingWorn() && caller.player.ReadyWeapon != checkitem)
 		{
 			preventory = caller.player.ReadyWeapon;
 		}
