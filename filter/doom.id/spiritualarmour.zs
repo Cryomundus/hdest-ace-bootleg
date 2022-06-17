@@ -21,7 +21,7 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 
 	override void DoEffect()
 	{
-		if (AccumulatedDamage > 0)
+		if (AccumulatedDamage > 0 && GetAge() % 35 == 0)
 		{
 			AccumulatedDamage--;
 		}
@@ -68,13 +68,17 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		let hdp = HDPlayerPawn(victim);
 		if (damage < 144)
 		{
-			int blocked = max(damage >> Amount, 1);
+			int newDamage = max(damage >> Amount, 1);
+			if (mod == 'hot' && random(0, Amount))
+			{
+				newDamage = 0;
+			}
 
 			// [Ace] So the way this works is that more layers means you get a ridiculous amount of damage reduction, but you are also much more prone to losing a layer.
-			// The amount of damage blocked gets added up, so the more damage you absorb, the faster it builds up. It goes down over time at the rate of 1 per tic.
-			AccumulatedDamage += damage - blocked;
+			// The amount of damage blocked gets added up, so the more damage you absorb, the faster it builds up.
+			AccumulatedDamage += damage - newDamage;
 
-			damage = blocked;
+			damage = newDamage;
 			tostun = min(tostun >> Amount, 7);
 
 			if (hdp && hdp.inpain > 0)
