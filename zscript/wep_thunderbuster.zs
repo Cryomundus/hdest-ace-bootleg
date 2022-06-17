@@ -198,10 +198,10 @@ class ThunderBuster:HDCellWeapon{
 				hitactor.damagemobj(null,caller,random(1,(battery<<2)),"Balefire",dmgflags);
 			}else if(
 				hitactor.bnodamage
-				||(hitactor.bnoblood&&!random(0,3))
+				||hitactor.bnoblood
 				||hitactor.bloodtype=="NotQuiteBloodSplat"
+				||random(0,7)
 				||hitactor.countinv("ImmunityToFire")
-				||!random(0,7)
 				||HDWoundFixer.CheckCovered(hitactor,true)
 			){
 				//dry actor - ping damage and continue
@@ -364,14 +364,14 @@ class ThunderBuster:HDCellWeapon{
 			if(invoker.weaponstatus[TBS_BATTERY]>=0)
 				return resolvestate("unmag");
 			return resolvestate("nope");
-		}
+		}goto magout;
 	unmag:
 		#### A 2 offset(0,33){
 			A_SetCrosshair(21);
 			A_MuzzleClimb(frandom(-1.2,-2.4),frandom(1.2,2.4));
 		}
-		#### A 3 offset(0,35);
-		#### A 2 offset(0,40) A_StartSound("weapons/plasopen",8);
+		#### A 3 offset(0,35) A_StartSound("weapons/plasopen",8);
+		#### A 6 offset(0,40) A_StartSound("weapons/plasload",8,CHANF_OVERLAP);
 		#### A 0{
 			int bat=invoker.weaponstatus[TBS_BATTERY];
 			A_MuzzleClimb(frandom(-1.2,-2.4),frandom(1.2,2.4));
@@ -403,11 +403,11 @@ class ThunderBuster:HDCellWeapon{
 			}
 		}
 		#### A 8 offset(0,43) A_StartSound("weapons/pocket",9);
-		#### A 8 offset(0,42) A_StartSound("weapons/pocket",9);
+		#### A 8 offset(0,42) A_StartSound("weapons/pocket",9,CHANF_OVERLAP);
 		goto magout;
 
 	magout:
-		---- A 0 A_JumpIf(invoker.weaponstatus[0]&TBF_JUSTUNLOAD,"Reload3");
+		---- A 0 A_JumpIf(invoker.weaponstatus[0]&TBF_JUSTUNLOAD,"reload3");
 		goto loadmag;
 
 	reload:
@@ -420,11 +420,13 @@ class ThunderBuster:HDCellWeapon{
 		}goto nope;
 
 	loadmag:
-		#### A 12 offset(0,42);
-		#### A 2 offset(0,43){if(health>39)A_SetTics(0);}
+		#### A 2 offset(0,43){
+			A_StartSound("weapons/pocket",9);
+			if(health>39)A_SetTics(0);
+		}
 		#### AA 2 offset(0,42);
 		#### A 2 offset(0,44) A_StartSound("weapons/pocket",9);
-		#### A 4 offset(0,43) A_StartSound("weapons/pocket",9);
+		#### A 4 offset(0,43);
 		#### A 6 offset(0,42);
 		#### A 8 offset(0,38)A_StartSound("weapons/plasload",8);
 		#### A 4 offset(0,37){if(health>39)A_SetTics(0);}
