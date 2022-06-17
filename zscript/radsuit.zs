@@ -255,12 +255,12 @@ class PortableRadsuit:HDPickup replaces RadSuit{
 			if(owrs){
 				if(HDPlayerPawn.CheckStrip(self,owrs) != CSResult_Nothing)return;
 			}else{
-				invoker.wornlayer=STRIP_RADSUIT+1;
+				invoker.wornlayer += 1;
 				if(HDPlayerPawn.CheckStrip(self,invoker) != CSResult_Nothing){
-					invoker.wornlayer=STRIP_RADSUIT;
+					invoker.wornlayer -= 1;
 					return;
 				}
-				invoker.wornlayer=0;
+				invoker.wornlayer -= 1;
 			}
 
 			HDArmour.ArmourChangeEffect(self,120);
