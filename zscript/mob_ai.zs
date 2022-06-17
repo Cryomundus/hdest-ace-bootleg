@@ -177,7 +177,7 @@ extend class HDMobBase{
 			aatt=absangle(angle,angleto(target));
 			int didntsee=max(0,stunned-(mass>>1));
 
-			double d3t=distance3d(target);
+			targdist=level.Vec3Diff(pos,lasttargetpos).length()-target.radius;
 
 			//handle invisibility
 			if(
@@ -185,7 +185,7 @@ extend class HDMobBase{
 				&&!bseeinvisible
 				&&!(
 					target.bSPAWNSOUNDSOURCE
-					&&d3t<HDCONST_MOBSOUNDRANGE
+					&&targdist<HDCONST_MOBSOUNDRANGE
 				)
 			){
 				//imitate blursphere invisibility
@@ -222,14 +222,13 @@ extend class HDMobBase{
 			;
 			if(targsight){
 				lasttargetpos=target.pos;
-				targdist=d3t-target.radius;
 			}else{
 				if(target.bSPAWNSOUNDSOURCE)lasttargetpos=(
 					target.pos.x+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
 					target.pos.y+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
 					target.pos.z
 				);
-				targdist=(level.vec3offset(lasttargetpos,pos)).length();
+				else lasttargetpos.xy+=(frandom(-5,5),frandom(-5,5));
 			}
 		}
 
@@ -352,6 +351,11 @@ extend class HDMobBase{
 				double mms=minmissilechance*(1./256);
 				if(bmissilemore)mms*=0.5;
 				if(bmissileevenmore)mms*=0.25;
+				if(
+					targsight
+					&&vel dot vel < height*3.
+					&&absangle(angle,angleto(target))<5
+				)mms*=0.2;
 				double mchk=frandom(0.,fastmonsters?5.12:2.56);
 				mms=1.+max(mms,dsp);
 				if(mchk>mms){
@@ -621,11 +625,20 @@ extend class HDMobBase{
 		//don't go at full throttle without good reason
 		if(!target&&!threat)speedmult=min(speedmult,0.4);
 
+		//face mvt dir
+		if(!(flags&CHF_NODIRECTIONTURN)){
+			if(
+				target
+				&&targdist<height*(targsight||target.bSPAWNSOUNDSOURCE?5.:3.)
+			){
+				double destangle=HDMath.AngleTo(pos.xy,lasttargetpos.xy);
+				destangle=deltaangle(angle,destangle);
+				angle+=clamp(destangle,-20,20);
+			}
+			else A_FaceMovementDirection(0,20,20);
+		}
 
 		vel.xy+=vecto.unit()*speed*0.16*speedmult;
-
-		//face mvt dir
-		if(!(flags&CHF_NODIRECTIONTURN))A_FaceMovementDirection(0,30,30);
 	}
 
 
@@ -645,7 +658,12 @@ extend class HDMobBase{
 			||targdist<maxtargetrange
 		)
 		&&firefatigue<HDCONST_MAXFIREFATIGUE
-		&&hdmobai.tryshoot(self,angle:angleto(target),pitch:hdmath.pitchto(pos,target.pos),flags:hdmobai.TS_GEOMETRYOK)
+		&&hdmobai.tryshoot(
+			self,
+			angle:hdmath.angleto(pos.xy,lasttargetpos.xy),
+			pitch:hdmath.pitchto(pos,lasttargetpos),
+			flags:hdmobai.TS_GEOMETRYOK
+		)
 		&&(
 			!meleethreshold
 			||targdist>abs(meleethreshold)
@@ -846,8 +864,10 @@ extend class HDMobBase{
 
 				if(newtarget==lastheard)lastheard=null;
 
-				if(!checksight(newtarget))
-					lasttargetpos.xy=newtarget.pos.xy+(frandom(-1,1),frandom(-1,1))*512;
+				lasttargetpos=newtarget.pos;
+				if(
+					!checksight(newtarget)
+				)lasttargetpos.xy+=(frandom(-1,1),frandom(-1,1))*HDCONST_MOBSOUNDRANGE;
 
 				target=newtarget;
 			}
