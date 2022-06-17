@@ -214,8 +214,12 @@ extend class HDMobBase{
 					||aatt<
 						(seefov?seefov:180)
 						*frandom(
-							0.4,  //"within X degrees" implies fov of 2X
-							max(abs(lasttargetpos.x-target.pos.x),abs(lasttargetpos.y-target.pos.y))<(10*HDCONST_ONEMETRE)?1.:0.6
+							0.2,  //"within X degrees" implies fov of 2X
+							max(
+								abs(lasttargetpos.x-target.pos.x),
+								abs(lasttargetpos.y-target.pos.y)
+							)<(10*HDCONST_ONEMETRE)
+							?1.:0.6
 						)
 				)
 				&&checksight(target)
@@ -348,7 +352,7 @@ extend class HDMobBase{
 					abs(targdist/maxtargetrange)
 					:min(0.99,targdist/(HDCONST_ONEMETRE*30))
 				;
-				double mms=minmissilechance*(1./256);
+				double mms=minmissilechance*(1./128);
 				if(bmissilemore)mms*=0.5;
 				if(bmissileevenmore)mms*=0.25;
 				if(
@@ -626,19 +630,22 @@ extend class HDMobBase{
 		if(!target&&!threat)speedmult=min(speedmult,0.4);
 
 		//face mvt dir
+		speedmult*=0.16; 
 		if(!(flags&CHF_NODIRECTIONTURN)){
 			if(
-				target
+				!threat
+				&&!!target
 				&&targdist<height*(targsight||target.bSPAWNSOUNDSOURCE?5.:3.)
 			){
 				double destangle=HDMath.AngleTo(pos.xy,lasttargetpos.xy);
 				destangle=deltaangle(angle,destangle);
 				angle+=clamp(destangle,-20,20);
+				speedmult*=0.8;
 			}
 			else A_FaceMovementDirection(0,20,20);
 		}
 
-		vel.xy+=vecto.unit()*speed*0.16*speedmult;
+		vel.xy+=vecto.unit()*speed*speedmult;
 	}
 
 
