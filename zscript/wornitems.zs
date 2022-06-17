@@ -7,10 +7,10 @@
 //see backpack for the minimum setup required.
 enum CheckStripResult
 {
-	CSResult_Invalid,
-	CSResult_OnCooldown,
 	CSResult_Nothing,
-	CSResult_LayerBlocked
+	CSResult_LayerBlocked,
+	CSResult_Invalid,
+	CSResult_OnCooldown
 }
 
 enum CheckStripFlags
