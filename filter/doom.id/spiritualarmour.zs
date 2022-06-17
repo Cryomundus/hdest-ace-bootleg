@@ -108,8 +108,8 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		let hdp = HDPlayerPawn(victim);
 		if (damage < 144)
 		{
-			damage = max(damage >> 2, 1);
-			tostun = min(tostun >> 2, 7);
+			damage = max(damage >> Amount, 1);
+			tostun = min(tostun >> Amount, 7);
 
 			if (hdp && hdp.inpain > 0)
 			{
