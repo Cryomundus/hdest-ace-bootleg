@@ -22,7 +22,6 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 		}
 		givearmour(1.);
 	}
-	double spread;
 	double turnamount;
 	int gunloaded;
 	override void deathdrop(){
@@ -81,9 +80,9 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 	roam:
 		#### E 3 A_Jump(60,"roam2");
 		#### E 0{spread=1;}
-		#### EEEE 1 A_HDChase("melee","turnaround",CHF_DONTMOVE);
+		#### EEEE 1 A_Watch();
 		#### E 0{spread=0;}
-		#### EEEEEEEEEEEEE 1 A_HDChase("melee","turnaround",CHF_DONTMOVE);
+		#### EEEEEEEEEEEEE 1 A_Watch();
 		#### A 0 A_Jump(60,"roam");
 	roam2:
 		#### A 0 A_Jump(8,"see");
@@ -91,16 +90,6 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 		#### A 0 A_Jump(140,"Roam");
 		#### A 0 A_JumpIfTargetInLOS("see");
 		loop;
-	turnaround:
-		#### A 0 A_FaceTarget(15,0);
-		#### E 2 A_JumpIfTargetInLOS("missile2",40);
-		#### E 0{spread=3;}
-		#### A 0 A_FaceTarget(15,0);
-		#### E 0{spread=6;}
-		#### E 2 A_JumpIfTargetInLOS("missile2",40);
-		#### E 0{spread=4;}
-		#### ABCD 3 A_HDChase();
-		---- A 0 setstatelabel("see");
 	pain:
 		SSWV H 3;
 		SSWV H 3 A_Pain();
@@ -109,15 +98,8 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 	missile:
 		#### A 0 A_JumpIf(gunloaded<1,"reload");
 		#### A 0 A_JumpIfTargetInLOS(3,120);
-		#### CDE 1 A_FaceTarget(90);
+		#### CDE 2 A_FaceLastTargetPos(40);
 		#### F 1 A_SetTics(random(4,10)); //when they just start to aim,not for followup shots!
-		#### A 0 A_JumpIfTargetInLOS("missile2");
-		#### A 0 A_CheckLOF("see",
-			CLOFF_JUMPNONHOSTILE|CLOFF_SKIPTARGET|
-			CLOFF_MUSTBESOLID|
-			CLOFF_SKIPENEMY,
-			0,0,0,0,44,0
-		);
 	missile2:
 		#### A 0{
 			if(!target){
@@ -128,19 +110,14 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 			if(enemydist<200)turnamount=50;
 			else if(enemydist<600)turnamount=30;
 			else turnamount=10;
+
+			spread=0.02*turnamount;
 		}goto turntoaim;
 	turntoaim:
-		#### F 2 A_FaceTarget(turnamount,turnamount);
-		#### A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
-		#### A 0 A_JumpIfTargetInLOS(1,10);
+		#### F 3 A_TurnToAim(turnamount,shootstate:"leadtarget");
 		loop;
-		#### F 1{
-			A_FaceTarget(turnamount,turnamount);
-			A_SetTics(random(1,int(100/clamp(turnamount,1,turnamount+1)+4)));
-			spread=frandom(0.06,0.27)*turnamount;
-		}
-		#### A 0 A_Jump(256,"shoot");
+	leadtarget:
+		#### F 0 A_LeadTarget(lasttargetdist*0.01);
 	shoot:
 		SSWV G 1 bright light("SHOT"){
 			if(gunloaded<1){
@@ -154,12 +131,12 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 			HDWeapon.EjectCasing(self,"HDSpent9mm",11,-frandom(79,81),frandom(7,7.5));
 			gunloaded--;
 		}
-		SSWV F 2 A_SpawnProjectile("HDSpent9mm",40);
+		SSWV F 2;
 		SSWV F 0 A_Jump(128,"shoot");
 	shootend:
 		SSWV F 1 A_FaceTarget(0,0);
 		SSWV F 4 A_Jump(132,"see");
-		SSWV F 6 A_CPosRefire();
+		SSWV FFFFF 4 A_CoverFire();
 		loop;
 	ohforfuckssake:
 		SSWV F 8;

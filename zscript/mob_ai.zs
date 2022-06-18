@@ -40,6 +40,9 @@ extend class HDMobBase{
 	int firefatigue;
 	vector3 movepos;
 	vector3 lasttargetpos;
+	double lasttargetdist;
+	bool targetinsight;
+	double absangletotarg;
 	actor threat;
 	virtual void A_HDWander(int flags=0){A_HDChase(null,null,flags|CHF_WANDER,0.4);}
 	virtual void A_HDChase(
@@ -168,92 +171,31 @@ extend class HDMobBase{
 
 		//initialize target stuff
 		if(!target)target=lastenemy;
-		double targdist=0;
-		bool targsight=false;
-		double aatt=180.;
 
-		//target partial or total invisibility
-		if(target){
-			aatt=absangle(angle,angleto(target));
-			int didntsee=max(0,stunned-(mass>>1));
 
-			targdist=level.Vec3Diff(pos,lasttargetpos).length()-target.radius;
+		vector3 lastlasttargetpos=lasttargetpos;
+		CheckTargetInSight();
 
-			//handle invisibility
-			if(
-				!bnoblurgaze
-				&&!bseeinvisible
-				&&!(
-					target.bSPAWNSOUNDSOURCE
-					&&targdist<HDCONST_MOBSOUNDRANGE
-				)
-			){
-				//imitate blursphere invisibility
-				if(
-					target.bspecialfiredamage
-				){
-					didntsee+=int(600+aatt+targdist*0.1);
-				}else if(
-					target.bshadow
-					&&!target.instatesequence(target.curstate,target.resolvestate("pain"))
-				){
-					didntsee+=max(
-						13,
-						int(aatt+targdist*0.1)-((255-target.cursector.lightlevel)>>5)
-					);
-				}
-			}else if(!blookallaround)didntsee+=(int(aatt)>>5);
-
-			//check sight and distance
-			targsight=
-				!bBOUNCELIKEHERETIC
-				&&!random(0,didntsee)
-				&&(
-					blookallaround
-					||target.bspawnsoundsource
-					||aatt<
-						(seefov?seefov:180)
-						*frandom(
-							0.2,  //"within X degrees" implies fov of 2X
-							max(
-								abs(lasttargetpos.x-target.pos.x),
-								abs(lasttargetpos.y-target.pos.y)
-							)<(10*HDCONST_ONEMETRE)
-							?1.:0.6
-						)
-				)
-				&&checksight(target)
-			;
-			if(targsight){
-				lasttargetpos=target.pos;
-			}else{
-				if(target.bSPAWNSOUNDSOURCE)lasttargetpos=(
-					target.pos.x+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
-					target.pos.y+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
-					target.pos.z
-				);
-				else lasttargetpos.xy+=(frandom(-5,5),frandom(-5,5));
-			}
-		}
 
 		//strain to attack
 		//basically turns stun into DoT
 		if(
 			stunned>1000
 			&&(
-				targsight
-				||targdist<height*6.
+				targetinsight
+				||lasttargetdist<height*6.
 			)
 		){
 			stunned-=(stunned>>3);
 			bodydamage+=(stunned>>6);
 		}
 
+
 		//randomly lose track of target
 		if(
 			!bnotargetswitch
 			&&target
-			&&!targsight
+			&&!targetinsight
 			&&(
 				(bfriendly&&reactiontime<4)
 				||!random(0,255)
@@ -310,7 +252,7 @@ extend class HDMobBase{
 		double checkmeleeradius=target?(target.radius+radius+4)*HDCONST_SQRTTWO:0;
 		if(
 			(
-				targsight
+				targetinsight
 				||(
 					target
 					&&!(random(0,(stunned>>4)))
@@ -319,7 +261,7 @@ extend class HDMobBase{
 			)
 			&&target!=goal
 			&&findstate(meleestate)
-			&&targdist<meleerange
+			&&lasttargetdist<meleerange
 		){
 			lasttargetpos=target.pos;
 			vector3 tpp=target.pos-pos;
@@ -342,24 +284,26 @@ extend class HDMobBase{
 			//consider doing a missile
 			if(
 				CanDoMissile(
-					targsight,
-					targdist,
+					targetinsight,
+					lasttargetdist,
 					missilestate
 				)
 			){
 				//totally new randomizer trying to keep with the spirit of the original
 				double dsp=maxtargetrange?
-					abs(targdist/maxtargetrange)
-					:min(0.99,targdist/(HDCONST_ONEMETRE*30))
+					abs(lasttargetdist/maxtargetrange)
+					:min(0.99,lasttargetdist/(HDCONST_ONEMETRE*30))
 				;
 				double mms=minmissilechance*(1./128);
 				if(bmissilemore)mms*=0.5;
 				if(bmissileevenmore)mms*=0.25;
 				if(
-					targsight
-					&&vel dot vel < height*3.
-					&&absangle(angle,angleto(target))<5
+					targetinsight
+					&&absangletotarg<5
+					&&vel dot vel < height
+					&&absangle(angleto(target),hdmath.angleto(pos.xy,lastlasttargetpos.xy))<15
 				)mms*=0.2;
+
 				double mchk=frandom(0.,fastmonsters?5.12:2.56);
 				mms=1.+max(mms,dsp);
 				if(mchk>mms){
@@ -489,7 +433,7 @@ extend class HDMobBase{
 			if(
 				target
 				&&(
-					aatt>seefov
+					absangletotarg>seefov
 					||!random(0,3)
 				)
 			){
@@ -511,7 +455,7 @@ extend class HDMobBase{
 					||target.bfrightening
 					||(
 						meleethreshold<0
-						&&targdist<abs(meleethreshold)
+						&&lasttargetdist<abs(meleethreshold)
 					)
 				)vecto=rotatevector(vecto,180);
 			}else if(
@@ -605,7 +549,7 @@ extend class HDMobBase{
 
 			if(!(flags&CHF_DONTCHANGEMOVEPOS)){
 				if(
-					!targsight
+					!targetinsight
 					&&target
 					&&!random(0,7)
 				){
@@ -629,13 +573,14 @@ extend class HDMobBase{
 		//don't go at full throttle without good reason
 		if(!target&&!threat)speedmult=min(speedmult,0.4);
 
+
 		//face mvt dir
 		speedmult*=0.16; 
 		if(!(flags&CHF_NODIRECTIONTURN)){
 			if(
 				!threat
 				&&!!target
-				&&targdist<height*(targsight||target.bSPAWNSOUNDSOURCE?5.:3.)
+				&&lasttargetdist<height*(targetinsight||target.bSPAWNSOUNDSOURCE?5.:3.)
 			){
 				double destangle=HDMath.AngleTo(pos.xy,lasttargetpos.xy);
 				destangle=deltaangle(angle,destangle);
@@ -649,20 +594,96 @@ extend class HDMobBase{
 	}
 
 
+	bool CheckTargetInSight(){
+		if(!target){
+			targetinsight=false;
+			return false;
+		}
+
+		double att=angleto(target);
+		absangletotarg=absangle(angle,att);
+		int didntsee=max(0,stunned-(mass>>1));
+
+		lasttargetdist=level.Vec3Diff(pos,lasttargetpos).length()-target.radius;
+
+		//handle invisibility
+		if(
+			!bnoblurgaze
+			&&!bseeinvisible
+			&&!(
+				target.bSPAWNSOUNDSOURCE
+				&&lasttargetdist<HDCONST_MOBSOUNDRANGE
+			)
+		){
+			//imitate blursphere invisibility
+			if(
+				target.bspecialfiredamage
+			){
+				didntsee+=int(600+absangletotarg+lasttargetdist*0.1);
+			}else if(
+				target.bshadow
+				&&!target.instatesequence(target.curstate,target.resolvestate("pain"))
+			){
+				didntsee+=max(
+					13,
+					int(absangletotarg+lasttargetdist*0.1)-((255-target.cursector.lightlevel)>>5)
+				);
+			}
+		}else if(!blookallaround)didntsee+=(int(absangletotarg)>>5);
+
+		//check sight and distance
+		targetinsight=
+			!bBOUNCELIKEHERETIC
+			&&!random(0,didntsee)
+			&&(
+				blookallaround
+				||target.bspawnsoundsource
+				||absangletotarg<
+					(seefov?seefov:180)
+					*frandom(
+						0.2,  //"within X degrees" implies fov of 2X
+						max(
+							abs(lasttargetpos.x-target.pos.x),
+							abs(lasttargetpos.y-target.pos.y)
+						)<(10*HDCONST_ONEMETRE)
+						?1.:0.6
+					)
+			)
+			&&checksight(target)
+		;
+		if(targetinsight){
+			lasttargetpos=target.pos;
+		}else{
+			if(
+				target.bSPAWNSOUNDSOURCE
+				&&absangle(hdmath.angleto(pos.xy,lasttargetpos.xy),att)>30
+			){
+				lasttargetpos=(
+					target.pos.x+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
+					target.pos.y+frandom(-1,1)*(0.2*HDCONST_MOBSOUNDRANGE),
+					frandom(target.pos.z,target.ceilingz)
+				);
+			}
+			else lasttargetpos.xy+=(frandom(-5,5),frandom(-5,5));
+		}
+		return targetinsight;
+	}
+
+
 	//criteria for doing a missile
 	virtual bool CanDoMissile(
-		bool targsight,
-		double targdist,
+		bool targetinsight,
+		double lasttargetdist,
 		out statelabel missilestate
 	){
 		return
-		targsight
+		targetinsight
 		&&target!=goal
 		&&!reactiontime
 		&&findstate(missilestate)
 		&&(
 			!maxtargetrange
-			||targdist<maxtargetrange
+			||lasttargetdist<maxtargetrange
 		)
 		&&firefatigue<HDCONST_MAXFIREFATIGUE
 		&&hdmobai.tryshoot(
@@ -673,7 +694,7 @@ extend class HDMobBase{
 		)
 		&&(
 			!meleethreshold
-			||targdist>abs(meleethreshold)
+			||lasttargetdist>abs(meleethreshold)
 			||!random(0,7)  //brainfart or fuckit
 		);
 	}
@@ -1190,3 +1211,5 @@ class HDAIOverride:Actor{
 	}
 
 }
+
+

@@ -186,7 +186,7 @@ class PainLord:PainMonster replaces BaronofHell{
 		BOSS I 2 A_SpawnItemEx("BFGNecroShard",0,0,35,10,0,8,135,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
 		BOSS I 2 A_SpawnItemEx("BFGNecroShard",0,0,50,10,0,8,225,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
 		BOSS I 2 A_SpawnItemEx("BFGNecroShard",0,0,65,10,0,8,315,SXF_NOCHECKPOSITION|SXF_TRANSFERPOINTERS);
-		BOSS J 8 A_Scream();
+		BOSS J 8 A_Vocalize(default.deathsound);
 		BOSS KLMN 8;
 		BOSS OOOOO 6;
 		BOSS O -1 A_BossDeath();

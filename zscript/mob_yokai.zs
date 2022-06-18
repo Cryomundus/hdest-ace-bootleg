@@ -14,7 +14,7 @@ class Yokai:HDMobBase{
 		+hdmobbase.noshootablecorpse
 		+hdmobbase.novitalshots
 		height 42;radius 10;
-		renderstyle "Add";
+		renderstyle "Subtract";
 		tag "yokai";
 		maxtargetrange 666;
 		bloodtype "NullPuff";
@@ -56,13 +56,17 @@ class Yokai:HDMobBase{
 		GiveBody(4);
 
 		target.A_StartSound("yokai/sight",666,CHANF_OVERLAP,volume:0.4,pitch:0.5);
-		A_GiveToTarget("IsMoving",2);
+		HDF.Give(target,"IsMoving",2);
 		target.damagemobj(
 			self,self,
 			1,!random(0,63)?"balefire":"internal",
 			DMG_NO_ARMOR
 		);
-		if(target&&target.health>0&&!random(0,3))target.givebody(1);
+		if(
+			target.health>0
+			&&random(0,3)
+			&&absangle(target.angle,target.angleto(self))>20
+		)target.givebody(1);
 	}
 	states{
 	spawn:

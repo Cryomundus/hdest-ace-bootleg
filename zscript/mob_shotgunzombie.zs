@@ -59,7 +59,6 @@ class ZombieShotgunner:HDHumanoid{
 	int wep;
 	int turnamount;
 	int choke; //record here because the gun should only drop once
-	double shotspread; //related to aim, NOT choke. Sorry about shitty names
 	override void beginplay(){
 		super.beginplay();
 		bhasdropped=0;
@@ -221,78 +220,43 @@ class ZombieShotgunner:HDHumanoid{
 			else if(!wep&&gunspent>0)setstatelabel("chambersg");
 		}
 		#### ABCD 4 A_HDChase();
-		#### A 0 A_JumpIfTargetInLOS("see");
-		#### A 0 A_Jump(16,"roam");
+		#### A 0 A_Jump(116,"roam","roam","roam","roam2","roam2");
 		loop;
 	roam:
-		#### A 0 A_Jump(60,"roam2");
-	roam1:
-		#### E 4{bmissileevenmore=true;}
-		#### EEEE 3 A_HDChase("melee","turnaround",CHF_DONTMOVE);
-		#### A 0{bmissileevenmore=false;}
+		#### EEEE 3 A_Watch();
 		#### A 0 A_Jump(60,"roam");
 	roam2:
-		#### A 0 A_Jump(8,"see");
+		#### A 0 A_JumpIf(targetinsight||!random(0,31),"see");
 		#### ABCD 6 A_HDChase();
-		#### A 0 A_Jump(200,"Roam");
-		#### A 0 A_JumpIfTargetInLOS("see");
+		#### A 0 A_Jump(80,"roam");
 		loop;
-	turnaround:
-		#### A 0 A_FaceTarget(15,0);
-		#### E 2 A_JumpIfTargetInLOS("missile2",40);
-		#### A 0 A_FaceTarget(15,0);
-		#### E 2 A_JumpIfTargetInLOS("missile2",40);
-		#### ABCD 3 A_HDChase();
-		---- A 0 setstatelabel("see");
 
 	missile:
-		#### A 0 A_JumpIfTargetInLOS(3,120);
-		#### CD 2 A_FaceTarget(90,90);
-		#### E 1 A_SetTics(random(4,10)); //when they just start to aim,not for followup shots!
-		#### A 0 A_JumpIf(!hdmobai.tryshoot(self,pradius:5,pheight:5),"see");
-	missile2:
 		#### A 0{
-			if(!target){
-				setstatelabel("see");
-				return;
-			}
-			double dist=distance3d(target);
-			if(dist<300){
-				turnamount=40;
-			}else if(dist<800){
-				turnamount=30;
-			}else{
-				turnamount=20;
-			}
+			turnamount=int(max(10,30-lasttargetdist*0.01));
 		}//fallthrough to turntoaim
 	turntoaim:
-		#### E 2 A_FaceTarget(turnamount,turnamount);
-		#### A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
-		#### A 0 A_JumpIfTargetInLOS(1,10);
+		#### ABCD 3 A_TurnToAim(turnamount);
 		loop;
-		#### A 0 A_FaceTarget(turnamount,turnamount);
-		#### E 1 A_SetTics(random(1,100/clamp(1,turnamount,turnamount+1)+6));
+	shoot:
+		#### E 2{
+			int lag=max(2,10-(turnamount>>5));
+			A_SetTics(lag);
+			A_LeadTarget(tics);
+		}
 		#### E 0{
-			if(
-				gunloaded<1
-			){
-				setstatelabel("ohforfuckssake");
+			if(jammed){
+				setstatelabel("jammed");
 				return;
 			}
-			shotspread=frandom(0.07,0.27)*turnamount;
-			setstatelabel("shoot");
-		}
-	shoot:
-		#### E 1 A_JumpIf(jammed,"jammed");
-		#### E 0{
 			if(gunloaded<1){
 				setstatelabel("ohforfuckssake");
 				return;
 			}
-			if(wep==1)shotspread*=0.8;
-			angle+=frandom(0,shotspread)-frandom(0,shotspread);
-			pitch+=frandom(0,shotspread)-frandom(0,shotspread);
+			spread=0.1*turnamount;
+			if(wep==1)spread*=0.8;
+			angle+=frandom(0,spread)-frandom(0,spread);
+			pitch+=frandom(0,spread)-frandom(0,spread);
 
 			pitch+=frandom(0,0.3);  //anticipate recoil
 
@@ -315,8 +279,8 @@ class ZombieShotgunner:HDHumanoid{
 				return;
 			}
 
-			angle+=frandom(-0.2,0.1)*shotspread;
-			pitch+=frandom(-0.2,0.1)*shotspread;
+			angle+=frandom(-0.2,0.1)*spread;
+			pitch+=frandom(-0.2,0.1)*spread;
 
 			A_StartSound("weapons/rifle",CHAN_WEAPON);
 
@@ -334,7 +298,6 @@ class ZombieShotgunner:HDHumanoid{
 			else A_SetTics(random(4,12));
 		}
 		#### E 0 A_Jump(127,"see");
-		#### E 0 A_SpidRefire();
 		goto turntoaim;
 
 	shootssg:
@@ -362,8 +325,7 @@ class ZombieShotgunner:HDHumanoid{
 		}
 		#### E 1 A_SetTics(random(2,4));
 		#### E 0 A_Jump(192,"see");
-		#### E 0 A_SpidRefire();
-		goto turntoaim;
+		goto roam;
 
 	shootsg:
 		#### F 1 bright light("SHOT"){
@@ -398,8 +360,8 @@ class ZombieShotgunner:HDHumanoid{
 			else A_SetTics(random(3,8));
 		}
 		#### E 0 A_Jump(127,"see");
-		#### E 0 A_SpidRefire();
-		goto turntoaim;
+		#### E 0 A_Jump(32,"turntoaim");
+		---- A 0 setstatelabel("roam");
 	chambersg:
 		#### E 8{
 			if(gunspent){
@@ -419,8 +381,7 @@ class ZombieShotgunner:HDHumanoid{
 		}
 		#### E 1 A_SetTics(random(3,8));
 		#### E 0 A_Jump(127,"see");
-		#### E 0 A_SpidRefire();
-		goto turntoaim;
+		goto roam;
 
 	jammed:
 		#### E 8;
@@ -461,7 +422,6 @@ class ZombieShotgunner:HDHumanoid{
 			A_StartSound("weapons/rifleclick2");
 			gunloaded=50;
 			gunspent=0;
-			bfrightened=false;
 			A_HDChase();
 		}
 		#### CB 4 A_HDChase("melee",null);
@@ -494,12 +454,10 @@ class ZombieShotgunner:HDHumanoid{
 		---- A 0 setstatelabel("see");
 
 	reloadsg:
-		#### A 0{bfrightened=true;}
 		#### A 2 A_HDChase("melee",null);
 		#### A 0 A_StartSound("weapons/huntopen",8);
-		#### BCDA 2 A_HDChase("melee",null);
+		#### BCDA 2 A_HDChase("melee",null,flags:CHF_FLEE);
 	reloadsg2:
-		#### A 0{if(!threat)threat=target;}
 		#### BB 3 A_HDWander(flags:CHF_FLEE);
 		#### B 0{
 			gunloaded++;
@@ -522,7 +480,6 @@ class ZombieShotgunner:HDHumanoid{
 		#### ABCDA 2 A_HDWander();
 		loop;
 	reloadsgend:
-		#### A 0{bfrightened=false;}
 		#### BCD 3 A_HDWander(flags:CHF_FLEE);
 		#### A 0 A_StartSound("weapons/huntopen",8);
 		#### E 4 A_HDChase("melee","missile",CHF_DONTMOVE);
@@ -534,9 +491,8 @@ class ZombieShotgunner:HDHumanoid{
 		#### G 0{
 			A_ShoutAlert(0.2,SAF_SILENT);
 			if(target&&distance3d(target)<100)setstatelabel("see");
-			bfrightened=true;
 		}
-		#### ABCD 2 A_HDChase();
+		#### ABCD 2 A_HDChase(flags:CHF_FLEE);
 		#### G 0{bfrightened=false;}
 		---- A 0 setstatelabel("see");
 

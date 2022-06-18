@@ -238,6 +238,7 @@ class Matribite:HDMobBase replaces PainElemental{
 			aaa.pitch=pitch;
 			aaa.vel=vel;
 			aaa.A_SetFriendly(bfriendly);
+			if(bbossspawned)aaa.bbossspawned=true;
 			aaa.A_Vocalize(aaa.attacksound);
 			aaa.A_ChangeVelocity(cos(pitch)*15,0,sin(pitch)*-15,CVF_RELATIVE);
 			brewing=4;

@@ -109,6 +109,7 @@ class PainBringer:PainMonster replaces HellKnight{
 			p.master=self;p.angle=angle;p.pitch=pitch;
 			p.A_ChangeVelocity(cos(pitch)*5,0,-sin(pitch)*5,CVF_RELATIVE);
 			p.A_SetFriendly(bfriendly);
+			if(bbossspawned)p.bbossspawned=true;
 			p.target=target;
 			puttopawn=p;
 			firefatigue+=int(HDCONST_MAXFIREFATIGUE*0.8);

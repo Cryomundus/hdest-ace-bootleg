@@ -101,7 +101,7 @@ class NinjaPirate:HDMobBase{ //replaces Spectre{
 		TNT1 A 0 Cloak();
 	spawnstillcloaked:
 		TNT1 A 0 GiveBody(2);
-		TNT1 A 10 A_Look();
+		TNT1 A 10 A_HDLook();
 		loop;
 	spawnwander:
 		SARG ABCD 8 A_BlurWander();
@@ -113,7 +113,7 @@ class NinjaPirate:HDMobBase{ //replaces Spectre{
 		TNT1 A 0 Cloak();
 	spawnwandercloaked:
 		TNT1 A 0 GiveBody(2);
-		TNT1 A 0 A_Look();
+		TNT1 A 0 A_HDLook();
 		TNT1 A 7 A_Wander();
 		TNT1 A 0 A_Jump(12,1);
 		loop;
@@ -122,9 +122,9 @@ class NinjaPirate:HDMobBase{ //replaces Spectre{
 		TNT1 A 0 A_StartSound("demon/active",CHAN_VOICE);
 	spawnstill:
 		SARG E 10 A_Jump(48,"spawnwander");
-		TNT1 A 0 A_Look();
+		TNT1 A 0 A_HDLook();
 		SARG E 10 A_SetAngle(angle+random(-20,20));
-		SARG EEFF 10 A_Look();
+		SARG EEFF 10 A_HDLook();
 		loop;
 	spawnuncloak:
 		SARG G 0 A_Uncloak();

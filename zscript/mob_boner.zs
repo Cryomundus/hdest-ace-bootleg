@@ -165,7 +165,7 @@ class Boner:HDMobBase replaces Revenant{
 	}
 	states{
 	spawn:
-		SKEL B 10 A_Look();
+		SKEL B 10 A_HDLook();
 		wait;
 	see:
 		SKEL ABCDEF 3 A_HDChase();

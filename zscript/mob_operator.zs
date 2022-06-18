@@ -49,7 +49,6 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 	}
 	int user_weapon;property user_weapon:user_weapon;
 	int user_colour;property user_colour:user_colour;
-	double spread;
 	double turnamount;
 	int gunloaded;
 	int gunmax;
@@ -1724,6 +1723,3 @@ class BotBot:HDOperator{
 		}stop;
 	}
 }
-
-
-

@@ -14,7 +14,7 @@ class ThunderBuster:HDCellWeapon{
 		weapon.ammouse 1;
 		scale 0.6;
 		inventory.pickupmessage "You got the particle beam gun!";
-		obituary "%o was roasted by %k's particle splatter.";
+		obituary "%o was hammered by %k's particle beam.";
 		hdweapon.barrelsize 28,1.6,3;
 		hdweapon.refid HDLD_THUNDER;
 		tag "Thunder Buster";
@@ -178,6 +178,7 @@ class ThunderBuster:HDCellWeapon{
 		if(alt){
 			if(tlt.hittype==Trace_HitNone||tlt.distance>2000)return;
 			actor bbb=spawn("BeamSpotFlash",tlt.hitlocation-tlt.hitdir,ALLOW_REPLACE);
+			bbb.setz(clamp(bbb.pos.z,bbb.floorz,bbb.ceilingz-8));
 			if(!random(0,3))(lingeringthunder.zap(bbb,bbb,caller,40,true));
 			beamspotflash(bbb).impactdistance=tlt.distance-16*battery;
 			bbb.angle=caller.angle;
@@ -220,6 +221,7 @@ class ThunderBuster:HDCellWeapon{
 		}
 		//where where the magic happens happens
 		actor bbb=spawn("BeamSpot",tlt.hitlocation-tlt.hitdir,ALLOW_REPLACE);
+		bbb.setz(clamp(bbb.pos.z,bbb.floorz,bbb.ceilingz-8));
 		bbb.target=caller;
 		bbb.stamina=basedmg;
 		bbb.angle=caller.angle;
@@ -584,8 +586,9 @@ class BeamSpot:HDActor{
 		array<actor>beamspots;
 		actoriterator it=level.createactoriterator(TB_BEAMSPOTTID,"BeamSpot");
 		while(master=it.Next()){
+			if(!BeamSpot(master))continue;
 			double dist=master.distance3d(self)*0.01;
-			if(master && dist<8){
+			if(dist<8){
 				stamina+=int(21-dist);
 				if(master!=self)beamspots.push(master);
 				if(master.stamina>21)master.setstatelabel("glow");
@@ -656,7 +659,7 @@ class BeamSpotFlash:IdleDummy{
 	default{
 		+puffonactors +hittracer +puffgetsowner +rollsprite +rollcenter +forcexybillboard
 		renderstyle "add";
-		obituary "%o was roasted by %k's particle splatter.";
+		obituary "%o was hammered by %k's particle splatter.";
 		decal "Scorch";
 		seesound "weapons/plasmaf";
 		deathsound "weapons/plasmaf";

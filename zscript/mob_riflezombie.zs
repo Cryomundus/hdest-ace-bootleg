@@ -29,7 +29,6 @@ class ZombieStormtrooper:HDHumanoid{
 		hitobituary "%o was beaten up by a zombie.";
 		accuracy 0;
 	}
-	double spread;
 	double turnamount;
 	int user_weapon;
 	int mag;
@@ -184,7 +183,7 @@ class ZombieStormtrooper:HDHumanoid{
 		}
 		#### A 0 A_JumpIf(mag<1,"reload");
 		#### A 0 A_JumpIfTargetInLOS(3,120);
-		#### CD 2 A_FaceTarget(90,90);
+		#### CD 2 A_FaceLastTargetPos(90);
 		#### E 1 A_SetTics(random(4,10)); //when they just start to aim,not for followup shots!
 		#### A 0 A_JumpIf(!hdmobai.tryshoot(self),"see");
 	missile2:
@@ -199,13 +198,11 @@ class ZombieStormtrooper:HDHumanoid{
 			else turnamount=10;
 		}goto turntoaim;
 	turntoaim:
-		#### E 2 A_FaceTarget(turnamount,turnamount);
-		#### A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
+		#### E 2 A_TurnToAim(turnamount);
 		#### A 0 A_JumpIfTargetInLOS(1,10);
 		loop;
 		#### E 1{
-			A_FaceTarget(turnamount,turnamount);
+			A_FaceLastTargetPos(turnamount);
 			A_SetTics(random(1,int(120/clamp(turnamount,1,turnamount+1)+4)));
 
 			spread=frandom(0.12,0.27)*turnamount;
@@ -220,7 +217,7 @@ class ZombieStormtrooper:HDHumanoid{
 		}
 		#### A 0 A_Jump(256,"shoot");
 	shoot:
-		#### F 1 A_JumpIf(jammed,"jammed");
+		#### E 0 A_JumpIf(jammed,"jammed");
 		#### F 1 bright light("SHOT"){
 			if(mag<1){
 				setstatelabel("ohforfuckssake");
@@ -286,15 +283,12 @@ class ZombieStormtrooper:HDHumanoid{
 		goto coverfire;
 
 	coverfire:
-		#### E 1 A_SetTics(random(2,12));
-		#### E 0{
+		#### E 1{
 			spread=2;
+			A_Coverfire();
+			A_SetTics(random(2,6));
 		}
-		#### E 0 A_Jump(90,"roam");
-		#### E 0 A_JumpIf(!hdmobai.tryshoot(self,flags:hdmobai.TS_GEOMETRYOK),"see");
-		#### E 0 A_JumpIfTargetInLOS("missile2");
-		#### E 0 A_Jump(216,"shoot");
-		loop;
+		wait;
 
 	frag:
 		---- A 10 A_Vocalize(seesound);
@@ -320,11 +314,8 @@ class ZombieStormtrooper:HDHumanoid{
 		#### E 8;
 	reload:
 		---- A 0 A_JumpIf(mag<0,"unloadedreload");
-		---- A 4{
-			A_StartSound("weapons/rifleclick2");
-			bfrightened=true;
-		}
-		#### AA 1 A_HDChase("melee",null);
+		---- A 4 A_StartSound("weapons/rifleclick2");
+		#### AA 1 A_HDChase("melee",null,flags:CHF_FLEE);
 		#### A 0{
 			A_StartSound("weapons/rifleunload");
 			name emptymag="HD4mMag";
@@ -333,13 +324,12 @@ class ZombieStormtrooper:HDHumanoid{
 			mag=-1;
 		}
 	unloadedreload:
-		#### BCD 2 A_HDChase("melee",null);
+		#### BCD 2 A_HDChase("melee",null,flags:CHF_FLEE);
 		#### E 12 A_StartSound("weapons/pocket",8);
 		#### E 8 A_StartSound("weapons/rifleload",9);
 		#### E 2{
 			A_StartSound("weapons/rifleclick2",8);
 			if(firemode==-2)mag=30;else mag=50;
-			bfrightened=false;
 		}
 		#### CCBB 2 A_HDWander();
 
@@ -357,9 +347,9 @@ class ZombieStormtrooper:HDHumanoid{
 	roam:
 		#### E 3 A_Jump(60,"roam2");
 		#### E 0{spread=1;}
-		#### E 4 A_HDChase("melee","turnaround",CHF_DONTMOVE);
+		#### E 4 A_Watch();
 		#### E 0{spread=0;}
-		#### EEE 4 A_HDChase("melee","turnaround",CHF_DONTMOVE);
+		#### EEE 4 A_Watch();
 		#### A 0 A_Jump(60,"roam");
 	roam2:
 		#### A 0 A_Jump(8,"see");
@@ -377,37 +367,14 @@ class ZombieStormtrooper:HDHumanoid{
 		#### E 0{spread=4;}
 		#### ABCD 3 A_HDChase();
 		---- A 0 setstatelabel("see");
-//	melee:
-		#### C 8 A_FaceTarget();
-		#### D 4;
-		#### E 4{
-			A_CustomMeleeAttack(
-				random(3,20),"weapons/smack","","none",randompick(0,0,0,1)
-			);
-			if(jammed&&!random(0,32)){
-				if(!random(0,5))A_SpawnItemEx("HDSmokeChunk",12,0,height-12,4,frandom(-2,2),frandom(2,4));
-				for(int i=0;i<5;i++)A_SpawnItemEx("FourMilChunk",0,0,20,
-					random(4,7),random(-2,2),random(-2,1),0,SXF_NOCHECKPOSITION
-				);
-				jammed=false;
-				A_StartSound("weapons/rifleclick",8);
-			}
-		}
-		#### E 3 A_JumpIfCloser(64,2);
-		#### E 4 A_FaceTarget(10,10);
-		goto missile2;
-		#### A 4;
-		---- A 0 setstatelabel("see");
 	pain:
 		#### G 2;
 		#### G 3 A_Vocalize(painsound);
 		#### G 0{
 			A_ShoutAlert(0.1,SAF_SILENT);
 			if(target&&distance3d(target)<100)setstatelabel("see");
-			else bfrightened=true;
 		}
-		#### ABCD 2 A_HDChase();
-		#### G 0{bfrightened=false;}
+		#### ABCD 2 A_HDChase(flags:CHF_FLEE);
 		---- A 0 setstatelabel("see");
 	death:
 		#### H 5;

@@ -41,7 +41,7 @@ class Putto:HDMobBase{
 		}
 	spawn2:
 		#### ABCD 6{
-			A_Look();
+			A_HDLook();
 			if(!random(0,31)) A_StartSound(activesound);
 		}
 		loop;

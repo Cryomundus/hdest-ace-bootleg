@@ -6,6 +6,7 @@ class Roboball:SlowProjectile{
 		+rockettrail
 		damage 30;
 		speed 72;
+		mass 800;
 		radius 5;height 5;
 		missileheight 3;
 		gravity 0;
@@ -223,7 +224,6 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		tag "$CC_CYBER";
 
 		+avoidmelee +nofear
-		-noradiusdmg
 		+noblooddecals
 		+hdmobbase.smallhead
 		+hdmobbase.biped
@@ -306,7 +306,6 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		//cheat
 		if(source==self)return 0;
 
-		//Search me, O God, and know my heart; try me, and know my thoughts.
 		if(damage==TELEFRAG_DAMAGE)
 			return super.damagemobj(inflictor,source,TELEFRAG_DAMAGE,"Telefrag");
 

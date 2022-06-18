@@ -49,63 +49,10 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 		if(bplayingid)givearmour(1.,0.06,-0.4);
 		else givearmour(1.,0.2,-0.4);
 	}
-	void A_ScanForTargets(){
-		if(noammo()){
-			setstatelabel("reload");
-			return;
-		}
-
-		int c=-2;
-		double oldangle=angle;
-		double oldpitch=pitch;
-		while(
-			c<=1
-		){
-			c++;
-			//shoot a line out
-			flinetracedata hlt;
-			int ccc=0;
-			double aimangle=oldangle+frandom(-4,4);
-			double aimpitch=oldpitch+c*2+frandom(-4,4);
-			do{
-				ccc++;
-				linetrace(
-					aimangle+frandom(-2,2),16384,aimpitch+frandom(-2,2),
-					flags:TRF_NOSKY,
-					offsetz:40,
-					data:hlt
-				);
-			}while(!hlt.hitactor&&ccc<4);
-
-			//if the line hits a valid target, go into shooting state
-			actor hitactor=hlt.hitactor;
-			if(hitactor&&(
-				hitactor==target
-				||(
-					isHostile(hitactor)
-					&&hitactor.bshootable
-					&&!hitactor.bnotarget
-					&&!hitactor.bnevertarget
-					&&(hitactor.bismonster||hitactor.player)
-					&&(!hitactor.player||!(hitactor.player.cheats&CF_NOTARGET))
-					&&hitactor.health>random(-4,5)
-				)
-			)){
-				if(!target||target.health<1)target=hitactor;
-				angle=aimangle+frandom(-1,1);
-				pitch=aimpitch+frandom(-1,1);
-				burstcount=random(3,max(8,hitactor.health/10));
-				setstatelabel("scanshoot");
-				return;
-			}
-		}
-		if(turnleft)angle+=frandom(3,4);
-		else angle-=frandom(3,4);
-	}
 	bool noammo(){
 		return chambers<1&&thismag<1&&mags<1;
 	}
-	void A_VulcGuyShot(){
+	void A_VulcZombieShot(){
 		//abort if burst is over
 		if(
 			burstcount<1
@@ -139,19 +86,6 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 			chambers++;
 			A_StartSound("weapons/rifleclick2",8);
 		}
-	}
-	void A_TurnTowardsTarget(
-		statelabel shootstate="shoot",
-		double maxturn=13,
-		double maxvariance=10
-	){
-		A_FaceTarget(maxturn,maxturn);
-		if(
-			!target
-			||maxvariance>absangle(angle,angleto(target))
-			||!checksight(target)
-		)setstatelabel(shootstate);
-		if(bfloat||floorz>=pos.z)A_ChangeVelocity(0,frandom(-0.1,0.1)*speed,0,CVF_RELATIVE);
 	}
 	override void deathdrop(){
 		if(!bhasdropped){
@@ -230,44 +164,35 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 		CPOS A 0 A_Jump(196,"spawn");
 		loop;
 	see2:
-		CPOS A 0{
-			if(!mags&&thismag<1)setstatelabel("reload");
-			else bfrightened=0;
-		}
+		CPOS A 0 A_JumpIf(!mags&&thismag<1,"reload");
 		CPOS ABCD 5 A_HDChase();
 		CPOS A 0 A_Jump(196,"see2");
 		---- A 0 setstatelabel("scan");
 	missile:
-		CPOS ABCD 3 A_TurnTowardsTarget("aim");
+		CPOS ABCD 5 A_TurnToAim(15,shootstate:"aim");
 		loop;
 	aim:
 		CPOS E 4{
-			if(target){
-				coverdir=(angleto(target),atan2(pos.z-target.pos.z,distance2d(target)));
-				if(target.spawnhealth()>random(50,1000))superauto=true;
-			}
+			if(
+				target
+				&&target.spawnhealth()>random(50,1000)
+			)superauto=true;
 		}
-		CPOS E 0 A_TurnTowardsTarget("scanshoot",5,5);
+		CPOS E 0 A_TurnToAim(5,shootstate:"shoot");
 		loop;
 	see:
 	scan:
-		CPOS E 2{
+		CPOS E 4{
 			turnleft=randompick(0,0,0,1);
 			if(turnleft)angle-=frandom(18,24);
 			else angle+=frandom(18,24);
 		}
 	scanturn:
-		CPOS EEEEEE 3 A_ScanForTargets();
+		CPOS EEEEEE 4 A_Watch();
 		CPOS E 0 A_Jump(32,"scanturn","scanturn","scan");
 		---- A 0 setstatelabel("see2");
-	scanshoot:
-		CPOS E 1{
-			angle+=frandom(-2,2);
-			pitch+=frandom(-2,2);
-		}
-		//fallthrough to shoot
 	shoot:
-		CPOS F 1 bright light("SHOT") A_VulcGuyShot();
+		CPOS F 1 bright light("SHOT") A_VulcZombieShot();
 		CPOS E 2 A_JumpIf(superauto,"shoot");
 		loop;
 	postshot:
@@ -278,27 +203,8 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 		}
 	considercover:
 		CPOS E 0 A_JumpIf(thismag<1&&mags<1,"reload");
-		CPOS E 0 A_JumpIf(target&&target.health>0&&!checksight(target),"cover");
-		CPOS E 3 A_ScanForTargets();
-		---- A 0 setstatelabel("scan");
 	cover:
-		CPOS E 0 A_JumpIf(
-			!target
-			||target.health<1
-			||hdmobai.tryshoot(self,pradius:6,pheight:6,flags:hdmobai.TS_GEOMETRYOK),
-			"see"
-		);
-		CPOS E 0{
-			superauto=randompick(0,0,0,0,0,0,1);
-			angle+=clamp(coverdir.x-angle,-20,20);
-			pitch=clamp(coverdir.y-angle,-20,20);
-			if(!random(0,99))setstatelabel("see");
-		}
-		CPOS EEEEEE 2 A_JumpIf(
-			!target
-			||checksight(target)
-			||!random(0,20)
-		,"scanshoot");
+		CPOS EEEE 3 A_Coverfire("shoot",5);
 		loop;
 	shuntmag:
 		CPOS E 1;
@@ -326,11 +232,8 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 		---- A 0 setstatelabel("shoot");
 
 	reload:
-		CPOS A 0{
-			if(!target||!checksight(target))setstatelabel("loadamag");
-			bfrightened=true;
-		}
-		CPOS ABCD 5 A_Chase(null,null);
+		CPOS A 0 A_JumpIf(!target||!checksight(target),"loadamag");
+		CPOS ABCD 5 A_Chase(null,null,flags:CHF_FLEE);
 	loadamag:
 		CPOS E 9 A_StartSound("weapons/pocket",9);
 		CPOS E 7 A_StartSound("weapons/vulcmag",8);

@@ -7,16 +7,12 @@ class UndeadHomeboy:HDHumanoid{
 	int thismag;
 	int firemode; //based on the old pistol method: -1=semi only, 0=semi selected, 1=full auto
 
-	double spread;
-
 	//specific to undead homeboy
 	int user_weapon; //0 random, 1 semi, 2 auto
 
 	override void postbeginplay(){
 		super.postbeginplay();
 		bhasdropped=false;
-		aimpoint1=(-1,-1);
-		aimpoint2=(-1,-1);
 
 		//specific to undead homeboy
 		thismag=random(1,15);
@@ -43,65 +39,6 @@ class UndeadHomeboy:HDHumanoid{
 	like HDMobAI.DropAdjust that are too tedious to repeat.
 	*/
 
-	void A_TurnTowardsTarget(
-		statelabel shootstate="shoot",
-		double maxturn=20,
-		double maxvariance=20
-	){
-		A_FaceTarget(maxturn,maxturn);
-		if(
-			!target
-			||maxvariance>absangle(angle,angleto(target))
-			||!checksight(target)
-		)setstatelabel(shootstate);
-		if(bfloat||floorz>=pos.z)A_ChangeVelocity(0,frandom(-0.1,0.1)*speed,0,CVF_RELATIVE);
-	}
-
-
-
-	//aiming and leading targets
-	vector2 aimpoint1;
-	vector2 aimpoint2;
-	int aimpointtics;
-
-	void A_LeadTarget(int phase){
-		vector2 ap;
-		if(target){
-			double dist=distance2d(target);
-			ap=(
-				angleto(target),
-				atan2(
-					pos.z-target.pos.z,
-					distance2d(target)
-				)
-			);
-		}else ap=(angle,pitch);
-		if(phase==2)aimpoint2=ap;
-		else aimpoint1=ap;
-	}
-	void A_LeadAim(double missilespeed,int inleadtics=1,vector3 destpos=(-32000,0,0)){
-		double dist;
-		if(destpos==(-32000,0,0)){
-			if(!target)return;
-			destpos=target.pos;
-		}
-		vector2 apadj=(aimpoint2-aimpoint1)/inleadtics;
-
-		dist=(level.vec3offset(pos,destpos)).length();
-		double ticstolead=dist/missilespeed;
-
-		//the calcs are typically done while there's a little inertia,
-		//so best to re-center a little fore applying them
-		A_FaceTarget(1,1);
-
-		//put it all together
-		pitch+=apadj.y*ticstolead;
-		angle+=apadj.x*ticstolead;
-
-		//fidget with the fire selector
-		if(firemode>=0)firemode=randompick(0,0,0,1);
-	}
-
 
 
 	//post-shot checks
@@ -119,8 +56,7 @@ class UndeadHomeboy:HDHumanoid{
 	}
 
 
-	//will routinely be overridden
-	void A_PistolGuyAttack(){
+	void A_PistolZombieAttack(){
 		if(chamber<2){
 			if(chamber>0)A_EjectPistolCasing();
 			if(thismag>0){
@@ -157,7 +93,7 @@ class UndeadHomeboy:HDHumanoid{
 			}
 		}
 	}
-	void A_PistolGuyUnload(int which=0){
+	void A_PistolZombieUnload(int which=0){
 		if(thismag>=0){
 			actor aaa;int bbb;
 			[bbb,aaa]=A_SpawnItemEx("HD9mMag15",
@@ -230,11 +166,11 @@ class UndeadHomeboy:HDHumanoid{
 		#### A 0 A_JumpIf(bambush,"spawnstill");
 		goto spawnwander;
 	spawnstill:
-		#### A 0 A_Look();
+		#### A 0 A_HDLook();
 		#### A 0 A_Recoil(random(-1,1)*0.4);
 		#### CD 5 A_SetAngle(angle+random(-4,4));
 		#### A 0{
-			A_Look();
+			A_HDLook();
 			if(!random(0,127))A_Vocalize(activesound);
 		}
 		#### AB 5 A_SetAngle(angle+random(-4,4));
@@ -250,14 +186,13 @@ class UndeadHomeboy:HDHumanoid{
 		#### A 0 A_JumpIf(noammo(),"reload");
 		loop;
 	missile:
-		#### ABCD 3 A_TurnTowardsTarget();
+		#### ABCD 3 A_TurnToAim(20);
 		loop;
 	shoot:
-		#### E 3 A_LeadTarget(1);
-		#### E 1 A_LeadTarget(2);
-		#### E 2 A_LeadAim(500,3);
+		#### E 1 A_SetTics(min(1,int(lasttargetdist)>>5));
+		#### E 2 A_LeadTarget(lasttargetdist*0.01,randompick(0,0,0,1));
 	fire:
-		#### F 1 bright light("SHOT") A_PistolGuyAttack();
+		#### F 1 bright light("SHOT") A_PistolZombieAttack();
 	postshot:
 		#### E 1;
 		#### E 0 A_JumpIf(chamber!=2||!target,"nope");
@@ -276,7 +211,7 @@ class UndeadHomeboy:HDHumanoid{
 		#### E 10;
 	reload:
 		#### ABCD 4 A_HDChase("melee",null,CHF_FLEE);
-		#### A 7 A_PistolGuyUnload();
+		#### A 7 A_PistolZombieUnload();
 		#### BC 6 A_HDChase("melee",null,CHF_FLEE);
 		#### D 8 A_HDReload();
 		---- A 0 setstatelabel("see");
@@ -297,10 +232,9 @@ class UndeadHomeboy:HDHumanoid{
 				double ato=angleto(target)+randompick(-90,90);
 				vel+=((cos(ato),sin(ato))*speed,1.);
 				setstatelabel("missile");
-			}else bfrightened=true;
+			}
 		}
-		#### ABCD 2 A_HDChase();
-		#### G 0{bfrightened=false;}
+		#### ABCD 2 A_HDChase(flags:CHF_FLEE);
 		---- A 0 setstatelabel("see");
 	death:
 		#### H 5;

@@ -55,7 +55,6 @@ class Technorantula:HDMobBase replaces SpiderMastermind{
 	}
 	int shotchannel;
 	int shotcount;
-	double spread;
 	states{
 	spawn:
 		SPID A 0 A_StartSound("spider/walk",CHAN_BODY);
@@ -298,3 +297,4 @@ class SpiderRemains:CyberRemains{
 		loop;
 	}
 }
+

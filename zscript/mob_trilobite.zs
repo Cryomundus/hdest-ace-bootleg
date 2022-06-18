@@ -25,7 +25,7 @@ class FooFighter:HDActor{
 		super.beginplay();
 		vel*=frandom(0.4,1.7);
 		stamina=random(300,600);
-		ChangeTid(424707);
+		ChangeTid(FOOF_TID);
 
 		foowizard=randompick(0,0,0,0,1);
 		foocleric=randompick(0,0,0,0,0,1);
@@ -170,10 +170,12 @@ class FooFighter:HDActor{
 					return;
 				}
 				actor itt=null;
-				actoriterator it=level.createactoriterator(424707,"FooFighter");
+				actoriterator it=level.createactoriterator(FOOF_TID,"FooFighter");
 				while(itt=it.next()){
-					if(checksight(itt))
-					itt.vel+=itt.vec3to(tracer).unit()*2;
+					if(
+						FooFighter(itt)
+						&&checksight(itt)
+					)itt.vel+=itt.vec3to(tracer).unit()*2;
 				}
 			}
 		}goto spawn;
@@ -295,6 +297,8 @@ class Triloball:IdleDummy{
 
 enum CacoNums{
 	CACO_MAXHEALTH=420,
+
+	FOOF_TID=424707,
 }
 class CacoChunk:WallChunk{
 	override void postbeginplay(){

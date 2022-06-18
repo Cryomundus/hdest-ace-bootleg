@@ -64,16 +64,16 @@ class TechnoSpider:HDMobBase replaces Arachnotron{
 	states{
 	ambushrotate:
 		---- A 0 A_StartSound("baby/walk");
-		BSPI A 8 A_Look();
+		BSPI A 8 A_HDLook();
 		BSPI B 8 A_SetAngle(angle+frandom(-12,12));
-		BSPI C 8 A_Look();
+		BSPI C 8 A_HDLook();
 		BSPI D 8 A_SetAngle(angle+frandom(-12,12));
 	ambush:
-		BSPI C 10 A_Look();
+		BSPI C 10 A_HDLook();
 		---- A 0 A_Jump(28,"ambushrotate");
 	spawn:
 		BSPI A 0 A_JumpIf(bambush,"ambush");
-		BSPI CCC 10 A_Look();
+		BSPI CCC 10 A_HDLook();
 		---- A 0 A_Jump(192,"spawn","ambushrotate");
 	spawnwander:
 		BSPI ABC 8 A_HDWander();

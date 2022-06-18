@@ -64,10 +64,10 @@ class HDPlayerPawn:PlayerPawn{
 
 		height HDCONST_PLAYERHEIGHT;radius 12;
 		mass 150;gibhealth 180;
-		deathheight 24;
+		deathheight HDCONST_PLAYERHEIGHT*0.44;
 
-		player.viewheight 48;
-		player.attackzoffset 21;
+		player.viewheight HDCONST_PLAYERHEIGHT*0.889;
+		player.attackzoffset HDCONST_PLAYERHEIGHT*0.389;
 		player.damagescreencolor "12 06 04",0;
 		player.jumpz 0;
 		player.colorrange 112,127;
@@ -106,7 +106,13 @@ class HDPlayerPawn:PlayerPawn{
 		if(!scopecamera)scopecamera=spawn("ScopeCamera",pos+(0,0,height-6),ALLOW_REPLACE);
 		scopecamera.target=self;
 
-		if(player&&player.bot&&hd_nobots&&!hdlivescounter.wiped(playernumber()))ReplaceBot();
+		if(
+			player
+			&&player.bot
+			&&hd_nobots
+			&&!HDBotSpectator(self)
+			&&!hdlivescounter.wiped(playernumber())
+		)ReplaceBot();
 		A_TakeInventory("NullWeapon");
 
 		A_SetTeleFog("TeleportFog","TeleportFog");
