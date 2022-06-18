@@ -131,6 +131,7 @@ const HDCONST_MINEYERANGE=HDCONST_HEIGHTOVER54*18;
 #include "zscript/mob_damage.zs"
 #include "zscript/mob_ai.zs"
 #include "zscript/mob_ai_static.zs"
+#include "zscript/mob_attack.zs"
 #include "zscript/mob_names.zs"
 
 #include "zscript/mob_barrel.zs"

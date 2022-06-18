@@ -32,7 +32,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Scopes aren't tiny on WADs that supply their own CONFONT (1) lump.
 	- Fixed an obscure bug where the pistol firing animation would hang when holding down the fire button.
 - Various tweaks:
-	- Rebalanced spiritual armor. Reduces damage under 144 by a factor of 4 but does not prevent dying. Any damage above that gets completely nullified but you lose a layer and become ethereal for several seconds.
+	- Rebalanced spiritual armor. Reduces damage under 144 by a factor of 2^layers but does not prevent dying. Blocked damage stacks (stack goes down over time) and upon reaching a specific threshold you lose a layer. Any damage above 144 instantly strips a layer. Each time you lose a layer, you become ethereal for several seconds. Enemies stop targeting you, you become impervious to damage and also gain flight to allow you to reposition yourself to safety. Make it count.
 	- Archviles only need 4 times to be pained in order to die instead of 6.
 	- You can pick stuff up while incapped;
 	- Living actor climbing is less insufferable;
