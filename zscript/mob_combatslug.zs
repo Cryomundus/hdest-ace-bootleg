@@ -104,8 +104,9 @@ class CombatSlug:HDMobBase replaces Fatso{
 	default{
 		health 600;
 		mass 1000;
-		speed 8;
+		speed 10;
 		monster;
+		+map07boss2
 		+floorclip
 		+bossdeath
 		seesound "fatso/sight";
@@ -119,8 +120,7 @@ class CombatSlug:HDMobBase replaces Fatso{
 		radius 28;
 		height 60;
 
-		meleerange 64;
-		meleethreshold 128;
+		meleerange 96;
 
 		damagefactor "hot", 0.7;
 		damagefactor "cold", 0.8;
@@ -128,10 +128,6 @@ class CombatSlug:HDMobBase replaces Fatso{
 		obituary "%o was smoked by a $TAG.";
 		painchance 80;
 	}
-	vector2 firsttargetaim;
-	vector2 secondtargetaim;
-	vector2 leadoffset;
-	double targdist;
 	override bool CanDoMissile(
 		bool targsight,
 		double targdist,
@@ -150,86 +146,74 @@ class CombatSlug:HDMobBase replaces Fatso{
 		loop;
 	see:
 		FATT ABCDEF 6 A_HDChase();
+		---- A 1 A_Jump(64,"guard");
 		loop;
-	missile:
-		FATT ABCD 3{
-			A_FaceTarget(30,30);
-			if(A_JumpIfTargetInLOS("null",10))setstatelabel("raiseshoot");
+	guard:
+		FATT J 4{
+			A_StartSound("fatso/raiseguns",CHAN_VOICE);
+			A_FaceLastTargetPos(20,32);
 		}
-		FATT E 0 A_JumpIfTargetInLOS("raiseshoot",30);
-		FATT E 0 A_JumpIfTargetInLOS("missile");
-		---- A 0 setstatelabel("see");
+		FATT ####### 3 A_Watch();
+		goto see;
+	missile:
+		FATT ABCDEF 3 A_TurnToAim(20,shootstate:"raiseshoot");
+		loop;
 	raiseshoot:
 		FATT G 4{
 			A_StartSound("fatso/raiseguns",CHAN_VOICE);
-			A_FaceTarget(40,40);
+			A_FaceLastTargetPos(20,32);
 		}
-		FATT G 4 A_FaceTarget(20,20);
+		FATT G 4 A_FaceLastTargetPos(20,32);
 		FATT GGGG 1 A_SpawnItemEx("HDSmoke",
 			16,randompick(24,-24),bplayingid?18:40,
 			random(2,4),flags:SXF_NOCHECKPOSITION
 		);
 	shoot:
 		FATT G 2{
-			A_FaceTarget(10,10);
+			A_FaceLastTargetPos(20,32);
 			A_SpawnItemEx("HDSmoke",
 				16,randompick(24,-24),bplayingid?18:40,
 				random(2,4),flags:SXF_NOCHECKPOSITION
 			);
-			if(!hdmobai.TryShoot(self,24,128,48,32))setstatelabel("see");
 		}
-		FATT G 1{
-			vector2 aimbak=(angle,pitch);
-			A_FaceTarget(0,0);
-			firsttargetaim=(angle,pitch);
-			angle=aimbak.x;pitch=aimbak.y;
-		}
-		FATT G 2{
-			vector2 aimbak=(angle,pitch);
-			A_FaceTarget(0,0);
-			secondtargetaim=(angle,pitch);
-			angle=aimbak.x;pitch=aimbak.y;
-
-			targdist=(target?max(1.,distance3d(target)):4096);
-
-			if(targdist>2000)leadoffset=(frandom(-2.,2),frandom(-1.,1.));
-			else leadoffset=(
-				deltaangle(firsttargetaim.x,secondtargetaim.x),
-				deltaangle(firsttargetaim.y,secondtargetaim.y)
-			)*targdist*frandom(0.021,0.070);
-
-			angle+=leadoffset.x;pitch+=leadoffset.y;
-		}
+		FATT G 2 A_LeadTarget(lasttargetdist*(1./CSLUG_BALLSPEED)*frandom(0.9,1.2),false);
 		FATT H 10 bright{
 			A_StartSound("weapons/bronto",CHAN_WEAPON);
 
 			hdmobai.DropAdjust(self,"ManJuice");
 
+			vector2 atv=angletovector(angle-90,24);
+			vector3 shotpos=(pos.xy,pos.z+32);
+
+			if(lasttargetdist<1000){
+				A_LeadTarget(lasttargetdist*(1./CSLUG_BALLSPEED),true);
+				angle+=frandom(-1,1)*max(0,1000-lasttargetdist)*0.01;
+			}
+
 			//lead target
-			actor ppp;int bluh;
-			[bluh,ppp]=A_SpawnItemEx(
-				"manjuice",0,24,32,
-				cos(pitch)*CSLUG_BALLSPEED,0,-sin(pitch)*CSLUG_BALLSPEED,
-				atan(24/targdist),
-				flags:SXF_NOCHECKPOSITION|SXF_SETTARGET|SXF_TRANSFERPITCH
-			);
+			let bbb=spawn("manjuice",(shotpos.xy+atv,shotpos.z));
+			bbb.pitch=pitch;
+			bbb.angle=angle;
+			bbb.target=self;
+			bbb.vel=vel+(cos(pitch)*(cos(angle),sin(angle)),-sin(pitch))*CSLUG_BALLSPEED;
+
 
 			//random
 			int opt=random(0,2);
 			if(opt==1){
-				leadoffset*=frandom(-2.,0.2);
-				angle+=leadoffset.x;
-				pitch+=leadoffset.y;
+				double pbak=pitch;
+				A_LeadTarget(lasttargetdist*(1./CSLUG_BALLSPEED),true);
+				pitch=pbak;
 			}else if(opt==2){
-				angle+=frandom(-10,10)/targdist;
+				angle+=frandom(-10,10)/lasttargetdist;
 				pitch+=frandom(-1,1);
 			}
-			[bluh,ppp]=A_SpawnItemEx(
-				"manjuice",0,-24,32,
-				cos(pitch)*CSLUG_BALLSPEED,0,-sin(pitch)*CSLUG_BALLSPEED,
-				-atan(24/targdist),
-				flags:SXF_NOCHECKPOSITION|SXF_SETTARGET|SXF_TRANSFERPITCH
-			);
+
+			bbb=spawn("manjuice",(shotpos.xy-atv,shotpos.z));
+			bbb.pitch=pitch;
+			bbb.angle=angle;
+			bbb.target=self;
+			bbb.vel=vel+(cos(pitch)*(cos(angle),sin(angle)),-sin(pitch))*CSLUG_BALLSPEED;
 		}
 		FATT G 6;
 		FATT G 10{
@@ -307,3 +291,4 @@ class CombatSlug:HDMobBase replaces Fatso{
 		stop;
 	}
 }
+

@@ -7,12 +7,19 @@ extend class HDMobBase{
 		bool randomize=true
 	){
 		if(!target)return;
-		if(randomize)tics=frandom(0,tics*1.2);
-		let ltp=lasttargetpos+(target.pos-target.prev)*tics;
-		double ach=deltaangle(hdmath.angleto(pos.xy,lasttargetpos.xy),hdmath.angleto(pos.xy,ltp.xy));
-		double pch=hdmath.pitchto(pos,ltp)-hdmath.pitchto(pos,lasttargetpos);
-		angle+=ach;
-		pch+=ach;
+		if(randomize)tics=frandom(0,tics*1.3);
+
+		let ltp=lasttargetpos+(target.prev-target.pos);
+		let lsp=prev;
+
+		double ach=deltaangle(
+			hdmath.angleto(lsp.xy,ltp.xy),
+			hdmath.angleto(pos.xy,lasttargetpos.xy)
+		);
+		double pch=hdmath.pitchto(lsp,ltp)-hdmath.pitchto(pos,lasttargetpos);
+
+		angle+=ach*tics;
+		pch+=pch*tics;
 	}
 	void A_FaceLastTargetPos(
 		double maxturn=180,

@@ -8,6 +8,7 @@ class TechnoSpider:HDMobBase replaces Arachnotron{
 		radius 32;
 		mass 600;
 		painchance 128;
+		+map07boss2
 		+floorclip
 		+bossdeath
 		+lookallaround
@@ -122,40 +123,19 @@ class TechnoSpider:HDMobBase replaces Arachnotron{
 		loop;
 
 	missile:
-		---- A 0 A_JumpIfTargetInLOS("shoot",15);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
 		---- A 0 A_StartSound("baby/walk");
-		BSPI AA 3 A_FaceTarget(20,0);
+		BSPI AA 3 A_TurnToAim(20);
 		---- A 0 A_JumpIf(!HDMobAI.TryShoot(self,flags:hdmobai.TS_GEOMETRYOK),"see");
-		---- A 0 A_JumpIfTargetInLOS("shoot",15);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
-		BSPI BB 3 A_FaceTarget(20,0);
-		---- A 0 A_JumpIfTargetInLOS("shoot",15);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
+		BSPI BB 3 A_TurnToAim(20);
 		---- A 0 A_StartSound("baby/walk");
-		BSPI CC 3 A_FaceTarget(20,0);
-		---- A 0 A_JumpIfTargetInLOS("shoot",15);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
-		BSPI DD 3 A_FaceTarget(20,0);
-		---- A 0 A_JumpIfTargetInLOS("shoot",15);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
+		BSPI CC 3 A_TurnToAim(20);
+		BSPI DD 3 A_TurnToAim(20);
 		---- A 0 A_StartSound("baby/walk");
-		BSPI EE 3 A_FaceTarget(20,0);
-		---- A 0 A_JumpIfTargetInLOS("shoot",15);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
-		BSPI FF 3 A_FaceTarget(20,0);
+		BSPI EEFF 3 A_TurnToAim(20);
 		loop;
 	shoot:
-		---- A 0 A_JumpIf(!hdmobai.tryshoot(self,32,256,1,1),"roam");
-		BSPI A 10 A_FaceTarget(20,20,z_ofs:(alt?0:frandom(10,-60)));
-	shootpb:
 		BSPI A 10{alt=(target&&distance3d(target)<666);}
+		BSPI A 10 A_FaceLastTargetPos(20,targetheight:(alt?-1:frandom(0,target.height*0.6)));
 		BSPI GGGGG 3 bright light("PLAZMABX2")A_StartSound("weapons/plasidle",CHAN_WEAPON);
 	shootpb2:
 		BSPI GGGGGGGGGGGGG 2 bright light("PLAZMABX2")A_ThunderZap();

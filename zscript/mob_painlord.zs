@@ -44,6 +44,7 @@ class PainLord:PainMonster replaces BaronofHell{
 		hitobituary "$ob_baronhit";
 		tag "$CC_BARON";
 
+		+e1m8boss
 		+missilemore +dontharmspecies
 		maxtargetrange 65536;
 		damagefactor "hot",0.8;

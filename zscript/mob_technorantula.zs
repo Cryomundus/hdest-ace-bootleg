@@ -18,6 +18,7 @@ class Technorantula:HDMobBase replaces SpiderMastermind{
 		activesound "spider/active";
 		tag "$cc_spider";
 
+		+e3m8boss
 		+nodropoff
 		+nofear
 		+noblooddecals
@@ -35,12 +36,11 @@ class Technorantula:HDMobBase replaces SpiderMastermind{
 		mass 14000;
 		radiusdamagefactor 0.8;
 	}
-	double gunheight,facetargetzofs;
+	double gunheight;
 	override void postbeginplay(){
 		super.postbeginplay();
 		resize(0.7,1.);
 		gunheight=(bplayingid?32:58)*scale.y;
-		facetargetzofs=32.-gunheight;
 	}
 	override void tick(){
 		super.tick();
@@ -120,26 +120,21 @@ class Technorantula:HDMobBase replaces SpiderMastermind{
 			A_StartSound("spider/walk",CHAN_BODY);
 			shotcount=0;
 		}
-		SPID # 0 A_JumpIfTargetInLOS("aim",10);
 		SPID # 0 A_Recoil(-1);
-		SPID A 4 A_FaceTarget(4,20);
+		SPID A 4 A_TurnToAim(10,gunheight);
 		SPID # 0 A_Recoil(-1);
-		SPID B 4 A_FaceTarget(4,20);
+		SPID B 4 A_TurnToAim(10,gunheight);
 		SPID # 0 A_StartSound("spider/walk",CHAN_BODY);
 		SPID # 0 A_Recoil(-1);
-		SPID C 4 A_FaceTarget(4,8,flags:FAF_MIDDLE,z_ofs:facetargetzofs);
-		SPID # 0 A_JumpIfTargetInLOS("aim",10);
+		SPID C 4 A_TurnToAim(10,gunheight);
 		SPID # 0 A_Recoil(-1);
-		SPID D 4 A_FaceTarget(4,8,flags:FAF_MIDDLE,z_ofs:facetargetzofs);
-		SPID # 0 A_JumpIfTargetInLOS("aim",10);
+		SPID D 4 A_TurnToAim(10,gunheight);
 		SPID # 0 A_StartSound("spider/walk",CHAN_BODY);
 		SPID # 0 A_Recoil(-1);
-		SPID E 4 A_FaceTarget(4,8,flags:FAF_MIDDLE,z_ofs:facetargetzofs);
-		SPID # 0 A_JumpIfTargetInLOS("aim",10);
+		SPID E 4 A_TurnToAim(10,gunheight);
 		SPID # 0 A_Recoil(-1);
-		SPID F 4 A_FaceTarget(4,8,flags:FAF_MIDDLE,z_ofs:facetargetzofs);
-		SPID # 0 A_JumpIfTargetInLOS("missile",10);
-		---- A 0 setstatelabel("see");
+		SPID F 4 A_TurnToAim(10,gunheight);
+		loop;
 	aim:
 		SPID # 4{
 			shotcount=0;
@@ -148,7 +143,7 @@ class Technorantula:HDMobBase replaces SpiderMastermind{
 			A_Recoil(-1);
 		}
 		SPID # 4{
-			A_FaceTarget(4,8,flags:FAF_MIDDLE,z_ofs:facetargetzofs);
+			A_FaceLastTargetPos(4,gunheight);
 			A_Recoil(2);
 			double dist=target?distance3d(target):1000;
 			A_SetTics(clamp(int(dist*0.002),4,16));
@@ -165,19 +160,15 @@ class Technorantula:HDMobBase replaces SpiderMastermind{
 		SPID # 0 A_JumpIfTargetInLOS("stopshot",20);
 		goto guard;
 	stopshot:
-		SPID G 0 A_Jump(220,"shoot");
+		SPID A 0 A_Jump(220,"shoot");
 		SPID # 10{
-			frame=randompick(2,5);
+			frame=randompick(2,4);
 			A_Recoil(-1);
-		}---- A 0 setstatelabel("see");
+		}
+		---- A 0 setstatelabel("see");
 	guard:
-		SPID # 1 A_JumpIfTargetInLOS("shoot",20);
-		SPID # 1 A_JumpIfTargetInLOS("missile");
-		SPID # 1 A_Jump(12,"see");
-		SPID # 0 A_JumpIfTargetInLOS("shoot",20);
-		SPID # 1 A_SetAngle(angle+random(-4,4));
-		SPID # 1 A_Jump(28,"shoot");
-		SPID # 0 A_JumpIfTargetInLOS("shoot",20);
+		SPID ##### 2 A_Watch();
+		SPID # 0 A_CoverFire();
 		loop;
 	pain:
 		SPID I 4;

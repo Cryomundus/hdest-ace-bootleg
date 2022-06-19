@@ -209,9 +209,11 @@ class SatanBallLight:PointLight{
 
 class SatanRobo:HDMobBase replaces Cyberdemon{
 	double launcheroffset;
+	double attackheight;property attackheight:attackheight;
 	default{
 		height 100;
 		radius 32;
+		satanrobo.attackheight 42;
 		+boss 
 		+missilemore
 		+floorclip
@@ -223,6 +225,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		activesound "cyber/active";
 		tag "$CC_CYBER";
 
+		+e1m8boss
 		+avoidmelee +nofear
 		+noblooddecals
 		+hdmobbase.smallhead
@@ -262,31 +265,24 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			0,SXF_NOCHECKPOSITION
 		);
 	}
-	void A_CyberAdjustLead(){
-		oldaim=(angle,pitch);
-		A_FaceTarget(12,12,0,0,FAF_MIDDLE);
-		aimadjust=(deltaangle(oldaim.x,angle),deltaangle(oldaim.y,pitch));
-		if(target)aimadjust*=distance3d(target)*0.0005;
-	}
-	void A_SatanRoboAttack(double spread=0.,double aimhorz=0.,double aimvert=0.){
+	void A_SatanRoboAttack(double spread=0){
 		A_StartSound("weapons/bronto",CHAN_WEAPON,CHANF_OVERLAP);
 		if(shottype=="Roboball"){
 			A_CyberGunSmoke();
 			DistantNoise.Make(self,"world/shotgunfar");
 		}else tics=max(1,tics-2);
-		if(spread){
-			aimhorz=frandom(-spread,spread);
-			aimvert=frandom(-spread,spread);
-		}
-		bool tgt=target!=null;
-		double dist=(tgt?distance3d(target):1);
+
+		double dist=lasttargetdist;
 		double dmult=1.;
-		if(dist!=0)dmult/=dist;
-		A_SpawnProjectile(shottype,42,launcheroffset,
-			aimhorz+(tgt?atan(launcheroffset*dmult):0),
-			CMF_AIMDIRECTION|CMF_SAVEPITCH,
-			pitch+aimvert-(dist>2048?dist*0.000001:0)+(tgt?atan(10*dmult):0)
-		);
+
+		vector3 shotpos=(pos.xy,pos.z+attackheight);
+		if(launcheroffset)shotpos.xy+=angletovector(angle-90,launcheroffset);
+
+		let bbb=spawn(shottype,shotpos);
+		bbb.pitch=pitch+frandom(-spread,spread);
+		bbb.angle=angle+frandom(-spread,spread);
+		bbb.target=self;
+		bbb.vel=vel+(cos(pitch)*(cos(angle),sin(angle)),-sin(pitch))*bbb.speed;
 	}
 	override void tick(){
 		super.tick();
@@ -319,7 +315,6 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		shottype="Roboball";
 		if(bplayingid)launcheroffset=-24;
 	}
-	vector2 oldaim;vector2 aimadjust;
 	int rockets;
 	class<actor>shottype;
 	enum CyberStats{
@@ -367,20 +362,18 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			}
 		}---- A 0 setstatelabel("see");
 	missile:
-		CYBR A 0 A_JumpIfTargetInLOS("inposition",20);
-		CYBR A 4 A_FaceTarget(40,40);
+		CYBR A 4 A_TurnToAim(40,attackheight,shootstate:"inposition");
 		CYBR B 4{
-			A_FaceTarget(40,40);
+			A_TurnToAim(40,attackheight,shootstate:"inposition");
 			A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 			A_Recoil(-4);
 		}
-		CYBR C 0 A_JumpIfTargetInLOS("inposition",20);
 		CYBR C 4{
-			A_FaceTarget(40,40);
+			A_TurnToAim(40,attackheight,shootstate:"inposition");
 			A_StartSound("cyber/hoof",16,CHANF_OVERLAP);
 			A_Recoil(-4);
 		}
-		CYBR D 4 A_FaceTarget(40,40);
+		CYBR D 4 A_TurnToAim(40,attackheight,shootstate:"inposition");
 		CYBR E random(15,25) A_Recoil(-4);
 		CYBR E 0 A_JumpIfTargetInLOS("missile");
 		CYBR E 0 A_Jump(128,"spray");
@@ -389,33 +382,44 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR E 4{
 			A_Recoil(1);
 			bfrightening=true;
-			A_FaceTarget(12,12);
+			A_FaceLastTargetPos(12,attackheight);
 		}
-		CYBR E 0 A_Stop();
-		CYBR E 0 A_JumpIf(health>1600,3);
-		CYBR EE 2 A_CyberGunSmoke();
-		CYBR E 4;
-		CYBR E 0 A_JumpIfTargetInLOS(2,90);
-		CYBR E 0 setstatelabel("missile");
 
 		CYBR E 0 A_JumpIf(health>1600,3);
 		CYBR EE 2 A_CyberGunSmoke();
-		CYBR E 4 A_FaceTarget(12,12);
+
+		CYBR E 4;
+
 		CYBR E 0 A_JumpIf(health>1600,3);
 		CYBR EE 2 A_CyberGunSmoke();
-		CYBR E 0 A_JumpIf(!target,"fireend");
+
+		CYBR E 4 A_FaceLastTargetPos(12,attackheight);
+
+		CYBR E 0 A_JumpIf(health>1600,3);
+		CYBR EE 2 A_CyberGunSmoke();
+
 		CYBR E 4 A_SetTics(target?clamp(int(distance2d(target)*0.0003),4,random(4,24)):4);
 		CYBR E 0 A_JumpIf(!target,"fireend");
 		CYBR A 0{
-			double dist=distance3d(target);
+			
+			double dist=lasttargetdist;
 
 			if(rockets>random(0,HDCB_ROCKETMAX*12/10)){
 				shottype="Roboball";
 				rockets--;
 			}else shottype="SatanBall";
 
-			if(dist<1024&&!random(0,7))setstatelabel("spray");
-			else if(dist<8192&&!random(0,2))setstatelabel("leadtarget");
+			if(
+				(
+					!CheckTargetInSight()
+					||dist<1024
+				)
+				&&!random(0,7)
+			)setstatelabel("spray");
+			else if(
+				dist<8192
+				&&!random(0,2)
+			)setstatelabel("leadtarget");
 			else setstatelabel("directshots");
 		}
 	leadtarget:
@@ -424,39 +428,35 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR E 0 A_JumpIf(health>1600,3);
 		CYBR EE 0 A_CyberGunSmoke();
 	leadtarget2:
-		CYBR E 8 A_FaceTarget(12,12,0,0,FAF_MIDDLE);
+		CYBR E 8 A_FaceLastTargetPos(12,attackheight,target?frandom(0,target.height):0);
 		CYBR F 3 bright light("ROCKET"){
-			A_CyberAdjustLead();
-			A_SatanRoboAttack(
-				0.,frandom(0,2)*aimadjust.x,frandom(0,2)*aimadjust.y
-			);
+			A_LeadTarget(lasttargetdist/(shottype=="Roboball"?20:15),randompick(0,0,1));
+			A_SatanRoboAttack(0.6);
 		}
 		CYBR E 1 A_SetTics(random(1,8));
 		CYBR E 0 A_JumpIf(health>1600,3);
 		CYBR EE 0 A_CyberGunSmoke();
 	leadtarget3:
-		CYBR E 8 A_FaceTarget(12,12,0,0,FAF_MIDDLE);
+		CYBR E 8 A_FaceLastTargetPos(12,attackheight,target?frandom(0,target.height):0);
 		CYBR F 3 bright light("ROCKET"){
-			A_CyberAdjustLead();
-			A_SatanRoboAttack(
-				0.,frandom(1,5)*aimadjust.x,frandom(1,5)*aimadjust.y
-			);
+			A_LeadTarget(lasttargetdist/(shottype=="Roboball"?30:25),false);
+			A_SatanRoboAttack();
 		}
 		goto fireend;
 
 	directshots:
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack();
-		CYBR E 8 A_FaceTarget(12,12,0,0,FAF_MIDDLE);
+		CYBR E 8 A_FaceLastTargetPos(12,attackheight);
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(0.3);
-		CYBR E 8 A_FaceTarget(12,12,0,0,FAF_MIDDLE);
+		CYBR E 8 A_FaceLastTargetPos(12,attackheight);
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(0.7);
 		goto fireend;
 
 	spray:
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(1.);
-		CYBR E 6 A_FaceTarget(12,12,0,0,FAF_MIDDLE);
+		CYBR E 6 A_FaceLastTargetPos(12,attackheight,target?frandom(0,target.height):0);
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(2.);
-		CYBR E 6 A_FaceTarget(12,12,0,0,FAF_MIDDLE);
+		CYBR E 6 A_FaceLastTargetPos(12,attackheight,target?frandom(0,target.height):0);
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(3.);
 	fireend:
 		CYBR E 0 A_JumpIf(health>1600,3);
@@ -469,22 +469,23 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR G 12{
 			A_SetSolid();
 			A_SetShootable();
+			CheckTargetInSight();
 			deathticks=9;
 		}
 		CYBR DD 6 A_Recoil(-2);
 		CYBR A 12 A_SetSolid();
 		CYBR A 0{
-			A_FaceTarget(40,0);
+			A_FaceLastTargetPos(40,attackheight);
 			A_SetAngle(angle+random(-10,10));
 			A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 		}
 		CYBR BB 6 A_Recoil(-2);
 		CYBR C 12{
-			A_FaceTarget(40,0);
+			A_FaceLastTargetPos(40,attackheight);
 			A_StartSound("cyber/hoof",16,CHANF_OVERLAP);
 		}
 		CYBR A 0{
-			A_FaceTarget(40,0);
+			A_FaceLastTargetPos(40,attackheight);
 			angle+=random(-10,10);
 		}
 		CYBR DD 6 A_Recoil(-2);
@@ -505,7 +506,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			frandom(-1,1),frandom(-1,1),frandom(1,3)
 		);
 		CYBR A 5{
-			A_FaceTarget(40,0);
+			A_FaceLastTargetPos(40,attackheight);
 			angle+=random(-10,10);
 			A_StartSound("cyber/hoof",16,CHANF_OVERLAP);
 		}
@@ -522,7 +523,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			);
 		}
 		CYBR C 16{
-			A_FaceTarget(40,0);
+			A_FaceLastTargetPos(40,attackheight);
 			angle+=frandom(-10,10);
 			A_StartSound("cyber/hoof",16,CHANF_OVERLAP);
 		}
@@ -537,7 +538,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM,144
 		);
 		CYBR B 0{
-			A_FaceTarget(40,0);
+			A_FaceLastTargetPos(40,attackheight);
 			angle+=random(-10,10);
 			A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 		}
@@ -552,7 +553,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR E 14{
 			A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 		}
-		CYBR EEEE 6 A_FaceTarget(10,0);
+		CYBR EEEE 6 A_FaceLastTargetPos(10,attackheight);
 		CYBR FF 0 A_SpawnItemEx("HDSmoke",54,launcheroffset,52,
 			frandom(1,4),frandom(-1,1),frandom(2,4)
 		);

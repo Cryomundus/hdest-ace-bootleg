@@ -318,66 +318,6 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		return true;
 	}
 
-
-
-	// #### E 1 A_LeadTarget1();
-	// #### E 3{
-	//	A_LeadTarget2(shotspeed:getdefaultbytype(missilename).speed);
-	//	hdmobai.DropAdjust(self,missilename);
-	// }
-	// #### F 1 bright light("SHOT") A_OpShot(missilename);
-	// maybe generalize this later?
-	vector2 leadoldaim;vector2 leadaim;
-	vector2 A_LeadTarget1(){
-		if(!target){
-			leadoldaim=(angle,pitch);
-			return leadoldaim;
-		}
-		vector2 aimbak=(angle,pitch);
-		A_FaceTarget(0,0);
-		leadoldaim=(angle,pitch);
-		angle=aimbak.x;pitch=aimbak.y;
-		return leadoldaim;
-	}
-	vector2 A_LeadTarget2(
-		double dist=-1,
-		double shotspeed=20,
-		vector2 oldaim=(-1,-1),
-		double adjusttics=1
-	){
-		if(!target||!shotspeed)return(0,0);
-
-		//get current angle for final calculation
-		vector2 aimbak=(angle,pitch);
-
-		//distance defaults to distance from target
-		if(dist<0)dist=distance3d(target);
-
-		//figure out how many tics to adjust
-		double ticstotarget=dist/shotspeed+adjusttics;
-		if(ticstotarget<1.)return(0,0);
-
-		//retrieve result from A_LeadTarget1
-		if(oldaim==(-1,-1))oldaim=leadoldaim;
-
-		//check the aim to change and revert immediately
-		//I could use angleto but the pitch calculations would be awkward
-		A_FaceTarget(0,0);
-		vector2 aimadjust=(
-			deltaangle(oldaim.x,angle),
-			deltaangle(oldaim.y,pitch)
-		);
-
-		//something fishy is going on
-		if(abs(aimadjust.x)>45)return (0,0);
-
-		//multiply by tics
-		aimadjust*=ticstotarget;
-
-		//apply and return
-		angle=aimbak.x+aimadjust.x;pitch=aimbak.y+aimadjust.y;
-		return aimadjust;
-	}
 	actor A_OpShot(class<actor> missiletype,bool userocket=false){
 		actor mmm=spawn(missiletype,pos+(0,0,height-6),ALLOW_REPLACE);
 		mmm.pitch=pitch+frandom(0,spread)-frandom(0,spread);
@@ -451,7 +391,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 				||target.bcorpse
 				||(hdplayerpawn(target)&&hdplayerpawn(target).incapacitated)
 				||(!target.instatesequence(target.curstate,target.resolvestate("falldown")))
-				||!checksight(target)
+				||!CheckTargetInSight()
 			)
 		);
 	}
@@ -480,10 +420,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 					)
 					||pistolloaded<15
 				)
-				&&(
-					!target
-					||!checksight(target)
-				)
+				&&!CheckTargetInSight()
 				&&!random(0,3)
 			)
 		;
@@ -551,8 +488,8 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 				||(pistolloaded>0&&shootstate=="shootpistol")
 			)
 			&&absangle(angle,angleto(target))<frandom(1,4)
-			&&checksight(target)
-			&&distance3d(target)<HDCONST_SPEEDOFSOUND
+			&&CheckTargetInSight()
+			&&lasttargetdist<HDCONST_SPEEDOFSOUND
 		;
 		if(
 			ks
@@ -586,8 +523,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		loop;
 	see:
 		#### AABBCCDD 2 A_HDChase(speedmult:0.5);
-		#### E 0 A_JumpIfTargetInLOS("see");
-		#### E 0 setstatelabel("roam");
+		#### E 0 A_JumpIf(targetinsight,"see");
 	roam:
 		#### AABBCCDD 3 A_HDChase(flags:CHF_LOOK,speedmult:0.3);
 		#### E 0 A_Jump(128,"roam");
@@ -598,20 +534,20 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 			angle+=DecideOnHandedness(-frandom(30,50));
 			A_HDLook();
 		}
-		#### EEEE 2 A_HDChase(flags:CHF_DONTMOVE);
+		#### EEEE 2 A_Watch();
 		#### A 0 A_JumpIf(threat,"see");
 		#### A 0{
 			angle+=DecideOnHandedness(-frandom(30,50));
 			A_HDLook();
 		}
-		#### EEEE 2 A_HDChase(flags:CHF_DONTMOVE);
+		#### EEEE 2 A_Watch();
 		#### A 0 A_Jump(90,"roam2");
-		#### E 0 A_JumpIfTargetInLOS("see");
+		#### E 0 A_JumpIf(targetinsight,"see");
 		#### E 0 setstatelabel("roam");
 
 	missile:
 		#### A 0 A_JumpIfTargetInLOS(3,120);
-		#### CD 3 A_FaceTarget(40);
+		#### CD 3 A_FaceLastTargetPos(40);
 	missile2:
 		#### A 0{
 			if(!target){
@@ -619,6 +555,11 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 				return;
 			}
 			double dist=distance3d(target);
+
+			double tgfacing=absangle(target.angleto(self),target.angle);
+			if(tgfacing>120)dist*=frandom(0.9,2.);
+			else if(tgfacing<40)dist*=frandom(0.3,1.1);
+
 			if(dist<500)turnamount=30;
 			else if(dist<900)turnamount=20;
 			else if(dist<1200)turnamount=10;
@@ -626,17 +567,14 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 			else turnamount=1;
 		}
 	turntoaim:
-		#### E 2 A_FaceTarget(turnamount,turnamount);
-		#### A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 setstatelabel("see");
-		#### A 0 A_JumpIfTargetInLOS(1,10);
-		loop;
-		#### A 0 A_FaceTarget(turnamount,turnamount);
-		#### E 1 A_SetTics(random(1,int(100/max(1,turnamount))));
-		#### E 0{
-			spread=turnamount*0.08;
-			A_SetTics(int(16/spread));
-			spread+=min(timesdied,15);
+		#### E 2 A_TurnToAim(turnamount,shootstate:"aiming");
+		wait;
+	aiming:
+		#### E 1{
+			spread=turnamount*0.08+min(timesdied,15);
+			int lag=max(2,10-(int(turnamount)>>5));
+			A_SetTics(lag);
+			A_LeadTarget(tics,randompick(0,0,0,1));
 		}
 		//fallthrough to shoot
 	shoot:
@@ -646,10 +584,8 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 				setstatelabel("noshot");
 				return;
 			}
-			A_FaceTarget(0,0); //can't lead without this
-			double dist=distance3d(target);
 
-			int settics=clamp(int(dist*0.002),0,30);
+			int settics=clamp(int(lasttargetdist*0.002),0,30);
 			if(lastinginjury>0)settics+=random(0,min(lastinginjury,(35*5)));
 			A_SetTics(settics);
 		}
@@ -703,15 +639,14 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 
 
 	shootzm66:
-		#### E 1;
-		#### E 1 A_LeadTarget1();
+		#### E 2;
 		#### E 1{
 			if(jammed){
 				setstatelabel("unjam");
 				return;
 			}
 			class<actor> mn="HDB_426";
-			A_LeadTarget2(shotspeed:getdefaultbytype(mn).speed,adjusttics:1);
+			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
 			hdmobai.DropAdjust(self,mn);
 		}
 	pullzm66:
@@ -738,10 +673,10 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 
 
 	shootsmg:
-		#### E 1 A_LeadTarget1();
+		#### E 1;
 		#### E 1{
 			class<actor> mn="HDB_9";
-			A_LeadTarget2(shotspeed:getdefaultbytype(mn).speed,adjusttics:1);
+			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
 			hdmobai.DropAdjust(self,mn);
 		}
 	firesmg:
@@ -760,11 +695,10 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 
 
 	shootsg:
-		#### E 1;
-		#### E 1 A_LeadTarget1();
+		#### E 2;
 		#### E 1{
 			class<actor> mn="HDB_00";
-			A_LeadTarget2(shotspeed:getdefaultbytype(mn).speed,adjusttics:1);
+			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
 			hdmobai.DropAdjust(self,mn);
 
 			//aim for head or legs
@@ -815,13 +749,12 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		}
 		#### E random(3,6) A_HDChase(null,null,speedmult:0.7);
 		#### E 0 A_CheckKeepShooting("firesg");
-
+		goto see;
 
 	shootrl:
 		#### E 2;
 		#### E 1{
-			if(A_CheckBlast(target))A_LeadTarget1();
-			else{
+			if(!A_CheckBlast(target)){
 				wep=-abs(wep);
 				if(pistolloaded<1)setstatelabel("reloadmag");
 				else setstatelabel("shootpistol");
@@ -829,7 +762,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		}
 		#### E 1{
 			class<actor> mn="GyroGrenade";
-			A_LeadTarget2(shotspeed:getdefaultbytype(mn).speed*6.4,adjusttics:1);
+			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
 			hdmobai.DropAdjust(self,mn,speedmult:6.4);
 		}
 		#### F 0 A_JumpIf(gunloaded<1,"ohforfuckssake");
@@ -850,8 +783,10 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 
 	shootgl:
 		#### E 1{
-			if(A_CheckBlast(target))A_LeadTarget1();
-			else if(wep==HDMW_ROCKET){
+			if(
+				!A_CheckBlast(target)
+				&&wep==HDMW_ROCKET
+			){
 				wep=-abs(wep);
 				if(pistolloaded<1)setstatelabel("reloadmag");
 				else setstatelabel("shootpistol");
@@ -859,7 +794,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		}
 		#### E 2{
 			class<actor> mn="GyroGrenade";
-			A_LeadTarget2(shotspeed:getdefaultbytype(mn).speed,adjusttics:2);
+			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
 			hdmobai.DropAdjust(self,mn);
 		}
 		#### F 0 A_JumpIf(!glloaded,"ohforfuckssake");
@@ -875,10 +810,10 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 
 
 	shootpistol:
-		#### E 1 A_LeadTarget1();
+		#### E 1;
 		#### E 1{
 			class<actor> mn="HDB_9";
-			A_LeadTarget2(shotspeed:getdefaultbytype(mn).speed,adjusttics:random(1,4));
+			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
 			hdmobai.DropAdjust(self,mn);
 		}
 	firepistol:
@@ -977,8 +912,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 			gunloaded<gunmax
 			||(
 				gunloaded>0
-				&&target
-				&&checksight(target)
+				&&CheckTargetInSight()
 			)
 		,"see");
 		---- A 0 setstatelabel("reloadsgloop");
