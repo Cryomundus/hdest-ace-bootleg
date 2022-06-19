@@ -34,6 +34,7 @@ extend class HDMobBase{
 	static bool forcepain(actor caller){
 		if(
 			!caller
+			||caller.bDORMANT
 			||caller.bnopain
 			||!caller.bshootable
 			||!caller.findstate("pain",true)
@@ -77,6 +78,11 @@ extend class HDMobBase{
 		actor inflictor,actor source,int damage,
 		name mod,int flags,double angle
 	){
+		if (bDORMANT)
+		{
+			return Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+		}
+		
 		//bypass mdk
 		if(damage==TELEFRAG_DAMAGE){
 			bodydamage+=(spawnhealth()+gibhealth)*100;
