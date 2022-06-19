@@ -140,6 +140,7 @@ class HDIED:DudRocket{
 			if(
 				hitactor
 				&&hitactor.bshootable
+				&&!hitactor.bdormant
 				&&!hitactor.bnotarget
 				&&!hitactor.bnevertarget
 				&&(hitactor.bismonster||hitactor.player)
