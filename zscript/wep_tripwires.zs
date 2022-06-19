@@ -229,7 +229,7 @@ class GumAndString:IdleDummy{
 		//set all the numbers
 		if(!trapisset){
 			if(tracer)ddd=tracer.pos+(0,0,4);
-			else ddd=master.pos+(0,0,master.height-8);
+			else ddd=master.pos+(0,0,master.height*0.65);
 
 			ddd-=pos;
 			stringlength=max(ddd.length(),1);
