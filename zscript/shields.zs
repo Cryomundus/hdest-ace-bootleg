@@ -128,7 +128,7 @@ class HDMagicShield:HDDamageHandler{
 				)
 			)
 		){
-			amount += speed;
+			amount = int(min(amount + speed, maxamount));
 			if(mass>0)mass--;
 		}
 
