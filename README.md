@@ -24,6 +24,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Radsuits can be used by NPCs;
 	- A_Immolate can check sight;
 	- HDAmBoxList::RemoveClass (static) and HDBackpack::RemoveClass for quick removal of items;
+	- Shields now use SOLID flag to make them impenetrable until depleted.
 - Various bugfixes:
 	- Fixed extremely rare desync that happens if one player has CRLF line endings while the other has only LF;
 	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless;

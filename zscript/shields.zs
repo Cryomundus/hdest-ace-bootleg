@@ -5,9 +5,10 @@ class HDMagicShield:HDDamageHandler{
 	default{
 		+nointeraction +noblockmap
 
-		+quicktoretaliate  //if enabled, regenerate up to maxamount
-		-standstill  //if enabled, do not deplete if over maxamount
-		+inventory.keepdepleted
+		+QUICKTORETALIATE //if enabled, regenerate up to maxamount
+		-STANDSTILL //if enabled, do not deplete if over maxamount
+		-SOLID // [Ace] Makes shields impenetrable until depleted
+		+INVENTORY.KEEPDEPLETED
 
 		inventory.amount 1;
 		inventory.maxamount 1024;
@@ -62,7 +63,7 @@ class HDMagicShield:HDDamageHandler{
 		if(shields){
 			shields.amount-=amount;
 			if(shields.amount<1){
-				int downto=-64;
+				int downto = shields.bSOLID ? -256 : -64;
 				shields.amount=downto;
 				if(hd_debug)console.printf(owner.getclassname().." shield broke to "..downto.."!");
 				owner.A_StartSound("misc/mobshieldx", CHAN_BODY, CHANF_OVERLAP, 0.75);
@@ -189,7 +190,7 @@ class HDMagicShield:HDDamageHandler{
 
 		if(!stamina)stamina=maxamount;
 
-		int blocked=min(amount>>1,damage,stamina>>1);
+		int blocked=min(bSOLID ? amount : amount >> 1, damage, bSOLID ? stamina : stamina >> 1);
 		damage-=blocked;
 		bool supereffective=(
 			mod=="BFGBallAttack"
@@ -224,7 +225,7 @@ class HDMagicShield:HDDamageHandler{
 		}
 
 		//chance to flinch
-		if(damage<1){
+		if(damage<1 && !bSOLID){
 			if(
 				!(flags&DMG_NO_PAIN)
 				&&blocked>(victim.spawnhealth()>>3)
@@ -284,11 +285,19 @@ class HDMagicShield:HDDamageHandler{
 		victim.angle+=deltaangle(victim.angle,victim.angleto(bullet))*frandom(-0.005,0.03);
 		victim.pitch+=frandom(-1.,1.);
 
+		if (bSOLID)
+		{
+			bullet.bMISSILE = false;
+			bullet.Destroy();
+			return 0, 0;
+		}
+
 		double addpenshell=min(pen,amount,stamina>>3);
 		if(addpenshell>0){
 			pen-=addpenshell;
 			penshell+=addpenshell; //in case anything else uses this value
 		}
+		
 		return pen,penshell;
 	}
 	states{
