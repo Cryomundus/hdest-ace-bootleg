@@ -31,8 +31,8 @@ class Hatchling:HDMobBase replaces LostSoul{
 
 	void A_TakeOff(bool vocalize=false){
 		if(vocalize)A_Vocalize(attacksound);
-		A_FaceTarget(10,10);
-		A_ChangeVelocity(cos(pitch)*5,0,sin(pitch)*-5,CVF_RELATIVE);
+		A_LeadTarget(lasttargetdist*0.125,false);
+		A_ChangeVelocity(cos(pitch)*8,0,sin(pitch)*-8,CVF_RELATIVE);
 	}
 	void A_Flying(){
 		if(
@@ -101,17 +101,10 @@ class Hatchling:HDMobBase replaces LostSoul{
 		loop;
 	missile:
 		SKUL AB 2;
-	turntoface:
-		SKUL AAB 1 A_FaceTarget(10,10);
-		SKUL A 0 A_JumpIf(
-			!random(0,3)
-			||(
-				target
-				&&absangle(angle,angleto(target))<frandom(4,20)
-			)
-		,"takeoff");
+	aim:
+		SKUL AB 1 A_TurnToAim(10);
 		loop;
-	takeoff:
+	shoot:
 		SKUL B 1 bright A_Takeoff(true);
 		SKUL C 1 bright ZapCheck();
 		SKUL D 1 bright A_Takeoff();
@@ -216,14 +209,14 @@ class Matribite:HDMobBase replaces PainElemental{
 		loop;
 	missile:
 		TNT1 A 0 A_JumpIfTargetInLOS("missile2",20);
-		PAIN ABCB 3 A_FaceTarget(10,10);
+		PAIN ABCB 3 A_FaceLastTargetPos(10);
 		TNT1 A 0 A_ChangeVelocity(0.8,0,frandom(-0.4,0.4),CVF_RELATIVE);
 		TNT1 A 0 A_JumpIfTargetInLOS("missile");
 		TNT1 A 0 A_Jump(40,"missile2");
 		---- A 0 setstatelabel("see");
 	missile2:
-		PAIN DDE 2 A_FaceTarget(5,5);
-		PAIN F 3 A_FaceTarget(5,5);
+		PAIN DDE 2 A_FaceLastTargetPos(5);
+		PAIN F 3 A_FaceLastTargetPos(5);
 		PAIN F 0 A_JumpIf(brewing>0,"missile2a");
 		PAIN F 6{
 			let aaa=Hatchling(spawn("Hatchling",(pos.xy,pos.z+32),ALLOW_REPLACE));

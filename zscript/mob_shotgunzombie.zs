@@ -239,10 +239,10 @@ class ZombieShotgunner:HDHumanoid{
 		#### ABCD 3 A_TurnToAim(turnamount);
 		loop;
 	shoot:
-		#### E 2{
-			int lag=max(2,10-(turnamount>>5));
+		#### E 4{
+			int lag=max(tics,10-(turnamount>>5));
 			A_SetTics(lag);
-			A_LeadTarget(tics);
+			A_LeadTarget(lag);
 		}
 		#### E 0{
 			if(jammed){
@@ -253,7 +253,7 @@ class ZombieShotgunner:HDHumanoid{
 				setstatelabel("ohforfuckssake");
 				return;
 			}
-			spread=0.1*turnamount;
+			spread=1.+0.1*turnamount;
 			if(wep==1)spread*=0.8;
 			angle+=frandom(0,spread)-frandom(0,spread);
 			pitch+=frandom(0,spread)-frandom(0,spread);

@@ -209,11 +209,10 @@ class SatanBallLight:PointLight{
 
 class SatanRobo:HDMobBase replaces Cyberdemon{
 	double launcheroffset;
-	double attackheight;property attackheight:attackheight;
 	default{
 		height 100;
 		radius 32;
-		satanrobo.attackheight 42;
+		missileheight 42;
 		+boss 
 		+missilemore
 		+floorclip
@@ -275,7 +274,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		double dist=lasttargetdist;
 		double dmult=1.;
 
-		vector3 shotpos=(pos.xy,pos.z+attackheight);
+		vector3 shotpos=(pos.xy,pos.z+missileheight);
 		if(launcheroffset)shotpos.xy+=angletovector(angle-90,launcheroffset);
 
 		let bbb=spawn(shottype,shotpos);
@@ -362,18 +361,18 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			}
 		}---- A 0 setstatelabel("see");
 	missile:
-		CYBR A 4 A_TurnToAim(40,attackheight,shootstate:"inposition");
+		CYBR A 4 A_TurnToAim(40,missileheight,shootstate:"inposition");
 		CYBR B 4{
-			A_TurnToAim(40,attackheight,shootstate:"inposition");
+			A_TurnToAim(40,missileheight,shootstate:"inposition");
 			A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 			A_Recoil(-4);
 		}
 		CYBR C 4{
-			A_TurnToAim(40,attackheight,shootstate:"inposition");
+			A_TurnToAim(40,missileheight,shootstate:"inposition");
 			A_StartSound("cyber/hoof",16,CHANF_OVERLAP);
 			A_Recoil(-4);
 		}
-		CYBR D 4 A_TurnToAim(40,attackheight,shootstate:"inposition");
+		CYBR D 4 A_TurnToAim(40,missileheight,shootstate:"inposition");
 		CYBR E random(15,25) A_Recoil(-4);
 		CYBR E 0 A_JumpIfTargetInLOS("missile");
 		CYBR E 0 A_Jump(128,"spray");
@@ -382,7 +381,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR E 4{
 			A_Recoil(1);
 			bfrightening=true;
-			A_FaceLastTargetPos(12,attackheight);
+			A_FaceLastTargetPos(12,missileheight);
 		}
 
 		CYBR E 0 A_JumpIf(health>1600,3);
@@ -393,7 +392,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR E 0 A_JumpIf(health>1600,3);
 		CYBR EE 2 A_CyberGunSmoke();
 
-		CYBR E 4 A_FaceLastTargetPos(12,attackheight);
+		CYBR E 4 A_FaceLastTargetPos(12,missileheight);
 
 		CYBR E 0 A_JumpIf(health>1600,3);
 		CYBR EE 2 A_CyberGunSmoke();
@@ -428,7 +427,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR E 0 A_JumpIf(health>1600,3);
 		CYBR EE 0 A_CyberGunSmoke();
 	leadtarget2:
-		CYBR E 8 A_FaceLastTargetPos(12,attackheight,target?frandom(0,target.height):0);
+		CYBR E 8 A_FaceLastTargetPos(12,missileheight,target?frandom(0,target.height):0);
 		CYBR F 3 bright light("ROCKET"){
 			A_LeadTarget(lasttargetdist/(shottype=="Roboball"?20:15),randompick(0,0,1));
 			A_SatanRoboAttack(0.6);
@@ -437,7 +436,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR E 0 A_JumpIf(health>1600,3);
 		CYBR EE 0 A_CyberGunSmoke();
 	leadtarget3:
-		CYBR E 8 A_FaceLastTargetPos(12,attackheight,target?frandom(0,target.height):0);
+		CYBR E 8 A_FaceLastTargetPos(12,missileheight,target?frandom(0,target.height):0);
 		CYBR F 3 bright light("ROCKET"){
 			A_LeadTarget(lasttargetdist/(shottype=="Roboball"?30:25),false);
 			A_SatanRoboAttack();
@@ -446,17 +445,17 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 
 	directshots:
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack();
-		CYBR E 8 A_FaceLastTargetPos(12,attackheight);
+		CYBR E 8 A_FaceLastTargetPos(12,missileheight);
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(0.3);
-		CYBR E 8 A_FaceLastTargetPos(12,attackheight);
+		CYBR E 8 A_FaceLastTargetPos(12,missileheight);
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(0.7);
 		goto fireend;
 
 	spray:
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(1.);
-		CYBR E 6 A_FaceLastTargetPos(12,attackheight,target?frandom(0,target.height):0);
+		CYBR E 6 A_FaceLastTargetPos(12,missileheight,target?frandom(0,target.height):0);
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(2.);
-		CYBR E 6 A_FaceLastTargetPos(12,attackheight,target?frandom(0,target.height):0);
+		CYBR E 6 A_FaceLastTargetPos(12,missileheight,target?frandom(0,target.height):0);
 		CYBR F 3 bright light("ROCKET")A_SatanRoboAttack(3.);
 	fireend:
 		CYBR E 0 A_JumpIf(health>1600,3);
@@ -475,17 +474,17 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR DD 6 A_Recoil(-2);
 		CYBR A 12 A_SetSolid();
 		CYBR A 0{
-			A_FaceLastTargetPos(40,attackheight);
+			A_FaceLastTargetPos(40,missileheight);
 			A_SetAngle(angle+random(-10,10));
 			A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 		}
 		CYBR BB 6 A_Recoil(-2);
 		CYBR C 12{
-			A_FaceLastTargetPos(40,attackheight);
+			A_FaceLastTargetPos(40,missileheight);
 			A_StartSound("cyber/hoof",16,CHANF_OVERLAP);
 		}
 		CYBR A 0{
-			A_FaceLastTargetPos(40,attackheight);
+			A_FaceLastTargetPos(40,missileheight);
 			angle+=random(-10,10);
 		}
 		CYBR DD 6 A_Recoil(-2);
@@ -506,7 +505,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			frandom(-1,1),frandom(-1,1),frandom(1,3)
 		);
 		CYBR A 5{
-			A_FaceLastTargetPos(40,attackheight);
+			A_FaceLastTargetPos(40,missileheight);
 			angle+=random(-10,10);
 			A_StartSound("cyber/hoof",16,CHANF_OVERLAP);
 		}
@@ -523,7 +522,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			);
 		}
 		CYBR C 16{
-			A_FaceLastTargetPos(40,attackheight);
+			A_FaceLastTargetPos(40,missileheight);
 			angle+=frandom(-10,10);
 			A_StartSound("cyber/hoof",16,CHANF_OVERLAP);
 		}
@@ -538,7 +537,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 			0,SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM,144
 		);
 		CYBR B 0{
-			A_FaceLastTargetPos(40,attackheight);
+			A_FaceLastTargetPos(40,missileheight);
 			angle+=random(-10,10);
 			A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 		}
@@ -553,7 +552,7 @@ class SatanRobo:HDMobBase replaces Cyberdemon{
 		CYBR E 14{
 			A_StartSound("cyber/walk",15,CHANF_OVERLAP);
 		}
-		CYBR EEEE 6 A_FaceLastTargetPos(10,attackheight);
+		CYBR EEEE 6 A_FaceLastTargetPos(10,missileheight);
 		CYBR FF 0 A_SpawnItemEx("HDSmoke",54,launcheroffset,52,
 			frandom(1,4),frandom(-1,1),frandom(2,4)
 		);

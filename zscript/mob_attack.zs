@@ -1,13 +1,19 @@
 // ------------------------------------------------------------
 // AI stuff related to aiming and targeting.
 // ------------------------------------------------------------
+const FLTP_TOP=-999;
+enum LeadTargetFlags{
+	HDLT_RANDOMIZE=1,
+	HDLT_DONTABORT=2,
+}
 extend class HDMobBase{
 	void A_LeadTarget(
 		double tics,
-		bool randomize=true
+		int flags=HDLT_RANDOMIZE,
+		double maxturn=100
 	){
-		if(!target)return;
-		if(randomize)tics=frandom(0,tics*1.3);
+		if(!targetinsight||!target)return;
+		if(flags&HDLT_RANDOMIZE)tics=frandom(0,tics*1.3);
 
 		let ltp=lasttargetpos+(target.prev-target.pos);
 		let lsp=prev;
@@ -18,8 +24,13 @@ extend class HDMobBase{
 		);
 		double pch=hdmath.pitchto(lsp,ltp)-hdmath.pitchto(pos,lasttargetpos);
 
-		angle+=ach*tics;
-		pch+=pch*tics;
+		ach=angle+clamp(ach*tics,-maxturn,maxturn);
+		pch=clamp(pitch+pch*tics,-90,90);
+
+		if(HDMobAI.TryShoot(self,angle:ach,pitch:pch,flags:HDMobAI.TS_GEOMETRYOK)){
+			angle=ach;
+			pitch=pch;
+		}else if(!(flags&HDLT_DONTABORT))setstatelabel("see");
 	}
 	void A_FaceLastTargetPos(
 		double maxturn=180,
@@ -28,7 +39,10 @@ extend class HDMobBase{
 	){
 		if(!target)return;
 		if(attackheight<0)attackheight=height*0.8;
-		if(targetheight<0)targetheight=target.height*0.6;
+		if(targetheight<0){
+			if(targetheight==FLTP_TOP)targetheight=target.height;
+			targetheight=target.height*0.6;
+		}
 
 		double targetpitch=hdmath.pitchto(
 			(pos.xy,pos.z+attackheight),
@@ -52,8 +66,6 @@ extend class HDMobBase{
 		if(attackheight<0)attackheight=height*0.8;
 		if(targetheight<0)targetheight=target.height*0.6;
 
-		A_FaceLastTargetPos(maxturn,attackheight,targetheight);
-
 		double targetpitch=hdmath.pitchto(
 			(pos.xy,pos.z+attackheight),
 			(lasttargetpos.xy,lasttargetpos.z+targetheight)
@@ -68,9 +80,15 @@ extend class HDMobBase{
 				||checksight(target)
 			)
 		){
-			TriggerPullAdjustments();
-			setstatelabel(shootstate);
+			if(!HDMobAI.TryShoot(self,flags:HDMobAI.TS_GEOMETRYOK)){
+				setstatelabel("see");
+				return;
+			}else{
+				TriggerPullAdjustments();
+				setstatelabel(shootstate);
+			}
 		}
+		else A_FaceLastTargetPos(maxturn,attackheight,targetheight);
 	}
 
 
@@ -109,6 +127,10 @@ extend class HDMobBase{
 
 	double spread;
 	virtual void TriggerPullAdjustments(){
+		if(
+			vel.z
+			||floorz>=pos.z
+		)spread+=max(abs(vel.x),abs(vel.y))*0.4;
 		if(spread){
 			angle+=frandom(-spread,spread);
 			pitch+=frandom(-spread,spread);

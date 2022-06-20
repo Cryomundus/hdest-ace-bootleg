@@ -80,19 +80,13 @@ class PainBringer:PainMonster replaces HellKnight{
 		}
 		goto pain;
 	missile:
-		BOS2 ABCD 3{
-			A_FaceTarget(30);
-			if(A_JumpIfTargetInLOS("null",10))setstatelabel("shoot");
-		}
-		BOS2 E 0 A_JumpIfTargetInLOS("shoot",10);
-		BOS2 E 0 A_JumpIfTargetInLOS("missile");
-		---- A 0 setstatelabel("see");
+		BOS2 ABCD 3 A_TurnToAim(30);
+		loop;
 	shoot:
 		BOS2 E 0{
-			if(target)targetdistance=distance3d(target);else targetdistance=0;
 			if(
 				!puttopawn
-				&&targetdistance>1024
+				&&lasttargetdist>1024
 				&&!random(0,4)
 			){
 				setstatelabel("putto");
@@ -100,8 +94,7 @@ class PainBringer:PainMonster replaces HellKnight{
 		}goto fireball;
 	putto:
 		BOS2 E 6 A_StartSound("knight/sight",CHAN_VOICE);
-		BOS2 E 4 A_FaceTarget(10,10);
-		BOS2 E 2;
+		BOS2 E 6;
 		BOS2 F 5;
 		BOS2 E 3;
 		BOS2 H 12{
@@ -116,25 +109,9 @@ class PainBringer:PainMonster replaces HellKnight{
 		}
 		---- A 0 setstatelabel("see");
 	fireball:
-		BOS2 FE 3 A_FaceTarget(60,60);
-		BOS2 E 2{
-			A_FaceTarget(6,6);
-			targetingangle=angle;targetingpitch=pitch;
-		}
-		BOS2 E 3{
-			A_FaceTarget(6,6);
-
-			if(target&&targetdistance<(25*35*7)){
-				double adj=targetdistance*frandom(0.008,0.032);
-				angle+=deltaangle(targetingangle,angle)*adj;
-				if(target.bfloat)pitch+=deltaangle(targetingpitch,pitch)*adj;
-				else pitch+=clamp(deltaangle(targetingpitch,pitch)*adj,-10,10);
-			}else{
-				angle+=frandom(-4.,4.);
-				pitch+=frandom(-0.1,0.1);
-			}
-		}
-		BOS2 F 1;
+		BOS2 EE 2 A_FaceLastTargetPos(30,32);
+		BOS2 F 3 A_FaceLastTargetPos(6,32);
+		BOS2 F 1 A_LeadTarget(lasttargetdist*0.06,false,45);
 		BOS2 G 4{
 			actor aaa;int bbb;
 			[bbb,aaa]=A_SpawnItemEx("BaleBall",
@@ -145,7 +122,13 @@ class PainBringer:PainMonster replaces HellKnight{
 		}
 		BOS2 GF 5;
 		BOS2 A 0 A_JumpIf(firefatigue>HDCONST_MAXFIREFATIGUE*1.6,"pain");
-		BOS2 A 0 A_Jump(128,"missile");
+		BOS2 A 0 A_JumpIf(
+			!random(0,7)
+			||(
+				!random(0,4)
+				&&!CheckTargetInSight()
+			)
+		,"missile");
 		---- A 0 setstatelabel("see");
 	melee:
 		BOS2 E 6 A_FaceTarget();

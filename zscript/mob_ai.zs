@@ -8,7 +8,7 @@
    +SPECIALFIREDAMAGE: is totally invisible.
 
    +NOBOUNCESOUND: not alerted by sound - will not even acquire a target.
-   +BOUNCELIKEHERETIC: no visual check when looking.
+   +NOSIGHTCHECK: no visual check when looking.
 */
 
 const HDCONST_MOBSOUNDRANGE=256.;
@@ -194,7 +194,7 @@ extend class HDMobBase{
 		//randomly lose track of target
 		if(
 			!bnotargetswitch
-			&&target
+			&&!!target
 			&&!targetinsight
 			&&(
 				(bfriendly&&reactiontime<4)
@@ -254,7 +254,7 @@ extend class HDMobBase{
 			(
 				targetinsight
 				||(
-					target
+					!!target
 					&&!(random(0,(stunned>>4)))
 					&&distance3dsquared(target)<(checkmeleeradius*checkmeleeradius)
 				)
@@ -279,7 +279,6 @@ extend class HDMobBase{
 		if(
 			!threat
 			||bnofear
-			||!random(0,(painchance>>5))
 		){
 			//consider doing a missile
 			if(
@@ -300,7 +299,6 @@ extend class HDMobBase{
 				if(
 					targetinsight
 					&&absangletotarg<5
-					&&vel dot vel < height
 					&&absangle(angleto(target),hdmath.angleto(pos.xy,lastlasttargetpos.xy))<15
 				)mms*=0.2;
 
@@ -550,7 +548,7 @@ extend class HDMobBase{
 			if(!(flags&CHF_DONTCHANGEMOVEPOS)){
 				if(
 					!targetinsight
-					&&target
+					&&!!target
 					&&!random(0,7)
 				){
 					movepos.z=lasttargetpos.z;
@@ -633,7 +631,7 @@ extend class HDMobBase{
 
 		//check sight and distance
 		targetinsight=
-			!bBOUNCELIKEHERETIC
+			!bNOSIGHTCHECK
 			&&!random(0,didntsee)
 			&&(
 				blookallaround
@@ -817,7 +815,7 @@ extend class HDMobBase{
 
 			if(
 				!(flags&LOF_NOSIGHTCHECK)
-				&&!bBOUNCELIKEHERETIC
+				&&!bNOSIGHTCHECK
 			){
 
 				//look for monsters

@@ -67,7 +67,7 @@ class Putto:HDMobBase{
 		#### ABCD 2 A_FastChase();
 		#### ABCD 3;
 		goto missile;
-	Death:
+	death:
 		#### AABB 1 A_SpawnItemEx(
 			"HDSmoke", random(-2,2),random(-2,2),random(4,8),
 			vel.x,vel.y,vel.z+2, flags:SXF_NOCHECKPOSITION|SXF_ABSOLUTEMOMENTUM

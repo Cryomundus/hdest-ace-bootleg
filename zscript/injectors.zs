@@ -488,7 +488,7 @@ class InjectZerkDummy:InjectStimDummy{
 		}stop;
 	}
 }
-class HDZerk:HDDrug
+class HDZerk : HDDrug
 {
 	enum ZerkAmounts
 	{
@@ -566,9 +566,9 @@ class HDZerk:HDDrug
 
 					if (!random(0, int(8 - amt * 0.0005)))
 					{
-						hdp.woundcount += random(0, 1);
 						if (!random(0, 7))
 						{
+							hdp.oldwoundcount++;
 							hdp.A_StartSound(hdp.PainSound, CHAN_VOICE);
 						}
 						else if (!random(0, 7))

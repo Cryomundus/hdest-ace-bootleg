@@ -242,91 +242,45 @@ class Serpentipede:HDMobBase{
 		#### ABCD 4 A_HDChase();
 		loop;
 	missile:
-		#### ABCD 4{
-			A_FaceTarget(40,40);
-			if(A_JumpIfTargetInLOS("null",40))setstatelabel("missile0");
-			else if(!A_JumpIfTargetInLOS("null"))setstatelabel("see");
-		}loop;
-	missile0:
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,"spam");
-		#### E 0{
-			double rl=angle+90;
-			vel.x+=cos(rl)*frandom(-3,3);
-			vel.y+=sin(rl)*frandom(-3,3);
-		}
+		#### ABCD 4 A_TurnToAim(40,35);
+		loop;
+	shoot:
+		#### E 0 A_ChangeVelocity(0,frandom(-3,3),0,CVF_RELATIVE);
 		#### E 0 A_Jump(16,"hork");
 		goto lead;
-		#### E 0 A_JumpIfCloser(512,"lead");
-		goto hork;
 
 	lead:
-		#### E 6 A_FaceTarget(40,40);
-		#### E 1{
-			A_FaceTarget(20,40);
-			leadaim1=(angle,pitch);
-		}
-		#### E 0{
-			if(!target)return;
-			A_FaceTarget(20,40);
-			leadaim2=(angle,pitch);
-			leadaim1=(deltaangle(leadaim1.x,leadaim2.x),deltaangle(leadaim2.y,leadaim1.y));
-
-			double dist=min(distance3d(target),512);
-			leadaim1*=frandom(0,dist/7); //less than average speed of ball
-			leadaim1.x=clamp(leadaim1.x,-30,30);
-			leadaim1.y=clamp(leadaim1.y,-12,10);
-
-			angle+=leadaim1.x;
-			pitch+=leadaim1.y;
-		}
-		#### F 4;
-		#### G 8 A_SpawnProjectile("HDImpBall",34,0,0,CMF_AIMDIRECTION,pitch-frandom(0,0.1));
-		#### F 0{
-			double rl=angle+90;
-			vel.x+=cos(rl)*frandom(-3,3);
-			vel.y+=sin(rl)*frandom(-3,3);
-		}
-		#### F 6;
+		#### E 4 A_FaceLastTargetPos(40,35);
+		#### E 1 A_FaceLastTargetPos(20,35);
+		#### F 4 A_LeadTarget(lasttargetdist/getdefaultbytype("HDImpBall").speed);
+		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,256,10,10,flags:HDMobAI.TS_GEOMETRYOK),"see");
+		#### G 6 A_SpawnProjectile("HDImpBall",34,0,0,CMF_AIMDIRECTION,pitch-frandom(0,0.1));
+		#### F 4 A_ChangeVelocity(0,frandom(-3,3),0,CVF_RELATIVE);
 		---- A 0 A_JumpIfTargetInsideMeleeRange("melee");
-		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,256,10,10),"see");
+		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,512,10,10,flags:HDMobAI.TS_GEOMETRYOK),"see");
 		#### E 0 A_Jump(16,"see");
-		#### E 0 A_Jump(40,"spam","hork");
-		goto missile;
+		#### E 0 A_Jump(140,"coverfire");
+		---- A 0 setstatelabel("see");
 
 	spam:
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,3);
-		#### DD 2 A_FaceTarget(12,24);
 		#### E 5 A_SetTics(random(4,6));
-		#### E 0 A_JumpIfTargetInLOS(1);
-		goto spam2;
-		#### E 2 A_FaceTarget(12,24);
-	spam2:
 		#### F 2;
 		#### G 6 A_SpawnProjectile("HDImpBall",35,0,frandom(-3,4),CMF_AIMDIRECTION,pitch+frandom(-2,1.8));
 		#### F 4;
 		#### F 0 A_JumpIf(firefatigue>HDCONST_MAXFIREFATIGUE,"pain");
-		#### F 0 A_JumpIfTargetInLOS("spam3");
-		#### F 0 A_Jump(256,"coverfire");
-	spam3:
-		---- A 0 A_Jump(120,"missile");
-		---- A 0 A_Jump(256,"see");
+		//fall through to more cover fire
 	coverfire:
-		---- A 0 A_JumpIfTargetInsideMeleeRange("melee");
-		#### E random(2,7)A_JumpIfTargetInLOS("Missile");
-		---- A 0 A_Jump(180,"missile1a");
-		---- A 0 A_Jump(40,"hork");
-		---- A 0 A_Jump(40,"see");
-		---- A 0 A_Jump(80,1);
-		loop;
-		#### ABCD 3 A_HDChase();
-		---- A 0 A_Jump(256,"missile");
+		---- A 0 A_JumpIfTargetInLOS("see");
+		#### EEEEE 3 A_Coverfire("coverdecide");
+		---- A 0 setstatelabel("see");
+	coverdecide:
+		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,512,10,10,flags:HDMobAI.TS_GEOMETRYOK),"see");
+		---- A 0 A_Jump(180,"spam");
+		---- A 0 A_Jump(90,"hork");
+		---- A 0 setstatelabel("missile");
 	hork:
 		#### E 0 A_Jump(156,"spam");
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,2);
-		---- A 0 A_FaceTarget(40,80);
+		---- A 0 A_FaceLastTargetPos(40,35);
 		#### E 2;
 		#### E 0 A_Vocalize(seesound);
 		#### EEEEE 2 A_SpawnItemEx("ReverseImpBallTail",4,24,random(31,33),1,0,0,0,160);
@@ -336,8 +290,9 @@ class Serpentipede:HDMobBase{
 		#### G 0 A_SpawnProjectile("HDImpBall",36,0,(frandom(-4,4)),CMF_AIMDIRECTION,pitch+frandom(-4,3.6));
 		#### G 0 A_SpawnProjectile("HDImpBall",36,0,(frandom(-2,-10)),CMF_AIMDIRECTION,pitch+frandom(-4,3.6));
 		#### GGFE 5 A_SetTics(random(4,6));
-		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,256,10,10),"see");
-		---- A 0 A_Jump(256,"spam");
+		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,256,10,10,flags:HDMobAI.TS_GEOMETRYOK),"see");
+		#### E 0 A_Watch();
+		---- A 0 setstatelabel("see");
 	melee:
 		#### EE 4 A_FaceTarget();
 		#### F 2;
@@ -385,13 +340,13 @@ class Serpentipede:HDMobBase{
 		#### M 4;
 		#### ML 6;
 		#### KJI 4;
-		#### A 0 A_Jump(256,"see");
+		---- A 0 setstatelabel("see");
 	ungib:
 		#### U 6;
 		#### UT 8;
 		#### SRQ 6;
 		#### PONH 4;
-		#### A 0 A_Jump(256,"see");
+		---- A 0 setstatelabel("see");
 	falldown:
 		#### H 5;
 		#### I 5 A_Vocalize(deathsound);
@@ -405,7 +360,7 @@ class Serpentipede:HDMobBase{
 		#### J 0 A_Vocalize(seesound);
 		#### JI 4 {vel.xy-=(cos(angle),sin(angle))*0.3;}
 		#### HE 5;
-		#### A 0 A_Jump(256,"see");
+		---- A 0 setstatelabel("see");
 	}
 }
 
@@ -530,27 +485,16 @@ class Regentipede:Serpentipede{
 	states{
 	missile:
 		#### E 0 A_Jump(128,"Missile2");
-		#### E 4 A_FaceTarget(0,0);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,2);
-		---- A 0 A_FaceTarget(0,0);
-		#### F 4;
+		#### EF 4 A_FaceLastTargetPos(50,32);
 		#### G 8 A_SpawnProjectile("HDImpBall",(random(24,30)),0,(random(-6,6)),CMF_AIMDIRECTION,pitch);
 		#### F 5;
 		---- A 0 setstatelabel("see");
 	missile2:
-		#### E 2 A_FaceTarget(0,0);
+		#### E 2 A_FaceLastTargetPos(50,32);
 		#### E 0 A_Vocalize(seesound);
 		#### EEEEE 2 A_SpawnItemEx("ReverseImpBallTail",3,19,random(24,30),1,0,0,0,160);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,2);
-		---- A 0 A_FaceTarget(0,0);
-		#### F 4;
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,2);
-		---- A 0 A_FaceTarget(0,0);
-		#### F 4;
-		#### G 0 A_FaceTarget();
+		#### F 4 A_FaceLastTargetPos(50,32);
+		#### F 4 A_FaceLastTargetPos(50,32);
 		#### G 0 A_SpawnProjectile("ShieldImpBall",32,8,0,CMF_AIMDIRECTION,pitch);
 		#### GGFE 5;
 		---- A 0 setstatelabel("see");
@@ -615,36 +559,30 @@ class Ardentipede:Serpentipede{
 		---- A 0 A_JumpIf(stamina>random(5,10),"recharge");
 		---- A 0 A_JumpIf(health<random(0,200),1);
 		goto super::missile;
-		---- A 0{stamina+=3;}
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,"missile1");
-		#### E 0 A_Jump(16,"missile1");
-		#### E 0 A_JumpIfCloser(640,1);
-		goto Missile3;
-		#### E 0 A_JumpIfCloser(256,1);
-		goto Missile2;
+		---- A 0{
+			stamina+=3;
+			if(
+				CheckTargetInSight()
+				||!random(0,15)
+			)setstatelabel("missile1");
+			else if(lasttargetdist>640)setstatelabel("missile3");
+			else if(lasttargetdist<256)setstatelabel("missile1");
+		}
+		goto missile2;
 	missile1:
 		#### E 0 A_Jump(32,"missile2");
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,2);
-		---- A 0 A_FaceTarget(0,0);
-		#### E 6;
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,2);
-		---- A 0 A_FaceTarget(0,0);
-		#### F 6;
+		#### EF 6 A_FaceLastTargetPos(40,32);
 		#### G 8 A_SpawnProjectile("ArdentipedeBall",(random(30,34)),0,(random(-6,6)),CMF_AIMDIRECTION,pitch);
 		---- A 0 setstatelabel("see");
 	missile2:
 		#### E 0 A_Jump(96,"Missile1");
 		#### E 0 A_Jump(16,"Missile3");
-		#### E 2 A_FaceTarget(0,0);
+		#### E 2 A_FaceLastTargetPos(40,32);
+		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,256,10,10,flags:HDMobAI.TS_GEOMETRYOK),"see");
 		#### E 2 A_Vocalize(seesound);
 		#### EEEEEEE 2 A_SpawnItemEx("ReverseImpBallTail",random(3,5),random(23,25),random(31,33),1,0,0,0,160);
-		---- A 0 A_JumpIfTargetInLOS(2);
-		---- A 0 A_Jump(256,2);
-		---- A 0 A_FaceTarget(0,0);
-		#### F 6;
+		#### F 3 A_FaceLastTargetPos(40,32);
+		#### F 3 A_LeadTarget(lasttargetdist*0.08);
 
 		#### GGGGGGGG 0 A_SpawnProjectile("ArdentipedeBall2",random(29,34),6,(random(-18,18)),CMF_AIMDIRECTION,pitch+frandom(-2,4));
 		---- A 0{stamina+=5;}
@@ -684,7 +622,7 @@ class Ardentipede:Serpentipede{
 		#### H 3 A_Vocalize(painsound);
 		#### A 2 A_FaceTarget();
 		#### BCD 2 A_FastChase();
-		Goto Missile;
+		goto missile;
 	}
 }
 

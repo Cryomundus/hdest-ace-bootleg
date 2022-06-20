@@ -198,14 +198,14 @@ class ZombieStormtrooper:HDHumanoid{
 			else turnamount=10;
 		}goto turntoaim;
 	turntoaim:
-		#### E 2 A_TurnToAim(turnamount);
-		#### A 0 A_JumpIfTargetInLOS(1,10);
+		#### E 2 A_TurnToAim(turnamount,shootstate:"startshoot");
 		loop;
-		#### E 1{
+	startshoot:
+		#### E 4{
 			A_FaceLastTargetPos(turnamount);
-			A_SetTics(random(1,int(120/clamp(turnamount,1,turnamount+1)+4)));
+			A_SetTics(max(tics,random(1,int(120/clamp(turnamount,1,turnamount+1)+4))));
 
-			spread=frandom(0.12,0.27)*turnamount;
+			spread=1.+frandom(0.12,0.27)*turnamount;
 			if(firemode==-2){
 				pitch+=frandom(0,spread)-frandom(0,spread);
 				angle+=frandom(0,spread)-frandom(0,spread);

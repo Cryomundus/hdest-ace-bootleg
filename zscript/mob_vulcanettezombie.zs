@@ -169,7 +169,7 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 		CPOS A 0 A_Jump(196,"see2");
 		---- A 0 setstatelabel("scan");
 	missile:
-		CPOS ABCD 5 A_TurnToAim(15,shootstate:"aim");
+		CPOS ABCD 5 A_TurnToAim(10,shootstate:"aim");
 		loop;
 	aim:
 		CPOS E 4{

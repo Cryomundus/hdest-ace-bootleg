@@ -319,7 +319,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 	}
 
 	actor A_OpShot(class<actor> missiletype,bool userocket=false){
-		actor mmm=spawn(missiletype,pos+(0,0,height-6),ALLOW_REPLACE);
+		actor mmm=spawn(missiletype,pos+(0,0,height*0.8),ALLOW_REPLACE);
 		mmm.pitch=pitch+frandom(0,spread)-frandom(0,spread);
 		mmm.angle=angle+frandom(0,spread)-frandom(0,spread);
 		mmm.target=self;
@@ -619,7 +619,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 							wep==HDMW_ZM66
 							||wep==HDMW_SMG
 						)
-						&&!random(0,15)
+						&&!random(0,31)
 					)
 				)
 			){
@@ -796,6 +796,11 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 			class<actor> mn="GyroGrenade";
 			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
 			hdmobai.DropAdjust(self,mn);
+
+			//everything else assumes you're aiming for centre, try ground instead
+			double aaa=angle;
+			A_FaceLastTargetPos(10,targetheight:1.);
+			angle=aaa;
 		}
 		#### F 0 A_JumpIf(!glloaded,"ohforfuckssake");
 		#### F 1 bright{

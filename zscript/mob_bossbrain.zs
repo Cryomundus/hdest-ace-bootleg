@@ -603,14 +603,14 @@ class HDBossEye:HDActor replaces BossEye{
 					offsetz:32,
 					data:tlt
 				);
-				spawn("TyrantWallSplode",tlt.hitlocation-tlt.hitdir,ALLOW_REPLACE);
+				spawn("TyrantWallSplode",tlt.hitlocation-tlt.hitdir*frandom(16,128),ALLOW_REPLACE);
 			}
 		}
 	}
 	default{
 		-solid -shootable +noblockmap +lookallaround +nointeraction
 		maxtargetrange 16384;
-		stamina 100;
+		stamina 140;
 	}
 	void A_ShootCube(){
 		if(!target||!checksight(target))return;
@@ -675,3 +675,4 @@ class Zaplinger:IdleDummy{
 		}
 	}
 }
+

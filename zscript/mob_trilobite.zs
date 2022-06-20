@@ -408,6 +408,7 @@ class Trilobite:HDMobBase replaces Cacodemon{
 	spawn:
 		HEAD A 10{
 			A_HDLook();
+			givebody(3);
 			if(health>(CACO_MAXHEALTH*0.5))bfloatbob=false;
 			if(!bambush&&!random(0,10))A_HDWander();
 		}wait;
@@ -428,17 +429,15 @@ class Trilobite:HDMobBase replaces Cacodemon{
 		HEAD E 3 A_SetGravity(clamp(1.-(health/CACO_MAXHEALTH),0,HDCONST_GRAVITY));
 		---- A 0 setstatelabel("see");
 	missile:
-		HEAD A 0 A_JumpIfTargetInLOS("shoot",10);
-		HEAD A 0 A_JumpIfTargetInLOS(2,flags:JLOSF_DEADNOJUMP);
-		---- A 0 setstatelabel("see");
-		HEAD A 3 A_FaceTarget(40,40,flags:FAF_TOP);
+		HEAD A 3 A_TurnToAim(10);
 		loop;
 	shoot:
 		HEAD A 0{vel.z+=frandom(-1,2);}
 		HEAD A 0 A_JumpIf(charge>30,"bigzap");
 	foof:
 		HEAD B 2{
-			A_FaceTarget(3,180,flags:FAF_TOP);
+			A_FaceLastTargetPos(3,32,FLTP_TOP);
+			A_LeadTarget(lasttargetdist*0.15,maxturn:45);
 			charge++;
 		}
 		HEAD C 1;
@@ -452,13 +451,14 @@ class Trilobite:HDMobBase replaces Cacodemon{
 		HEAD C 3;
 		HEAD D 36 bright{
 			vel.z+=frandom(0.2,1.2);
-			A_FaceTarget(30,180,flags:FAF_BOTTOM);
+			A_FaceLastTargetPos(40,32,0);
+			A_LeadTarget(lasttargetdist*0.01);
 			bnopain=true;
 			A_SpawnProjectile("Triloball",28,0,0,CMF_AIMDIRECTION,pitch);
 			if(!A_JumpIfCloser(1024,"null")&&random(0,3)){
 				charge=666;
 				A_StartSound("caco/sight",CHAN_VOICE,volume:1.,attenuation:0.1);
-				A_FaceTarget(2,8,FAF_BOTTOM);
+				A_FaceLastTargetPos(4,32,0);
 			}else A_StartSound("caco/sight",CHAN_VOICE);
 		}
 		HEAD D 24{
@@ -466,7 +466,7 @@ class Trilobite:HDMobBase replaces Cacodemon{
 			A_StartSound("caco/bigshot",CHAN_WEAPON);
 			A_ChangeVelocity(-cos(pitch)*3,0,sin(pitch),CVF_RELATIVE);
 			if(charge==666){
-				A_FaceTarget(0.5,2.,FAF_BOTTOM);
+				A_FaceLastTargetPos(1,32,0);
 				HDBulletActor.FireBullet(self,"KekB",32);
 			}else{
 				A_CustomRailgun(random(100,200),50,"","azure",

@@ -181,7 +181,7 @@ class Boner:HDMobBase replaces Revenant{
 				!targ
 				||(targ.bcorpse&&!random(0,31))
 			)return;
-			A_FaceTarget();
+			A_FaceLastTargetPos();
 			if(CheckMeleeRange()){
 				int damage=random[SkelFist](1, 10)*6;
 				A_StartSound("skeleton/melee",CHAN_WEAPON);
@@ -192,7 +192,7 @@ class Boner:HDMobBase replaces Revenant{
 		SKEL H 4;
 		---- A 0 setstatelabel("see");
 	missile:
-		SKEL II 4 A_FaceTarget();
+		SKEL II 4 A_FaceLastTargetPos();
 		SKEL J 3 bright A_SpawnProjectile("BonerBall",42,4,-24,2,4);
 		SKEL J 7 bright A_SpawnProjectile("BonerBall",42,-4,24,2,4);
 		SKEL K 12{
@@ -202,7 +202,7 @@ class Boner:HDMobBase replaces Revenant{
 		---- A 0 setstatelabel("see");
 	pain:
 		SKEL L 5;
-		SKEL L 5 A_Pain();
+		SKEL L 5 A_Vocalize(painsound);
 		---- A 0 setstatelabel("see");
 	death:
 		SKEL LM 7;
@@ -219,7 +219,7 @@ class Boner:HDMobBase replaces Revenant{
 		#### A 0 A_Jump(256,"see");
 	falldown:
 		SKEL L 5;
-		SKEL M 5 A_Pain();
+		SKEL M 5 A_Vocalize(painsound);
 		SKEL NNOOP 2 A_SetSize(-1,max(deathheight,height-10));
 		SKEL L 0 A_SetSize(-1,deathheight);
 		SKEL Q 10 A_KnockedDown();
@@ -227,7 +227,7 @@ class Boner:HDMobBase replaces Revenant{
 	standup:
 		SKEL P 6;
 		SKEL O 0 A_Jump(160,2);
-		SKEL O 0 A_StartSound(seesound,CHAN_VOICE);
+		SKEL O 0 A_Vocalize(seesound);
 		SKEL PO 4 A_Recoil(-0.3);
 		SKEL NML 4;
 		---- A 0 setstatelabel("see");
