@@ -19,12 +19,13 @@ For the most part this build is the same as the master branch at any given time.
 	- Barrels have been optimized and explosions will no longer grind the game to a halt;
 	- SectorDamageCounter has been refactored to use a thinker instead of an actor;
 	- HDSmoke has its own STATNUM which vastly improved ThinkerIterator performance;
-- Various modding support:
+- Various modding extensions:
 	- Pressing* can now be called from weapon context such as Tick overrides on the weapon itself rather than being locked to states;
 	- Radsuits can be used by NPCs;
 	- A_Immolate can check sight;
 	- HDAmBoxList::RemoveClass (static) and HDBackpack::RemoveClass for quick removal of items;
 	- Shields now use SOLID flag to make them impenetrable until depleted.
+	- Shield regen amount per cycle can be set using the Speed property.
 - Various bugfixes:
 	- Fixed extremely rare desync that happens if one player has CRLF line endings while the other has only LF;
 	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless;

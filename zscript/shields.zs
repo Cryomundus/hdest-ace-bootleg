@@ -15,6 +15,7 @@ class HDMagicShield:HDDamageHandler{
 		inventory.icon "BON2A0";
 
 		stamina 0;  //if set, this is the strength of the shield; otherwise use maxamount
+		speed 1; // [Ace] How much shield to regenerate per regen cycle.
 
 		HDDamageHandler.priority 10000;
 		+hdpickup.fullcoverage
@@ -127,7 +128,7 @@ class HDMagicShield:HDDamageHandler{
 				)
 			)
 		){
-			amount++;
+			amount += speed;
 			if(mass>0)mass--;
 		}
 
