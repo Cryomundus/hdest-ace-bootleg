@@ -585,7 +585,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 				return;
 			}
 
-			int settics=clamp(int(lasttargetdist*0.002),0,30);
+			int settics=clamp(int(lasttargetdist*0.001),0,30);
 			if(lastinginjury>0)settics+=random(0,min(lastinginjury,(35*5)));
 			A_SetTics(settics);
 		}

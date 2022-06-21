@@ -169,7 +169,7 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 		CPOS A 0 A_Jump(196,"see2");
 		---- A 0 setstatelabel("scan");
 	missile:
-		CPOS ABCD 5 A_TurnToAim(10,shootstate:"aim");
+		CPOS ABCD 5 A_TurnToAim(30,shootstate:"aim");
 		loop;
 	aim:
 		CPOS E 4{
@@ -188,12 +188,14 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 			else angle+=frandom(18,24);
 		}
 	scanturn:
-		CPOS EEEEEE 4 A_Watch();
+		CPOS EEEEEE 4 A_Watch(missilestate:"shoot");
 		CPOS E 0 A_Jump(32,"scanturn","scanturn","scan");
 		---- A 0 setstatelabel("see2");
 	shoot:
+		CPOS E 6 A_FaceLastTargetPos(10);
+	fire:
 		CPOS F 1 bright light("SHOT") A_VulcZombieShot();
-		CPOS E 2 A_JumpIf(superauto,"shoot");
+		CPOS E 2 A_JumpIf(superauto,"fire");
 		loop;
 	postshot:
 		CPOS E 1{
@@ -204,7 +206,7 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 	considercover:
 		CPOS E 0 A_JumpIf(thismag<1&&mags<1,"reload");
 	cover:
-		CPOS EEEE 3 A_Coverfire("shoot",5);
+		CPOS EEEE 3 A_Coverfire("fire",5);
 		loop;
 	shuntmag:
 		CPOS E 1;
@@ -220,7 +222,7 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 				thismag=50;
 			}
 		}
-		---- A 0 setstatelabel("shoot");
+		---- A 0 setstatelabel("fire");
 	chamber:
 		CPOS E 3{
 			if(chambers<5&&thismag>0){
@@ -229,7 +231,7 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 				A_StartSound("weapons/rifleclick2",8,CHANF_OVERLAP);
 			}
 		}
-		---- A 0 setstatelabel("shoot");
+		---- A 0 setstatelabel("fire");
 
 	reload:
 		CPOS A 0 A_JumpIf(!target||!checksight(target),"loadamag");
@@ -262,8 +264,7 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 	pain:
 		CPOS G 3;
 		CPOS G 3 A_Vocalize(painsound);
-		CPOS G 0 A_Jump(196,"see","scan");
-		---- A 0 setstatelabel("missile");
+		---- A 0 setstatelabel("see2");
 
 
 	death:

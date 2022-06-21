@@ -66,6 +66,8 @@ extend class HDMobBase{
 		if(attackheight<0)attackheight=height*0.8;
 		if(targetheight<0)targetheight=target.height*0.6;
 
+		A_FaceLastTargetPos(maxturn,attackheight,targetheight);
+
 		double targetpitch=hdmath.pitchto(
 			(pos.xy,pos.z+attackheight),
 			(lasttargetpos.xy,lasttargetpos.z+targetheight)
@@ -88,7 +90,6 @@ extend class HDMobBase{
 				setstatelabel(shootstate);
 			}
 		}
-		else A_FaceLastTargetPos(maxturn,attackheight,targetheight);
 	}
 
 
