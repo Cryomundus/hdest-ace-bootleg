@@ -89,6 +89,8 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 
 			if (AccumulatedDamage > 777)
 			{
+				damage = 0;
+				tostun = 0;
 				AccumulatedDamage = 0;
 				owner.GiveBody(100);
 				owner.A_GiveInventory('SpiritualArmourPower');
