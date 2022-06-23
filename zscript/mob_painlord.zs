@@ -361,7 +361,7 @@ class BaleBall:hdfireball{
 		activesound "baron/ballhum";
 		decal "gooscorch";
 		gravity 0;
-		speed 25;
+		speed 20;
 		hdfireball.firefatigue int(HDCONST_MAXFIREFATIGUE*0.2);
 	}
 	actor lingerburner;
