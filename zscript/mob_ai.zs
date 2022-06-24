@@ -709,6 +709,7 @@ extend class HDMobBase{
 		if(
 			!other
 			||!other.bshootable
+			||other.bdormant
 			||(!other.bismonster&&!other.player)
 			||other.health<=0
 			||!ishostile(other)
