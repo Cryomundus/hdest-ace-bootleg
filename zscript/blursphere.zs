@@ -301,6 +301,7 @@ class HDBlurSphere:HDDamageHandler{
 			if(!(xp%5)){
 				array<string>msgs;msgs.clear();
 				string msg=Wads.ReadLump(Wads.CheckNumForName("blurspheretexts",0));
+				msg.replace("\r", "");
 				msg.split(msgs,"\n");
 				msg=msgs[int(clamp(randtickerfloat*msgs.size(),0,msgs.size()-1))];
 				if(msg=="Out of sync with: ")msg=msg..randticker[0]+1;
