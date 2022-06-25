@@ -28,6 +28,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Shield regen amount per cycle can be set using the Speed property.
 - Various bugfixes:
 	- Fixed extremely rare desync that happens if one player has CRLF line endings while the other has only LF;
+	- Fixed desync if hd_helptext is different between one player;
 	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless;
 	- A_HDBlast's pushing actually works now;
 	- Bloodbags don't immediately come off if another player puts one on you while you're incapped;
