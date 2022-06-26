@@ -90,6 +90,10 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 
 			if (AccumulatedDamage > 777)
 			{
+				if (hdp)
+				{
+					hdp.incaptimer = 0;
+				}
 				damage = 0;
 				tostun = 0;
 				AccumulatedDamage = 0;
@@ -100,6 +104,10 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		}
 		else
 		{
+			if (hdp)
+			{
+				hdp.incaptimer = 0;
+			}
 			damage = 0;
 			tostun = 0;
 			owner.GiveBody(100);
