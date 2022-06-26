@@ -181,9 +181,9 @@ class HDArmour : HDMagAmmo
 		//put on the armour right away
 		if (other.player && other.player.cmd.buttons & BT_USE && !other.FindInventory('HDArmourWorn'))
 		{
-			wornlayer = STRIP_ARMOUR;
+			wornlayer += 1;
 			bool intervening = HDPlayerPawn.CheckStrip(other, self, 0) != CSResult_Nothing;
-			wornlayer = 0;
+			wornlayer -= 1;
 
 			if (intervening)
 			{
