@@ -12,6 +12,7 @@ class SpiritualArmour : HDDamageHandler replaces ShieldCore
 		string ps = pss[random(0, pss.size() - 1)];
 		ps = ps.mid(ps.indexof(" ") + 1);
 		ps = pscol..ps;
+		ps.replace("\r", "");
 		ps.replace("/", "\n"..pscol);
 		ps.replace("|", " ");
 		ps.replace("  ", " ");
