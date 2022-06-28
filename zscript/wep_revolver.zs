@@ -105,7 +105,7 @@ class HDRevolver:HDHandgun{
 		HDStatusBar sb,HDWeapon hdw,HDPlayerPawn hpl,
 		bool sightbob,vector2 bob,double fov,bool scopeview,actor hpc
 	){
-		if(cylinderopen)return;
+		if(HDRevolver(hdw).cylinderopen)return;
 
 		int cx,cy,cw,ch;
 		[cx,cy,cw,ch]=screen.GetClipRect();
@@ -136,7 +136,7 @@ class HDRevolver:HDHandgun{
 		}
 	}
 	override void ForceBasicAmmo(){
-		owner.A_SetInventory("HDRevolverAmmo",6);
+		owner.A_SetInventory("HDRevolverAmmo",1);
 	}
 	override void initializewepstats(bool idfa){
 		weaponstatus[BUGS_CYL1]=BUGS_MASTERBALL;

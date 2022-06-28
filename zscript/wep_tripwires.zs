@@ -115,7 +115,7 @@ class Tripwire:HDWeapon{
 			flinetracedata gumline;
 			linetrace(
 				angle,64,pitch,flags:0,
-				offsetz:height-8,
+				offsetz:gunheight(),
 				data:gumline
 			);
 			let othersector=hdmath.oppositesector(gumline.hitline,gumline.hitsector);
@@ -228,8 +228,8 @@ class GumAndString:IdleDummy{
 
 		//set all the numbers
 		if(!trapisset){
-			if(tracer)ddd=tracer.pos+(0,0,4);
-			else ddd=master.pos+(0,0,master.height*0.65);
+			if(tracer)ddd=(tracer.pos.xy,tracer.pos.z+4);
+			else ddd=(master.pos.xy,master.pos.z+master.height*0.8);
 
 			ddd-=pos;
 			stringlength=max(ddd.length(),1);

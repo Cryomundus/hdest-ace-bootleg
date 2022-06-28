@@ -137,10 +137,12 @@ class ThunderBuster:HDCellWeapon{
 		//determine angle
 		double shootangle=caller.angle;
 		double shootpitch=caller.pitch;
+		vector3 shootpos=(0,0,zoffset);
 		let hdp=hdplayerpawn(caller);
 		if(hdp&&hdp.scopecamera){
 			shootangle=hdp.scopecamera.angle;
 			shootpitch=hdp.scopecamera.pitch;
+			shootpos=hdp.gunpos;
 		}
 		if(alt){
 			shootangle+=frandom(-1.2,1.2);
@@ -153,10 +155,14 @@ class ThunderBuster:HDCellWeapon{
 			shootangle,
 			8000+200*battery,
 			shootpitch,
-			flags:TRF_NOSKY,
-			offsetz:zoffset,
+			flags:TRF_NOSKY|TRF_ABSOFFSET,
+			offsetz:shootpos.z,
+			offsetforward:shootpos.x,
+			offsetside:shootpos.y,
 			data:tlt
 		);
+
+
 		if(
 			tlt.hittype==Trace_HitNone
 			||(
@@ -243,7 +249,7 @@ class ThunderBuster:HDCellWeapon{
 		//the actual call
 		ThunderBuster.ThunderZap(
 			self,
-			HDWeapon.GetShootOffset(self,invoker.barrellength,invoker.barrellength-HDCONST_SHOULDERTORADIUS),
+			gunheight(),
 			invoker.weaponstatus[0]&TBF_ALT,
 			battery
 		);
@@ -282,13 +288,32 @@ class ThunderBuster:HDCellWeapon{
 					&&!player.cmd.yaw
 				)
 			){
+				vector3 gunpos=gunpos();
 				flinetracedata frt;
 				linetrace(
-					angle,512*HDCONST_ONEMETRE,pitch,flags:TRF_NOSKY,
-					offsetz:height-6,
+					angle,
+					512*HDCONST_ONEMETRE,
+					pitch,
+					flags:TRF_NOSKY|TRF_ABSOFFSET,
+					offsetz:gunpos.z,
+					offsetforward:gunpos.x,
+					offsetside:gunpos.y,
 					data:frt
 				);
-				invoker.rangefinder=int(frt.distance*(1./HDCONST_ONEMETRE));
+				if(
+					frt.hittype==Trace_HitNone
+					||(
+						frt.hittype==Trace_HitCeiling
+						&&frt.hitsector.gettexture(1)==skyflatnum
+					)||(
+						frt.hittype==Trace_HitFloor
+						&&frt.hitsector.gettexture(0)==skyflatnum
+					)||(
+						!!frt.hitline
+						&&frt.hitline.special==Line_Horizon
+					)
+				)invoker.rangefinder=999;
+				else invoker.rangefinder=int(frt.distance*(1./HDCONST_ONEMETRE));
 			}
 			A_WeaponReady(WRF_ALL&~WRF_ALLOWUSER1);
 		}goto readyend;
@@ -747,7 +772,7 @@ class LingeringThunder:IdleDummy{
 				||(!zt.bshootable&&!zt.bsolid)
 				||abs(zt.pos.z-pos.z)>96
 				||zt.floorz+(stamina>>2)<zt.pos.z
-				||random(0,3)
+				||!random(0,3)
 				||!checksight(zt)
 			)continue;
 			haszapped=true;
@@ -788,7 +813,7 @@ class LingeringThunder:IdleDummy{
 			}
 		}
 
-		int zappower=random(baseamount>>2,baseamount);
+		int zappower=random(baseamount>>5,baseamount>>2);
 		victim.A_StartSound("weapons/plasidle",CHAN_AUTO,volume:frandom(0.2,0.6));
 		victim.A_StartSound("misc/arccrackle",CHAN_AUTO);
 		victim.A_StartSound("weapons/plascrack",CHAN_AUTO,volume:frandom(0.2,0.6));
@@ -805,7 +830,10 @@ class LingeringThunder:IdleDummy{
 			victim.vel.z+=3.*zappower/victim.mass;
 		}
 
-		if(!nodmg)victim.damagemobj(inflictor,source,zappower,"electrical",source&&source.player?DMG_PLAYERATTACK:0);
+		if(!nodmg){
+			victim.damagemobj(inflictor,source,zappower,"electrical",source&&source.player?DMG_PLAYERATTACK:0);
+			if(hdmobbase(victim))hdmobbase(victim).stunned+=(zappower>>3);
+		}
 		return zappower;
 	}
 	states{

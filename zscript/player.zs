@@ -26,8 +26,10 @@ class HDPlayerPawn:PlayerPawn{
 	int runwalksprint;
 
 	double feetangle;
+	vector3 gunpos;
 
 	double heightmult;
+	double foreheadheight;
 
 	int stunned;
 	int fatigue;
@@ -62,11 +64,13 @@ class HDPlayerPawn:PlayerPawn{
 		+nomenu
 		+noskin
 
-		height HDCONST_PLAYERHEIGHT;radius 12;
-		mass 150;gibhealth 180;
+		height HDCONST_PLAYERHEIGHT;
+		radius 12;
+		mass 150;
+		gibhealth 180;
 		deathheight HDCONST_PLAYERHEIGHT*0.44;
 
-		player.viewheight HDCONST_PLAYERHEIGHT*0.889;
+		player.viewheight HDCONST_PLAYERHEIGHT;
 		player.attackzoffset HDCONST_PLAYERHEIGHT*0.389;
 		player.damagescreencolor "12 06 04",0;
 		player.jumpz 0;
@@ -310,13 +314,7 @@ class ScopeCamera:IdleDummy{
 		A_SetPitch(hpl.pitch+hpl.hudbob.y*0.27,SPF_INTERPOLATE);
 		A_SetRoll(hpl.roll);
 
-		double cf=(!!hpl.player)?hpl.player.viewheight:HDCONST_PLAYERHEIGHT-6;
-
-		vector3 newpos = hpl.vec3Angle(
-			1 * cos(-hpl.pitch) + 1 * abs(sin(-hpl.pitch)),
-			hpl.angle,
-			1 * sin(-hpl.pitch) + cf);
-		SetOrigin(newpos, true);
+		setorigin(hpl.pos+hpl.gunpos,true);
 	}
 }
 
@@ -405,20 +403,14 @@ extend class HDPlayerPawn{
 			a_setrenderstyle(1.,STYLE_Normal);
 		}
 
-		if(
-			player
-			&&player
-			&&cvar.getcvar("hd_consolidate",player).getbool()
-		)ConsolidateAmmo();
 
-		if(
-			player
-			&&player.mo
-			&&player==players[consoleplayer]
-		){
-			PPShader.SetEnabled("NiteVis",false);
-			if(getage()>10)showgametip();
-		}
+		if(!player)return;
+
+		if(cvar.getcvar("hd_consolidate",player).getbool())ConsolidateAmmo();
+
+		if(getage()>10)showgametip();
+
+		if(player==players[consoleplayer])PPShader.SetEnabled("NiteVis",false);
 	}
 }
 class kickchecker:actor{

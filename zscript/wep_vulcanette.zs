@@ -46,7 +46,7 @@ class Vulcanette:ZM66ScopeHaver{
 		weapon.bobrangey 3.5;
 		weapon.bobspeed 2.1;
 		weapon.bobstyle "normal";
-		obituary "%o barreled right into %k's hephty firepower";
+		obituary "%o barreled right into %k's hephty firepower.";
 		hdweapon.barrelsize 30,3,4;
 		hdweapon.refid HDLD_VULCETT;
 		tag "Vulcanette";
@@ -220,7 +220,7 @@ class Vulcanette:ZM66ScopeHaver{
 	}
 	override void ForceBasicAmmo(){
 		owner.A_TakeInventory("FourMilAmmo");
-		ForceOneBasicAmmo("HD4mMag",5);
+		ForceOneBasicAmmo("HD4mMag",1);
 		ForceOneBasicAmmo("HDBattery");
 	}
 	states{
@@ -739,6 +739,15 @@ class Vulcanette:ZM66ScopeHaver{
 
 		int xhdot=getloadoutvar(input,"dot",3);
 		if(xhdot>=0)weaponstatus[VULCS_DOT]=xhdot;
+
+		if(getage()<1){
+			weaponstatus[VULCS_MAG1]=45;
+			weaponstatus[VULCS_CHAMBER1]=1;
+			weaponstatus[VULCS_CHAMBER2]=1;
+			weaponstatus[VULCS_CHAMBER3]=1;
+			weaponstatus[VULCS_CHAMBER4]=1;
+			weaponstatus[VULCS_CHAMBER5]=1;
+		}
 	}
 
 	//shooting and cycling actions

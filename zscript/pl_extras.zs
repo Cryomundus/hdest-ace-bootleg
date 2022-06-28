@@ -396,7 +396,7 @@ extend class HDPlayerPawn{
 					fallroll
 					||realpitch>90
 					||realpitch<-90
-					||fatigue>20
+					||fatigue>=HDCONST_SPRINTFATIGUE
 					||stunned>40
 				)
 			)
@@ -420,6 +420,7 @@ extend class HDPlayerPawn{
 			else fallroll=min(fallroll,amt);
 		}
 		realpitch=pitch;
+
 		A_ChangeVelocity(0.2*amt,0,player.onground?abs(amt)*0.1:0,CVF_RELATIVE);
 	}
 
@@ -450,6 +451,15 @@ extend class HDPlayerPawn{
 			jumptimer=20+(unstablewoundcount>>1);
 			stunned+=25;
 			double kickback=strength;
+			
+			flinetracedata kickline;
+			bool kicky=linetrace(
+				angle,height*0.5,pitch,
+				TRF_NOSKY,
+				offsetz:height*0.77,
+				data:kickline
+			);
+
 			bool db=doordestroyer.destroydoor(self,frandom(0,frandom(0,72))*strength,frandom(0,frandom(0,16)*strength),ofsz:24);
 			if(!random(0,db?7:3)){
 				jumptimer+=20;
@@ -462,7 +472,7 @@ extend class HDPlayerPawn{
 			A_MuzzleClimb((0,-1),(0,-1),(0,-1),(0,-1));
 			A_ChangeVelocity(-kickback,0,0,CVF_RELATIVE);
 			A_StartSound("*fist",CHAN_BODY,CHANF_OVERLAP);
-			LineAttack(angle,48,pitch,0,"none",
+			LineAttack(angle,height*0.5,pitch,0,"none",
 				strength>12.?"BulletPuffBig":"BulletPuffMedium",
 				flags:LAF_OVERRIDEZ,
 				offsetz:height*0.3
@@ -569,23 +579,30 @@ extend class HDPlayerPawn{
 
 
 extend class HDHandlers{
-	static void FindRange(hdplayerpawn ppp){
+	static void FindRange(
+		hdplayerpawn hdp,
+		bool usegunposxy=false
+	){
 		flinetracedata frt;
-		ppp.linetrace(
-			ppp.angle,65536,ppp.pitch,flags:TRF_NOSKY,
-			offsetz:ppp.height*0.89,
+		hdp.linetrace(
+			hdp.angle,65536,
+			hdp.pitch,
+			flags:TRF_NOSKY|TRF_ABSOFFSET,
+			offsetz:hdp.gunpos.z,
+			offsetforward:usegunposxy?hdp.gunpos.x:0,
+			offsetside:usegunposxy?hdp.gunpos.y:0,
 			data:frt
 		);
 		double c=frt.distance;
 		double b=c/HDCONST_ONEMETRE;
-		ppp.A_Log(string.format("\cd[\cuRF\cd]\cj \cf%.2f\cj metre%s",b,b==1?"":"s"),true);
-		if(hd_debug)ppp.A_Log(string.format("("..(ppp.player?ppp.player.getusername():"something").." measured %.2f DU%s)",c,c==1?"":"s"),true);
+		hdp.A_Log(string.format("\cd[\cuRF\cd]\cj \cf%.2f\cj metre%s",b,b==1?"":"s"),true);
+		if(hd_debug)hdp.A_Log(string.format("("..(hdp.player?hdp.player.getusername():"something").." measured %.2f DU%s)",c,c==1?"":"s"),true);
 
 		if(
-			ppp.player
-			&&ppp.player.cmd.buttons&BT_USE
+			hdp.player
+			&&hdp.player.cmd.buttons&BT_USE
 		){
-			let hdw=HDWeapon(ppp.player.readyweapon);
+			let hdw=HDWeapon(hdp.player.readyweapon);
 			if(hdw)hdw.airburst=int(b*100);
 		}
 	}

@@ -167,57 +167,21 @@ class ZombieStormtrooper:HDHumanoid{
 		#### A 0 A_Jump(64,"spawn2");
 		loop;
 	missile:
-		#### A 0{
-			if(!target){
-				setstatelabel("spawn2");
-				return;
-			}
-			double dt=distance3d(target);
-			if(
-				firemode==-2
-				&&target
-				&&!random(0,39)
-				&&dt>200
-				&&dt<1000
-			)setstatelabel("frag");
-		}
 		#### A 0 A_JumpIf(mag<1,"reload");
-		#### A 0 A_JumpIfTargetInLOS(3,120);
-		#### CD 2 A_FaceLastTargetPos(90);
-		#### E 1 A_SetTics(random(4,10)); //when they just start to aim,not for followup shots!
-		#### A 0 A_JumpIf(!hdmobai.tryshoot(self),"see");
-	missile2:
-		#### A 0{
-			if(!target){
-				setstatelabel("spawn2");
-				return;
-			}
-			double enemydist=distance3d(target);
-			if(enemydist<200)turnamount=50;
-			else if(enemydist<600)turnamount=30;
-			else turnamount=10;
-		}goto turntoaim;
-	turntoaim:
-		#### E 2 A_TurnToAim(turnamount,shootstate:"startshoot");
+	missile:
+		#### ABCD 3 A_TurnToAim(40,shootstate:"aiming");
 		loop;
-	startshoot:
-		#### E 4{
-			A_FaceLastTargetPos(turnamount);
-			A_SetTics(max(tics,random(1,int(120/clamp(turnamount,1,turnamount+1)+4))));
-
-			spread=1.+frandom(0.12,0.27)*turnamount;
-			if(firemode==-2){
-				pitch+=frandom(0,spread)-frandom(0,spread);
-				angle+=frandom(0,spread)-frandom(0,spread);
-			}else{
-				pitch+=frandom(-spread,spread);
-				angle+=frandom(-spread,spread);
-			}
-			pitch+=frandom(0,0.3);  //anticipate recoil
-		}
-		#### A 0 A_Jump(256,"shoot");
+	aiming:
+		#### E 3 A_FaceLastTargetPos(30);
+		#### E 1 A_StartAim(maxspread:20,maxtics:random(0,35));
+		//fallthrough to shoot
 	shoot:
 		#### E 0 A_JumpIf(jammed,"jammed");
+		#### E 0{
+			pitch+=frandom(-spread,spread);
+			angle+=frandom(-spread,spread);
+		}
+	fire:
 		#### F 1 bright light("SHOT"){
 			if(mag<1){
 				setstatelabel("ohforfuckssake");
@@ -258,7 +222,7 @@ class ZombieStormtrooper:HDHumanoid{
 				firemode>=2
 			){
 				firemode++;
-				setstatelabel("shoot");
+				setstatelabel("fire");
 			}
 			else spread++;
 		}

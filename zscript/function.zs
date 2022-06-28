@@ -28,7 +28,6 @@ class HDHandlers:EventHandler{
 		}
 
 		MapTweaks();
-
 	}
 }
 
@@ -394,7 +393,6 @@ struct HDMath{
 	//mostly for exceptions for players and monsters
 	static string GetName(actor named){
 		if(named.player)return named.player.getusername();
-		if(HDOperator(named))return HDOperator(named).nickname;
 		string tagname=named.gettag();
 		if(tagname!="")return tagname;
 		return named.getclassname();
@@ -427,6 +425,7 @@ struct HDMath{
 		)mod="hot";
 		else if(
 			mod=="ice"
+			||mod=="cold"
 			||mod=="freeze"
 			||mod=="cryo"
 		)mod="cold";
@@ -533,6 +532,19 @@ struct HDMath{
 
 		return msg;
 	}
+
+	//find the relative position for the origin point of a projectile
+	static vector3 GetGunPos(actor caller){
+		let hdp=hdplayerpawn(caller);
+		let hdm=hdmobbase(caller);
+
+		if(hdp)return hdp.gunpos;
+		if(hdm)return (0,0,hdm.gunheight);
+
+		double defaultheight=32.;
+		if(caller.missileheight)defaultheight=caller.missileheight;
+		return (0,0,defaultheight);
+	}
 }
 struct HDF play{
 	//because this is 10 times faster than A_GiveInventory
@@ -587,10 +599,10 @@ struct HDF play{
 				&&llt.hitline.special==Line_Horizon
 			)
 		)return true;
-		let othersector=hdmath.oppositesector(llt.hitline,llt.hitsector);
-		if(!othersector)return false;
+		if(llt.hittype!=Trace_HitWall)return false;
+		let othersector=llt.lineside==line.back?llt.hitline.frontsector:llt.hitline.backsector;
 		return(
-			llt.hittype==Trace_HitWall
+			!!othersector
 			&&(
 				(
 					othersector.gettexture(othersector.ceiling)==skyflatnum
@@ -600,6 +612,42 @@ struct HDF play{
 					&&othersector.floorplane.zatpoint(llt.hitdir.xy)>llt.hitlocation.z
 				)
 			)
+		);
+	}
+	static void CheckNoKillCount(){
+		if(hd_nokillcount){
+			level.total_monsters=0;
+			level.killed_monsters=0;
+		}
+	}
+
+	//a de-shittifying wrapper.
+	//lets you set vel/pos/accel with absolute vector3s
+	static void Particle(
+		actor caller,
+		color color,
+		vector3 pos,
+		int lifetime=35,
+		double size=1,
+		vector3 vel=(0,0,0),
+		bool fullbright=false,
+		vector3 accel=(0,0,0),
+		double alpha=1,
+		double fadestep=-1,
+		double sizestep=0
+	){
+		caller.A_SpawnParticle(
+			color,
+			fullbright?SPF_FULLBRIGHT:0,
+			lifetime,
+			size,
+			caller.angle,
+			pos.x-caller.pos.x,
+			pos.y-caller.pos.y,
+			pos.z-caller.pos.z,
+			vel.x,vel.y,vel.z,
+			accel.x,accel.y,accel.z,
+			alpha,fadestep,sizestep
 		);
 	}
 }
@@ -824,5 +872,24 @@ class HDRaiseWep:HDCheatWep{
 		}goto nope;
 	}
 }
+
+
+
+//thing that can be spawned to replace a crusher/bossbrain kill script
+class NextMap:Actor{
+	states{
+	spawn:
+		TNT1 A 0;
+		TNT1 A 35{
+			for(int i=0;i<MAXPLAYERS;i++){
+				let pmo=players[i].mo;
+				if(pmo)pmo.damagemobj(pmo,pmo,TELEFRAG_DAMAGE,"none",DMG_FORCED);
+			}
+		}
+		TNT1 A 1 Exit_Normal(0);
+		stop;
+	}
+}
+
 
 

@@ -354,7 +354,7 @@ class LiberatorRifle:AutoReloadingThingy{
 			..WEPHELP_ZOOM.."+"..WEPHELP_FIREMODE.."+"..WEPHELP_UPDOWN.."  Zoom\n"))
 		..WEPHELP_MAGMANAGER
 		..WEPHELP_UNLOAD.."  Unload "..(glmode?"GL\n":"magazine\n")
-		..WEPHELP_UNLOAD.."+"..WEPHELP_USE.."  Assemble rounds"
+		..WEPHELP_USE.."+"..WEPHELP_UNLOAD.."  Assemble rounds"
 		;
 	}
 	override void DrawSightPicture(
@@ -387,7 +387,7 @@ class LiberatorRifle:AutoReloadingThingy{
 					sb.DI_SCREEN_CENTER
 				);
 
-				sb.fill(color(255,0,0,0),
+					sb.fill(color(255,0,0,0),
 					bob.x-36,scaledyoffset+bob.y-36,
 					72,72,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 				);
@@ -487,7 +487,7 @@ class LiberatorRifle:AutoReloadingThingy{
 					double fc=max(pitch*0.01,5);
 					double cosp=cos(pitch);
 					[cosp,brsss]=A_SpawnItemEx("HDSpent7mm",
-						cosp*12,0,height-8-sin(pitch)*12,
+						cosp*12,0,gunheight()-sin(pitch)*12,
 						cosp*fc,frandom(-0.5,0.5),-sin(pitch)*fc,
 						0,SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
 					);
@@ -499,7 +499,7 @@ class LiberatorRifle:AutoReloadingThingy{
 			double fc=max(pitch*0.01,5);
 			double cosp=cos(pitch);
 			[cosp,brsss]=A_SpawnItemEx("HDLoose7mm",
-				cosp*12,0,height-8-sin(pitch)*12,
+				cosp*12,0,gunheight()-sin(pitch)*12,
 				cosp*fc,0.2*randompick(-1,1),-sin(pitch)*fc,
 				0,SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
 			);
@@ -909,7 +909,7 @@ class LiberatorRifle:AutoReloadingThingy{
 					A_MuzzleClimb(frandom(-0.2,0.8),frandom(-0.2,0.4));
 					A_SetTics(6);
 				}else A_SpawnItemEx("HDRocketAmmo",
-					cos(pitch)*12,0,height-10-12*sin(pitch),
+					cos(pitch)*12,0,gunheight()-2-12*sin(pitch),
 					vel.x,vel.y,vel.z,
 					0,SXF_SETTARGET|SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
 				);

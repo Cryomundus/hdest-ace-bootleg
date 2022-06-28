@@ -5,14 +5,8 @@ extend class HDWeapon{
 	int airburst;
 	action void A_FireHDGL(){
 		A_StartSound("weapons/grenadeshot",CHAN_WEAPON,CHANF_OVERLAP);
-		let ggg=gyrogrenade(spawn("GyroGrenade",pos+(
-				0,0,HDWeapon.GetShootOffset(
-					self,invoker.barrellength,
-					invoker.barrellength-HDCONST_SHOULDERTORADIUS
-				)-2
-			),
-			ALLOW_REPLACE)
-		);
+		vector3 gpos=pos+gunpos((0,0,-getdefaultbytype("GyroGrenade").height*0.6));
+		let ggg=gyrogrenade(spawn("GyroGrenade",gpos,ALLOW_REPLACE));
 		ggg.angle=angle;ggg.pitch=pitch-2;ggg.target=self;ggg.master=self;
 		ggg.primed=false;
 		if(invoker.airburst){
@@ -104,7 +98,7 @@ class GyroGrenade:SlowProjectile{
 		//NOTE: basic impact damage calculation is ALREADY in base SlowProjectile!
 		if(blockingobject){
 			int dmgg=random(32,128);
-			if(primed&&isrocket){
+			if(isrocket){
 				double dangle=absangle(angle,angleto(blockingobject));
 				if(dangle<20){
 					dmgg+=random(200,600);

@@ -312,25 +312,17 @@ class Slayer:HDShotgun replaces HDShotgun{
 			for(int i=0;i<2;i++){
 				int chm=invoker.weaponstatus[SLAYS_CHAMBER1+i];
 				invoker.weaponstatus[SLAYS_CHAMBER1+i]=0;
-				if(chm>1){
-					if(health<90&&countinv("IsMoving"))A_SpawnItemEx("HDFumblingShell",
-						cos(pitch)*5,-1,height-7-sin(pitch)*5,
-						cos(pitch-45)*cos(angle+random(-2,2))*random(1,4)+vel.x,
-						cos(pitch-45)*sin(angle+random(-2,2))*random(1,4)+vel.y,
-						-sin(pitch-45)*random(1,4)+vel.z,
-						0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-					);else A_SpawnItemEx("HDUnspentShell",
-						cos(pitch)*5,0,height-7-sin(pitch)*5,
-						vel.x,vel.y,vel.z+1,
-						0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-					);
-				}else if(chm==1)A_SpawnItemEx("HDSpentShell",
-					cos(pitch)*5,0,height-7-sin(pitch)*5,
-					cos(pitch-45)*cos(angle+random(-2,2))*random(1,4)+vel.x,
-					cos(pitch-45)*sin(angle+random(-2,2))*random(1,4)+vel.y,
-					-sin(pitch-45)*random(1,4)+vel.z,
-					0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
-				);
+				actor sss=null;
+				if(chm>1)sss=spawn("HDUnspentShell",pos+HDMath.GetGunPos(self),ALLOW_REPLACE);
+				else if(chm==1)sss=spawn("HDSpentShell",pos+HDMath.GetGunPos(self),ALLOW_REPLACE);
+				if(!!sss){
+					double aaa=angle+frandom(-20,20);
+					sss.pitch=pitch;sss.angle=angle;
+					sss.vel=(cos(aaa),sin(aaa),2);
+					if(chm>1)sss.vel*=frandom(0.5,2);
+					sss.vel+=vel;
+					sss.target=self;
+				}
 			}
 		}
 		#### C 2 offset(1,34);
@@ -413,7 +405,7 @@ class Slayer:HDShotgun replaces HDShotgun{
 				setweaponstate("reloadssend");
 				return;
 			}
-			ssh=min(3,ssh,max(1,health/20),12-invoker.weaponstatus[SHOTS_SIDESADDLE]);
+			ssh=min(3,12-invoker.weaponstatus[SHOTS_SIDESADDLE]);
 			invoker.weaponstatus[SHOTS_SIDESADDLE]+=ssh;
 			A_TakeInventory("HDShellAmmo",ssh,TIF_NOTAKEINFINITE);
 		}

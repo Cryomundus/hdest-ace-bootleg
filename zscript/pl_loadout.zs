@@ -108,6 +108,7 @@ class HDWeaponSelector:Thinker{
 //all in one place for ease of checking for conflicts.
 
 const HDLD_SOLDIER="sol";
+const HDLD_INSURG="???";
 
 const HDLD_NINEMIL="9mm";
 const HDLD_NIMAG15="915";
@@ -601,9 +602,18 @@ class LoadoutItemList:CustomInventory{
 
 
 
-class InsurgentLoadout:Inventory{
+class InsurgentLoadout:HDPickup{
+	default{
+		tag "Insurgent Loadout";
+		hdpickup.refid HDLD_INSURG;
+		+hdpickup.norandombackpackspawn
+		+hdpickup.cheatnogive
+		+nointeraction
+	}
 	override void Tick(){
 		if(!owner){destroy();return;}
+		let hdp=hdplayerpawn(owner);
+
 		//pick one or two random weapons
 		class<inventory> ammoforwep=null;
 		for(int i=0;i<randompick(1,1,1,1,1,1,1,1,1,2,2,2,3);i++){
@@ -738,6 +748,7 @@ class InsurgentLoadout:Inventory{
 		//give random other gear
 		array<string> supplies;supplies.clear();
 		for(int i=0;i<allactorclasses.size();i++){
+			if(hdp)hdp.updateencumbrance();
 			let thisclass=((class<hdpickup>)(allactorclasses[i]));
 			if(thisclass && getdefaultbytype(thisclass).refid!=""){
 				supplies.push(thisclass.getclassname());
@@ -756,6 +767,7 @@ class InsurgentLoadout:Inventory{
 		int imax=random(3,6);
 		int smax=supplies.size()-1;
 		for(int i=0;i<imax;i++){
+			if(hdp)hdp.updateencumbrance();
 			let thisclass=supplies[random(0,smax)];
 			let thisitem=HDPickup(owner.GiveInventoryType(thisclass));
 			int thismax=1;

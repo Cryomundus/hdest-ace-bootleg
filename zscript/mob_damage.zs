@@ -20,6 +20,9 @@ extend class HDMobBase{
 		bloodloss=0;
 		reactiontime=default.reactiontime;
 		A_SetInventory("HDMagicShield",maxshields);
+
+		//not really damage stuff but oh well
+		lasttargetdist=maxtargetrange;
 	}
 
 	static bool inpainablesequence(actor caller){
@@ -372,6 +375,7 @@ extend class HDMobBase{
 
 
 		super.Die(source,inflictor,dmgflags);
+		HDF.CheckNoKillCount();
 		if(!self)return;
 
 		//check gibbing
@@ -766,6 +770,7 @@ class AngelFire:Thinker{
 		}
 		master.givebody(1);
 		double mrad=master.radius*0.3;
+
 		if(level.time&1)master.A_SpawnParticle(
 			"green",SPF_FULLBRIGHT,50,
 			frandom(4,8),0,

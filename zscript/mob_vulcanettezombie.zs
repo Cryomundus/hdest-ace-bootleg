@@ -46,6 +46,8 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 		bhashelmet=!bplayingid;
 		bnoincap=bplayingid;
 
+		gunheight=32;
+
 		if(bplayingid)givearmour(1.,0.06,-0.4);
 		else givearmour(1.,0.2,-0.4);
 	}
@@ -163,23 +165,6 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 		}
 		CPOS A 0 A_Jump(196,"spawn");
 		loop;
-	see2:
-		CPOS A 0 A_JumpIf(!mags&&thismag<1,"reload");
-		CPOS ABCD 5 A_HDChase();
-		CPOS A 0 A_Jump(196,"see2");
-		---- A 0 setstatelabel("scan");
-	missile:
-		CPOS ABCD 5 A_TurnToAim(30,shootstate:"aim");
-		loop;
-	aim:
-		CPOS E 4{
-			if(
-				target
-				&&target.spawnhealth()>random(50,1000)
-			)superauto=true;
-		}
-		CPOS E 0 A_TurnToAim(5,shootstate:"shoot");
-		loop;
 	see:
 	scan:
 		CPOS E 4{
@@ -188,21 +173,34 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 			else angle+=frandom(18,24);
 		}
 	scanturn:
-		CPOS EEEEEE 4 A_Watch(missilestate:"shoot");
+		CPOS EEEEEE 4 A_Watch();
 		CPOS E 0 A_Jump(32,"scanturn","scanturn","scan");
-		---- A 0 setstatelabel("see2");
+		//fallthrough to seemove
+	seemove:
+		CPOS A 0 A_JumpIf(!mags&&thismag<1,"reload");
+		CPOS ABCD 5 A_HDChase(null,"melee");
+		CPOS A 0 A_Jump(64,"scan");
+		loop;
+	missile:
+		CPOS ABCD 5 A_TurnToAim(30,shootstate:"aim");
+		loop;
+	aim:
+		CPOS E 2{
+			if(
+				target
+				&&target.spawnhealth()>random(50,1000)
+			)superauto=true;
+		}
+		CPOS E 1 A_StartAim(rate:0.92,maxtics:random(20,30));
+		//fallthrough to shoot
 	shoot:
-		CPOS E 6 A_FaceLastTargetPos(10);
+		CPOS E 4 A_LeadTarget(6);
 	fire:
 		CPOS F 1 bright light("SHOT") A_VulcZombieShot();
 		CPOS E 2 A_JumpIf(superauto,"fire");
 		loop;
 	postshot:
-		CPOS E 1{
-			turnleft=randompick(0,0,0,1);
-			if(turnleft)angle-=frandom(3,6);
-			else angle+=frandom(3,6);
-		}
+		CPOS E 1;
 	considercover:
 		CPOS E 0 A_JumpIf(thismag<1&&mags<1,"reload");
 	cover:
@@ -243,7 +241,7 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 			if(thismag<0)thismag=50;
 			else if(mags<4)mags++;
 			else{
-				setstatelabel("see2");
+				setstatelabel("seemove");
 				return;
 			}A_StartSound("weapons/rifleclick2",8);
 		}loop;
@@ -264,7 +262,7 @@ class HDChainReplacer:RandomSpawner replaces ChaingunGuy{
 	pain:
 		CPOS G 3;
 		CPOS G 3 A_Vocalize(painsound);
-		---- A 0 setstatelabel("see2");
+		---- A 0 setstatelabel("seemove");
 
 
 	death:

@@ -57,7 +57,6 @@ class ZombieShotgunner:HDHumanoid{
 	int gunloaded;
 	int gunspent;
 	int wep;
-	int turnamount;
 	int choke; //record here because the gun should only drop once
 	override void beginplay(){
 		super.beginplay();
@@ -232,18 +231,13 @@ class ZombieShotgunner:HDHumanoid{
 		loop;
 
 	missile:
-		#### A 0{
-			turnamount=int(max(10,30-lasttargetdist*0.01));
-		}//fallthrough to turntoaim
-	turntoaim:
-		#### ABCD 3 A_TurnToAim(turnamount);
+		#### ABCD 3 A_TurnToAim(40,shootstate:"aiming");
 		loop;
+	aiming:
+		#### E 1 A_StartAim(rate:0.88,maxtics:random(10,40));
+		//fallthrough to shoot
 	shoot:
-		#### E 4{
-			int lag=max(tics,10-(turnamount>>5));
-			A_SetTics(lag);
-			A_LeadTarget(lag);
-		}
+		#### E 2 A_LeadTarget(tics);
 		#### E 0{
 			if(jammed){
 				setstatelabel("jammed");
@@ -253,18 +247,13 @@ class ZombieShotgunner:HDHumanoid{
 				setstatelabel("ohforfuckssake");
 				return;
 			}
-			spread=1.+0.1*turnamount;
-			if(wep==1)spread*=0.8;
 			angle+=frandom(0,spread)-frandom(0,spread);
 			pitch+=frandom(0,spread)-frandom(0,spread);
-
-			pitch+=frandom(0,0.3);  //anticipate recoil
 
 			if(wep==-1)setstatelabel("shootzm66");
 			else if(wep==1)setstatelabel("shootssg");
 			else setstatelabel("shootsg");
 		}
-
 
 	shootzm66:
 		#### E 1{
@@ -278,9 +267,6 @@ class ZombieShotgunner:HDHumanoid{
 				setstatelabel("ohforfuckssake");
 				return;
 			}
-
-			angle+=frandom(-0.2,0.1)*spread;
-			pitch+=frandom(-0.2,0.1)*spread;
 
 			A_StartSound("weapons/rifle",CHAN_WEAPON);
 
@@ -298,15 +284,10 @@ class ZombieShotgunner:HDHumanoid{
 			else A_SetTics(random(4,12));
 		}
 		#### E 0 A_Jump(127,"see");
-		goto turntoaim;
+		goto missile;
 
 	shootssg:
 		#### F 1 bright light("SHOT"){
-			if(vel dot vel > 900){
-				setstatelabel("see");
-				return;
-			}
-
 			A_StartSound("weapons/slayersingle",CHAN_WEAPON);
 			if(gunloaded>1&&!random(0,5)){
 				//both barrels
@@ -332,11 +313,7 @@ class ZombieShotgunner:HDHumanoid{
 			if(gunspent>0){
 				setstatelabel("chambersg");
 				return;
-			}else if(vel dot vel > 400){
-				setstatelabel("see");
-				return;
 			}
-
 			if(Hunter.Fire(self,choke)<=Hunter.HUNTER_MINSHOTPOWER)semi=false;
 			gunspent=1;
 		}
@@ -360,7 +337,7 @@ class ZombieShotgunner:HDHumanoid{
 			else A_SetTics(random(3,8));
 		}
 		#### E 0 A_Jump(127,"see");
-		#### E 0 A_Jump(32,"turntoaim");
+		#### E 0 A_Jump(32,"missile");
 		---- A 0 setstatelabel("roam");
 	chambersg:
 		#### E 8{
@@ -425,7 +402,7 @@ class ZombieShotgunner:HDHumanoid{
 			A_HDChase();
 		}
 		#### CB 4 A_HDChase("melee",null);
-		goto turntoaim;
+		goto missile;
 
 	reloadssg:
 		#### E 2;

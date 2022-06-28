@@ -26,7 +26,6 @@ class HDMobBase : HDActor{
 	flagdef climbpastdropoff:hdmobflags,17;
 	flagdef bloodlesswhileshielded:hdmobflags,18;
 	flagdef headless:hdmobflags,19;  //no separate head target - often it's all head
-	flagdef justchased:hdmobflags,20;  //turned on in chase, turn off and abort A_HDLook if on
 
 	default{
 		monster;
@@ -37,6 +36,8 @@ class HDMobBase : HDActor{
 		height 52;
 		deathheight 24;
 		burnheight 24;
+		cameraheight 48;
+		hdmobbase.gunheight 32;
 		reactiontime 4;  //it's reduced by one per A_HDChase call, not per tic!
 		bloodtype "HDMasterBlood";
 		hdmobbase.shields 0;
@@ -57,7 +58,7 @@ class HDMobBase : HDActor{
 
 		super.postbeginplay();
 
-		resetdamagecounters();
+		resetdamagecounters();bloodloss=0;
 		bplayingid=(Wads.CheckNumForName("id",0)!=-1);
 
 		movepos=pos;
@@ -100,10 +101,14 @@ class HDMobBase : HDActor{
 		)vel.z=clamp(vel.z+0.5-getgravity(),vel.z,radius);
 
 		DamageTicker();
+
+		lastvel=vel;
 	}
+	vector3 lastvel;
 
 	//randomize size
 	double hitboxscale;
+	double gunheight;property gunheight:gunheight;  //2022-06-23 missileheight is not modifiable
 	void resize(double minscl=0.9,double maxscl=1.,int minhealth=0){
 		double drad=radius;
 		double dheight=height;
@@ -123,6 +128,8 @@ class HDMobBase : HDActor{
 		mass=int(scl*mass);
 		speed*=scl;
 		meleerange*=scl;
+		gunheight*=scl;
+		cameraheight*=scl;
 
 		//save a few things for future reference
 		hitboxscale=scl;
@@ -259,7 +266,8 @@ class HDHumanoid:HDMobBase{
 	default{
 		gibhealth 140;
 		health 100;
-		height 54;
+		height HDCONST_PLAYERHEIGHT;
+		hdmobbase.gunheight HDCONST_PLAYERHEIGHT*HDCONST_EYEHEIGHT;
 		radius 12;
 		deathheight 12;
 		mass 120;
@@ -275,6 +283,7 @@ class HDHumanoid:HDMobBase{
 	override void postbeginplay(){
 		super.postbeginplay();
 		resize(0.9,1.1);
+		gunheight=cameraheight-1.5;
 		voicepitch=frandom(0.9,1.2);
 		blefthanded=!random(0,3);
 	}

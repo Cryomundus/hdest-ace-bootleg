@@ -41,6 +41,9 @@ extend class HDMobBase{
 	vector3 movepos;
 	vector3 lasttargetpos;
 	double lasttargetdist;
+	double lasttargetradius;
+	double lasttargetheight;
+	vector3 lasttargetvel;
 	bool targetinsight;
 	double absangletotarg;
 	actor threat;
@@ -124,6 +127,7 @@ extend class HDMobBase{
 					&&lastenemy.health>0
 				){
 					target=lastenemy;
+					lasttargetdist=0;
 				}else{
 					A_HDLook(LOF_NOJUMP);
 					if(
@@ -170,7 +174,10 @@ extend class HDMobBase{
 
 
 		//initialize target stuff
-		if(!target)target=lastenemy;
+		if(!target){
+			target=lastenemy;
+			lasttargetdist=0;
+		}
 
 
 		vector3 lastlasttargetpos=lasttargetpos;
@@ -201,6 +208,7 @@ extend class HDMobBase{
 				||!random(0,255)
 			)
 		){
+			lasttargetdist=0;
 			let lll=lastenemy;
 			if(
 				lll
@@ -261,6 +269,7 @@ extend class HDMobBase{
 			)
 			&&target!=goal
 			&&findstate(meleestate)
+			&&lasttargetdist
 			&&lasttargetdist<meleerange
 		){
 			lasttargetpos=target.pos;
@@ -439,7 +448,6 @@ extend class HDMobBase{
 				let txyz=target.pos;
 				target.setxyz(lasttargetpos);
 				vecto=Vec2To(target);
-				if(hd_debug>1)target.A_SpawnParticle("red",SPF_FULLBRIGHT,6,20,zoff:target.height*0.7);
 				target.setxyz(txyz);
 
 				//chance of flanking non-handed side
@@ -651,6 +659,9 @@ extend class HDMobBase{
 		;
 		if(targetinsight){
 			lasttargetpos=target.pos;
+			lasttargetradius=target.radius;
+			lasttargetheight=target.height;
+			lasttargetvel=target.pos-target.prev;
 		}else{
 			if(
 				target.bSPAWNSOUNDSOURCE
@@ -664,6 +675,12 @@ extend class HDMobBase{
 			}
 			else lasttargetpos.xy+=(frandom(-5,5),frandom(-5,5));
 		}
+
+		if(
+			hd_debug>1
+			&&!!target
+		)HDF.Particle(target,"red",(lasttargetpos.xy,lasttargetpos.z+target.height*0.7),20,6,fullbright:true);
+
 		return targetinsight;
 	}
 
@@ -839,11 +856,16 @@ extend class HDMobBase{
 									||deltaangle(aaa.angle,aaa.angleto(self))<100
 								)
 							){
+								let hdm=hdmobbase(aaa);
+								if(hdm){
+									hdm.lasttargetdist=hdm.maxtargetrange;
+									hdm.lasttargetpos=pos;
+								}
 								aaa.target=self;
 								aaa.A_StartSound(
 									aaa.seesound,CHAN_VOICE,
 									attenuation:aaa.bboss?ATTN_DIRBOSS:ATTN_NORM,
-									pitch:hdmobbase(aaa)?hdmobbase(aaa).voicepitch:1.
+									pitch:hdm?hdm.voicepitch:1.
 								);
 							}
 						}

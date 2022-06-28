@@ -167,8 +167,8 @@ class Hunter:HDShotgun{
 			vector3 gunofs=HDMath.RotateVec3D((9,-1,-2),angle,pitch);
 			actor rrr=null;
 
-			if(chm>1)rrr=spawn("HDFumblingShell",(pos.xy,pos.z+height*0.85)+gunofs);
-			else rrr=spawn("HDSpentShell",(pos.xy,pos.z+height*0.85)+gunofs);
+			if(chm>1)rrr=spawn("HDFumblingShell",(pos.xy,pos.z+height*0.85)+gunofs+viewpos.offset);
+			else rrr=spawn("HDSpentShell",(pos.xy,pos.z+height*0.85)+gunofs+viewpos.offset);
 
 			rrr.target=self;
 			rrr.angle=angle;
@@ -204,7 +204,6 @@ class Hunter:HDShotgun{
 		int toload=min(
 			fromsidesaddles?invoker.weaponstatus[SHOTS_SIDESADDLE]:countinv("HDShellAmmo"),
 			alwaysone?1:(invoker.weaponstatus[HUNTS_TUBESIZE]-invoker.weaponstatus[HUNTS_TUBE]),
-			max(1,health/22),
 			maxhand
 		);
 		if(toload<1)return false;
@@ -270,7 +269,6 @@ class Hunter:HDShotgun{
 			int hnd=min(
 				countinv("HDShellAmmo"),
 				12-invoker.weaponstatus[SHOTS_SIDESADDLE],
-				max(1,health/22),
 				3
 			);
 			if(hnd<1)setweaponstate("reloadSSend");
@@ -483,17 +481,15 @@ class Hunter:HDShotgun{
 		SHTG C 3 offset(0,40) A_CheckPocketSaddles();
 		SHTG C 0 A_JumpIf(invoker.weaponstatus[0]&HUNTF_FROMPOCKETS,"reloadpocket");
 	reloadfast:
-		SHTG C 4 offset(0,40) A_GrabShells(3,false);
+		SHTG C 3 offset(0,40) A_GrabShells(3,false);
 		SHTG C 3 offset(0,42) A_StartSound("weapons/pocket",9,volume:0.4);
-		SHTG C 3 offset(0,41);
+		SHTG C 2 offset(0,41);
 		goto reloadashell;
 	reloadpocket:
-		SHTG C 4 offset(0,39) A_GrabShells(3,false);
-		SHTG C 6 offset(0,40) A_JumpIf(health>40,1);
-		SHTG C 4 offset(0,40) A_StartSound("weapons/pocket",9);
-		SHTG C 8 offset(0,42) A_StartSound("weapons/pocket",9);
+		SHTG C 3 offset(0,39) A_GrabShells(3,false);
+		SHTG C 5 offset(0,42) A_StartSound("weapons/pocket",9);
 		SHTG C 6 offset(0,41) A_StartSound("weapons/pocket",9);
-		SHTG C 6 offset(0,40);
+		SHTG C 4 offset(0,40);
 		goto reloadashell;
 	reloadashell:
 		SHTG C 2 offset(0,36);

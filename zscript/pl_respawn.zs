@@ -3,10 +3,12 @@
 // ------------------------------------------------------------
 extend class HDPlayerPawn{
 	void ReplaceBot(){
-		actor spot;int garbage;
-		[garbage,spot]=A_SpawnItemEx("BotBot",flags:
-			SXF_NOCHECKPOSITION|SXF_TRANSFERTRANSLATION|SXF_SETMASTER
-		);
+		BotBot bb=BotBot(spawn("BotBot",pos));
+		if(!bb)return;
+		bb.translation=translation;
+		bb.bfriendly=true;
+		bb.master=self;
+		bb.friendplayer=playernumber()+1;
 
 		setz(pos.z+50);
 		A_Log(string.format("Bot %s replaced with rifleman.",player.getusername()));

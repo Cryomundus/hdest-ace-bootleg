@@ -637,7 +637,7 @@ class ZM66AssaultRifle:ZM66ScopeHaver{
 				for(int i=0;i<5;i++)A_SpawnItemEx("FourMilChunk",0,0,20,
 					random(4,7),random(-2,2),random(-2,1),0,SXF_NOCHECKPOSITION
 				);
-				if(!random(0,5))A_SpawnItemEx("HDSmokeChunk",12,0,height-12,4,frandom(-2,2),frandom(2,4));
+				if(!random(0,5))A_SpawnItemEx("HDSmokeChunk",12,0,gunheight()-10,4,frandom(-2,2),frandom(2,4));
 			}else if(invoker.weaponstatus[0]&ZM66F_CHAMBERBROKEN){
 				A_StartSound("weapons/smack",CHAN_WEAPON,CHANF_OVERLAP);
 			}
@@ -708,7 +708,7 @@ class ZM66AssaultRifle:ZM66ScopeHaver{
 				||A_JumpIfInventory("HDRocketAmmo",0,"null")
 			){
 				A_SpawnItemEx("HDRocketAmmo",
-					cos(pitch)*10,0,height-10-10*sin(pitch),vel.x,vel.y,vel.z,0,
+					cos(pitch)*10,0,gunheight()-2-10*sin(pitch),vel.x,vel.y,vel.z,0,
 					SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION|SXF_TRANSFERPITCH
 				);
 			}else{

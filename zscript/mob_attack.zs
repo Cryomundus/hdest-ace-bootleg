@@ -12,10 +12,14 @@ extend class HDMobBase{
 		int flags=HDLT_RANDOMIZE,
 		double maxturn=100
 	){
-		if(!targetinsight||!target)return;
+		if(
+			!targetinsight
+			||!target
+			||lasttargetvel==(0,0,0)
+		)return;
 		if(flags&HDLT_RANDOMIZE)tics=frandom(0,tics*1.3);
 
-		let ltp=lasttargetpos+(target.prev-target.pos);
+		let ltp=lasttargetpos-lasttargetvel;
 		let lsp=prev;
 
 		double ach=deltaangle(
@@ -38,10 +42,10 @@ extend class HDMobBase{
 		double targetheight=-1
 	){
 		if(!target)return;
-		if(attackheight<0)attackheight=height*0.8;
+		if(attackheight<0)attackheight=gunheight;
 		if(targetheight<0){
-			if(targetheight==FLTP_TOP)targetheight=target.height;
-			targetheight=target.height*0.6;
+			if(targetheight==FLTP_TOP)targetheight=lasttargetheight;
+			targetheight=lasttargetheight*0.6;
 		}
 
 		double targetpitch=hdmath.pitchto(
@@ -63,8 +67,8 @@ extend class HDMobBase{
 		bool musthaveactualsight=false
 	){
 		if(!target)return;
-		if(attackheight<0)attackheight=height*0.8;
-		if(targetheight<0)targetheight=target.height*0.6;
+		if(attackheight<0)attackheight=gunheight;
+		if(targetheight<0)targetheight=lasttargetheight*0.6;
 
 		A_FaceLastTargetPos(maxturn,attackheight,targetheight);
 
@@ -92,7 +96,6 @@ extend class HDMobBase{
 		}
 	}
 
-
 	//returns whether a state was changed
 	bool A_Watch(
 		double randomturn=5.,
@@ -106,10 +109,12 @@ extend class HDMobBase{
 			else setstatelabel(seestate);
 			return true;
 		}
+		let lastltp=lasttargetpos;
 		if(CheckTargetInSight()){
 			setstatelabel(lasttargetdist<meleerange?meleestate:missilestate);
 			return true;
 		}
+		A_FaceLastTargetPos(2);
 		if(randomturn)angle+=frandom(-randomturn,randomturn);
 		return false;
 	}
@@ -136,5 +141,34 @@ extend class HDMobBase{
 			angle+=frandom(-spread,spread);
 			pitch+=frandom(-spread,spread);
 		}
+	}
+
+
+	//take a moment to stabilize a shot and actually point the gun where you're looking
+	//returns the amount of time taken
+	int A_StartAim(
+		//20max 0.9rate 30tics = best accuracy ~0.8 degrees
+		double maxspread=20,
+		double rate=0.9,
+		int mintics=3,
+		int maxtics=30,
+		bool dontlead=false
+	){
+		if(!target)return tics;
+		double silh=atan2(lasttargetradius,lasttargetdist);
+		int lag=maxtics;
+		for(int i=0;i<lag;i++){
+			if(
+				silh>maxspread
+			){
+				lag=min(lag,i);
+				break;
+			}
+			maxspread*=rate;
+		}
+		A_SetTics(lag);
+		if(!dontlead)A_LeadTarget(lag,false);
+		spread=maxspread;
+		return lag;
 	}
 }

@@ -185,12 +185,11 @@ class HDWeapon:Weapon{
 
 	//activate a laser rangefinder
 	//because every gun should have one of these
+	//note that this uses the gunpos xy offset unlike the command
 	action void FindRange(){
 		let hdp=hdplayerpawn(self);
-		if(hdp)HDHandlers.FindRange(hdp);
+		if(hdp)HDHandlers.FindRange(hdp,true);
 	}
-
-
 
 
 	//grabs mouse/whatever input and freezes the player if desired
@@ -214,13 +213,9 @@ class HDWeapon:Weapon{
 	override inventory CreateTossable(int amt){
 		let onr=hdplayerpawn(owner);
 		bool throw=(
-			onr&&(
-				HDZerk.IsZerk(onr)
-				||(
-					onr.player
-					&&onr.player.cmd.buttons&BT_ZOOM
-				)
-			)
+			onr
+			&&onr.player
+			&&onr.player.cmd.buttons&BT_ZOOM
 		);
 		bool isreadyweapon=onr&&onr.player&&onr.player.readyweapon==self;
 		if(!isreadyweapon)throw=false;
@@ -254,8 +249,8 @@ class HDWeapon:Weapon{
 				vel=target.vel+
 					(cp*(cos(target.angle),sin(target.angle)),-sin(target.pitch))
 					*min(20,800/weaponbulk())
-					*(HDZerk.IsZerk(target)?frandom(1,4):1
-				);
+					*(hdplayerpawn(target)?hdplayerpawn(target).strength:1.)
+				;
 			}else vel=target.vel+(cp*(cos(target.angle),sin(target.angle)),-sin(target.pitch))*4;
 			throwvel=vel dot vel;
 			bjustchucked=false;
@@ -475,6 +470,7 @@ class HDWeapon:Weapon{
 			shooter.pos.xy+cp*forwardvec*spawndist,
 			shooter.pos.z+shooter.height*spawnheight-sp*spawndist
 		);
+		if(!!shooter.viewpos)spawnpos+=shooter.viewpos.offset;
 		actor aaa=spawn(type,spawnpos);
 		spawnangle+=shooter.angle;
 		aaa.angle=shooter.angle;
@@ -496,7 +492,8 @@ class HDWeapon:Weapon{
 	){}
 	virtual string gethelptext(){return "";}
 	action void A_SetHelpText(){
-		let hdp=hdplayerpawn(self);if(hdp){
+		let hdp=hdplayerpawn(invoker.owner);  //can't use "self", backpack does something weird with this
+		if(hdp){
 			string ttt=invoker.gethelptext();
 			if(ttt!="")hdp.wephelptext="\cu"..invoker.gettag().."\n"..ttt;
 			else hdp.wephelptext=ttt;
@@ -665,34 +662,33 @@ class HDWeapon:Weapon{
 	}
 
 
+	//deprecated as of 4.8.x
 	//shoots out a line to see if the area ahead is unimpeded.
 	//if it is, the gun cannot be raised up to the eyes.
 	static double GetShootOffset(
 		actor caller,
 		double eyerange=36,
-		double chestrange=-1
+		double chestrange=-1,
+		double gundepth=3
 	){
-		double eyeheight;
-		if(caller.player)eyeheight=caller.player.viewheight-3;
-		else eyeheight=caller.height-HDCONST_CROWNTOEYES;
-
-		flinetracedata ltd;
-		caller.LineTrace(
-			caller.angle,
-			max(HDCONST_MINEYERANGE,eyerange),
-			caller.pitch,
-			TRF_NOSKY,
-			eyeheight,
-			data:ltd
-		);
-		if(ltd.distance>=eyerange)return eyeheight;
-		double waistheight=caller.height*0.5;
-		if(chestrange<0)chestrange=eyerange-HDCONST_SHOULDERTORADIUS;
-		if(
-			caller.height>(HDCONST_CROWNTOSHOULDER*2.)
-			&&ltd.distance>=chestrange
-		)return caller.height-HDCONST_CROWNTOSHOULDER;
-		return waistheight;
+		vector3 spp=HDMath.GetGunPos(caller);
+		if(hd_debug)console.printf("Deprecated wrapper HDWeapon.GetShootOffset. Use HDMath.GetGunPos instead.");
+		return spp.z;
+	}
+	action vector3 gunpos(
+		vector3 offset=(0,0,0)
+	){
+		let hdp=hdplayerpawn(self);
+		if(hdp){
+			if(offset.x||offset.y||offset.z)return hdp.gunpos+HDMath.RotateVec3D(offset,angle,pitch);
+			return hdp.gunpos;
+		}
+		return (0,0,height*0.8);
+	}
+	action double gunheight(){
+		let hdp=hdplayerpawn(self);
+		if(hdp)return hdp.gunpos.z;
+		return height*0.8;
 	}
 
 	override void postbeginplay(){
@@ -978,6 +974,10 @@ class HDWeapon:Weapon{
 				double hdbby=max(0,(ppp.hudbobrecoil1.y+ppp.hudbob.y)*0.5+invoker.bobrangey*2);
 				A_WeaponOffset(hdbbx,hdbby+WEAPONTOP,WOF_INTERPOLATE);
 			}
+			if(invoker.msgtimer>0){
+				invoker.msgtimer--;
+				if(invoker.msgtimer<1)invoker.wepmsg="";
+			}
 		}
 		---- A 0{
 			int inp=getplayerinput(MODINPUT_BUTTONS);
@@ -1104,7 +1104,7 @@ class SpareWeapons:HDPickup{
 		return null;
 	}
 	//retrieve the int from one specific slot from one specific weapon index
-	int GetWeaponValue(int wepindex,int statusslot){
+	clearscope int GetWeaponValue(int wepindex,int statusslot){
 		if(weaponstatus.size()<=wepindex)return -1;
 		array<string> wepstat;
 		string wepstat2="";

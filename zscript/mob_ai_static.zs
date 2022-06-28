@@ -50,7 +50,7 @@ struct HDMobAI play{
 			for(int i=1;i<=ticstotake;i++){
 				dropamt+=i;
 			}
-			caller.pitch-=min(atan(dropamt*gravity/dist),30);
+			caller.pitch-=min(atan(dropamt*gravity/dist),60);
 		}
 
 		//because we don't shoot from height 32 but 42
@@ -120,7 +120,11 @@ struct HDMobAI play{
 	){
 		if(!target)target=caller.target;
 		if(!target)return false;
-		if(shootheight<0)shootheight=caller.height*0.8;
+		let hdm=hdmobbase(caller);
+		if(shootheight<0){
+			if(hdm)shootheight=hdm.gunheight;
+			else shootheight=caller.missileheight;
+		}
 		if(angle==-999)angle=caller.angle;
 		if(pitch==-999)pitch=caller.pitch;
 

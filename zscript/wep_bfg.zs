@@ -31,7 +31,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
 	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}
 	//BFG9k.Spark(self,4);
-	//BFG9k.Spark(self,4,height-10);
+	//BFG9k.Spark(self,4,gunheight()-2);
 	static void Spark(actor caller,int sparks=1,double sparkheight=10){
 		actor a;vector3 spot;
 		vector3 origin=caller.pos+(0,0,sparkheight);
@@ -285,7 +285,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			}else if(invoker.weaponstatus[BFGS_BATTERY]==20)A_SetTics(2);
 			A_WeaponBusy(false);
 			A_StartSound("weapons/bfgcharge",CHAN_WEAPON);
-			BFG9k.Spark(self,1,height-10);
+			BFG9k.Spark(self,1,gunheight()-2);
 			A_WeaponReady(WRF_NOFIRE);
 		}
 		#### B 0{
@@ -296,7 +296,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		loop;
 	chargeend:
 		#### B 1{
-			BFG9k.Spark(self,1,height-10);
+			BFG9k.Spark(self,1,gunheight()-2);
 			A_StartSound("weapons/bfgcharge",(invoker.weaponstatus[BFGS_TIMER]>6)?CHAN_AUTO:CHAN_WEAPON);
 			A_WeaponReady(WRF_ALLOWRELOAD|WRF_NOFIRE|WRF_DISABLESWITCH);
 			A_SetTics(max(1,6-int(invoker.weaponstatus[BFGS_TIMER]*0.3)));
@@ -317,7 +317,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 		#### B 3{
 			invoker.weaponstatus[BFGS_CRITTIMER]--;
 			A_StartSound("weapons/bfgcharge",random(9005,9007));
-			BFG9k.Spark(self,1,height-10);
+			BFG9k.Spark(self,1,gunheight()-2);
 			if(invoker.weaponstatus[BFGS_CRITTIMER]<1){
 				invoker.weaponstatus[BFGS_CRITTIMER]=0;
 				player.setpsprite(PSP_WEAPON,invoker.findstate("reallyshoot"));
@@ -552,7 +552,7 @@ class BFG9K:HDCellWeapon replaces BFG9000{
 			}
 			if(invoker.weaponstatus[BFGS_BATTERY]==20)A_SetTics(5);
 			invoker.A_StartSound("weapons/bfgcharge",CHAN_VOICE);
-			BFG9k.Spark(invoker,1,height-10);
+			BFG9k.Spark(invoker,1,gunheight()-2);
 		}loop;
 	}
 
@@ -962,3 +962,4 @@ class BFGAccelerator:IdleDummy{
 		}stop;
 	}
 }
+

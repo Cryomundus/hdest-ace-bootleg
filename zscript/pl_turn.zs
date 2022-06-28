@@ -11,16 +11,17 @@ extend class HDPlayerPawn{
 	vector2 hudbobrecoil3;
 	vector2 hudbobrecoil4;
 	vector2 muzzledrift;
+
 	bool muzzlehit;
 	bool totallyblocked;
-	bool movehijacked;
-
 	enum muzzleblock{
 		MB_TOP=1,
 		MB_BOTTOM=2,
 		MB_LEFT=4,
 		MB_RIGHT=8,
 	}
+
+	bool movehijacked;
 
 	double lastpitch;
 	double lastangle;
@@ -179,18 +180,19 @@ extend class HDPlayerPawn{
 
 
 		//weapon collision
-		if(!(player.cheats&CF_NOCLIP2 || player.cheats&CF_NOCLIP)){
-			double highheight=height-HDCONST_CROWNTOEYES*heightmult;
-			double midheight=highheight-max(1,barreldepth)*0.5;
-			double lowheight=highheight-max(1,barreldepth);
+		if(!(player.cheats&(CF_NOCLIP2|CF_NOCLIP))){
+			double highheight=player.viewheight;
+			if(viewpos)highheight+=viewpos.offset.z;
 			double testangle=angle;
 			double testpitch=pitch;
 			vector3 posbak=pos;
 
 			setxyz(posbak+vel);
 
-			flinetracedata bigcoll;
+			double offfor=viewpos.offset.xy.length();
+
 			//check for super-collision preventing only aligned sights		
+			flinetracedata bigcoll;
 			if(
 				!barehanded
 				&&linetrace(
@@ -198,6 +200,7 @@ extend class HDPlayerPawn{
 					testpitch,
 					flags:TRF_NOSKY,
 					offsetz:highheight,
+					offsetforward:offfor,
 					data:bigcoll
 				)
 				&&(
@@ -213,11 +216,26 @@ extend class HDPlayerPawn{
 				hudbobrecoil2.y+=10;
 				hudbobrecoil3.y+=10;
 				hudbobrecoil4.y+=10;
-				highheight=max(height*0.5,height-HDCONST_CROWNTOSHOULDER*heightmult);
-			}else if(nocrosshair>0){
-				highheight=max(height*0.5,height-HDCONST_CROWNTOSHOULDER*heightmult);
 			}
-			barrellength-=(HDCONST_SHOULDERTORADIUS*player.crouchfactor);
+
+			double gunpitch=pitch-hudbob.y*0.2;
+			double gunangle=angle-hudbob.x*0.2;
+
+			if(nocrosshair>0)highheight=height*0.7;
+			gunpos=!viewpos?(0,0,highheight):
+				(viewpos.offset.xy,highheight)
+				+hdmath.rotatevec3d(
+					(HDCONST_GUNPOSOFFSET,0,-1.5),
+					gunangle,
+					gunpitch
+				)
+			;
+
+
+			barrellength-=(radius*0.6*player.crouchfactor);
+
+			double midheight=highheight-max(1,barreldepth)*0.5;
+			double lowheight=highheight-max(1,barreldepth);
 
 
 			//and now uh do stuff
@@ -238,9 +256,9 @@ extend class HDPlayerPawn{
 
 			//top
 			linetrace(
-				testangle,barrellength,testpitch,flags:TRF_NOSKY,
-				offsetz:highheight+cos(pitch)*barreldepth,
-				offsetforward:sin(pitch)*barreldepth,
+				gunangle,barrellength,gunpitch,flags:TRF_NOSKY,
+				offsetz:highheight+cos(gunpitch)*1.5,
+				offsetforward:sin(gunpitch)*barreldepth+offfor,
 				offsetside:0,
 				data:ltt
 			);
@@ -257,9 +275,9 @@ extend class HDPlayerPawn{
 
 			//bottom
 			linetrace(
-				testangle,barrellength,testpitch,flags:TRF_NOSKY,
-				offsetz:lowheight-cos(pitch)*barreldepth,
-				offsetforward:-sin(pitch)*barreldepth,
+				gunangle,barrellength,gunpitch,flags:TRF_NOSKY,
+				offsetz:lowheight-cos(gunpitch)*barreldepth,
+				offsetforward:-sin(gunpitch)*barreldepth+offfor,
 				offsetside:0,
 				data:ltb
 			);
@@ -277,8 +295,9 @@ extend class HDPlayerPawn{
 
 			//left
 			linetrace(
-				testangle,barrellength,testpitch,flags:TRF_NOSKY,
+				gunangle,barrellength,gunpitch,flags:TRF_NOSKY,
 				offsetz:midheight,
+				offsetforward:offfor,
 				offsetside:-barrelwidth,
 				data:ltl
 			);
@@ -295,8 +314,9 @@ extend class HDPlayerPawn{
 
 			//right
 			linetrace(
-				testangle,barrellength,testpitch,flags:TRF_NOSKY,
+				gunangle,barrellength,gunpitch,flags:TRF_NOSKY,
 				offsetz:midheight,
+				offsetforward:offfor,
 				offsetside:barrelwidth,
 				data:ltr
 			);
@@ -312,9 +332,18 @@ extend class HDPlayerPawn{
 			}
 
 
+			//debug: show where the lines have gone
+			if(hd_debug>2){
+				HDF.Particle(self,"red",ltt.hitlocation,3);
+				HDF.Particle(self,"red",ltb.hitlocation,3);
+				HDF.Particle(self,"red",ltl.hitlocation,3);
+				HDF.Particle(self,"red",ltr.hitlocation,3);
+				HDF.Particle(self,"green",pos+gunpos,3,alpha:0.2);
+			}
+
+
 			//totally caught
 			totallyblocked=muzzleblocked==MB_TOP|MB_BOTTOM|MB_LEFT|MB_RIGHT;
-
 
 
 			//set angles
@@ -437,25 +466,6 @@ extend class HDPlayerPawn{
 			}
 		}
 
-		//move pivot point a little behind the player's view
-		anglechange=normalize180(anglechange);
-		if(
-			!teleported
-			&&!incapacitated
-			&&player.onground
-		){
-			bool ongun=gunbraced&&!barehanded&&isFocussing;
-			if(abs(anglechange)>(ongun?0.05:0.7)){
-				int dir=((anglechange>0)||ongun)?90:-90;
-				double aad=angle+anglechange+dir;
-				trymove(self.pos.xy+(cos(aad),sin(aad))*(ongun?-0.3*anglechange:0.6),false);
-			}
-			double ptchch=clamp(abs(pitchchange),0,10); //THE CLAMP IS A BANDAID
-			if(ptchch>1 && abs(pitch)<30){  
-				trymove(pos.xy-(cos(angle)*ptchch,sin(angle)*ptchch)*0.1,false);
-				PlayRunning();
-			}
-		}
 
 		//move pivot point a little ahead of the player's view if braced
 		anglechange=normalize180(anglechange);
@@ -472,6 +482,8 @@ extend class HDPlayerPawn{
 				trymove(self.pos.xy+(cos(aad),sin(aad))*(-0.3*anglechange),false);
 			}
 		}
+
+
 
 		//reset blocked check for a fresh start
 		totallyblocked=false;

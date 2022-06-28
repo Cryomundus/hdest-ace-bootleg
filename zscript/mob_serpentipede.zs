@@ -218,8 +218,14 @@ class Serpentipede:HDMobBase{
 	override void deathdrop(){
 		if(!bfriendly)DropNewItem("HDHandgunRandomDrop");
 	}
-	vector2 leadaim1;
-	vector2 leadaim2;
+	bool strafeleft;
+	void A_Strafe(){
+		A_FaceLastTargetPos(10);
+		strafeleft=(random(0,2))?blefthanded:!blefthanded;
+		vector2 newdir=angletovector((strafeleft?angle+90:angle-90)+frandom(-20,20),frandom(0.5,2.5));
+		vel.xy+=newdir;
+		if(floorz==pos.z)vel.z+=randompick(-2.,1.);
+	}
 	states{
 	spawn:
 		TROO A 0;
@@ -242,16 +248,21 @@ class Serpentipede:HDMobBase{
 		#### ABCD 4 A_HDChase();
 		loop;
 	missile:
-		#### ABCD 4 A_TurnToAim(40,35);
+		#### ABCD 4{
+			A_Strafe();
+			A_TurnToAim(40,35);
+		}
 		loop;
 	shoot:
-		#### E 0 A_ChangeVelocity(0,frandom(-3,3),0,CVF_RELATIVE);
 		#### E 0 A_Jump(16,"hork");
 		goto lead;
 
 	lead:
+		#### E 0 A_Strafe();
 		#### E 4 A_FaceLastTargetPos(40,35);
+		#### E 0 A_Strafe();
 		#### E 1 A_FaceLastTargetPos(20,35);
+		#### E 0 A_Strafe();
 		#### F 4 A_LeadTarget(lasttargetdist/getdefaultbytype("HDImpBall").speed);
 		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,256,10,10,flags:HDMobAI.TS_GEOMETRYOK),"see");
 		#### G 6 A_SpawnProjectile("HDImpBall",34,0,0,CMF_AIMDIRECTION,pitch-frandom(0,0.1));
@@ -263,8 +274,8 @@ class Serpentipede:HDMobBase{
 		---- A 0 setstatelabel("see");
 
 	spam:
-		#### E 5 A_SetTics(random(4,6));
-		#### F 2;
+		#### E 3 A_SetTics(random(4,6));
+		#### EF 2 A_Strafe();
 		#### G 6 A_SpawnProjectile("HDImpBall",35,0,frandom(-3,4),CMF_AIMDIRECTION,pitch+frandom(-2,1.8));
 		#### F 4;
 		#### F 0 A_JumpIf(firefatigue>HDCONST_MAXFIREFATIGUE,"pain");
@@ -281,11 +292,10 @@ class Serpentipede:HDMobBase{
 	hork:
 		#### E 0 A_Jump(156,"spam");
 		---- A 0 A_FaceLastTargetPos(40,35);
-		#### E 2;
+		#### E 2 A_Strafe();
 		#### E 0 A_Vocalize(seesound);
 		#### EEEEE 2 A_SpawnItemEx("ReverseImpBallTail",4,24,random(31,33),1,0,0,0,160);
-		#### E 2;
-		#### F 2;
+		#### EF 2 A_Strafe();
 		#### G 0 A_SpawnProjectile("HDImpBall",36,0,(frandom(-2,10)),CMF_AIMDIRECTION,pitch+frandom(-4,3.6));
 		#### G 0 A_SpawnProjectile("HDImpBall",36,0,(frandom(-4,4)),CMF_AIMDIRECTION,pitch+frandom(-4,3.6));
 		#### G 0 A_SpawnProjectile("HDImpBall",36,0,(frandom(-2,-10)),CMF_AIMDIRECTION,pitch+frandom(-4,3.6));
@@ -580,18 +590,18 @@ class Ardentipede:Serpentipede{
 		#### E 2 A_FaceLastTargetPos(40,32);
 		#### E 0 A_JumpIf(!hdmobai.TryShoot(self,32,256,10,10,flags:HDMobAI.TS_GEOMETRYOK),"see");
 		#### E 2 A_Vocalize(seesound);
-		#### EEEEEEE 2 A_SpawnItemEx("ReverseImpBallTail",random(3,5),random(23,25),random(31,33),1,0,0,0,160);
+		#### EEEEEEE 2 A_SpawnItemEx("ReverseImpBallTail",frandom(3,5),frandom(23,25),frandom(31,33),1,0,0,0,160);
 		#### F 3 A_FaceLastTargetPos(40,32);
 		#### F 3 A_LeadTarget(lasttargetdist*0.08);
 
-		#### GGGGGGGG 0 A_SpawnProjectile("ArdentipedeBall2",random(29,34),6,(random(-18,18)),CMF_AIMDIRECTION,pitch+frandom(-2,4));
+		#### GGGGGGGG 0 A_SpawnProjectile("ArdentipedeBall2",frandom(29,34),6,frandom(-8,8),CMF_AIMDIRECTION,pitch+frandom(-2,4));
 		---- A 0{stamina+=5;}
 		#### GGFE 5;
 		---- A 0 setstatelabel("see");
 	missile3:
 		#### E 0 A_Jump(16,"missile1");
 		#### E 0 A_Jump(32,"missile2");
-		#### EEH 3 A_FaceTarget(0,0);
+		#### EEH 3 A_FaceLastTargetPos(30);
 	missile3a:
 		#### H 2;
 		#### H 16 bright{
@@ -664,13 +674,27 @@ class ArdentipedeBall2:HDImpBall{
 		roll=frandom(0,360);
 		A_FBSeek(256);
 	}
+	vector3 accelpos;
+	override void postbeginplay(){
+		super.postbeginplay();
+		let ttt=hdmobbase(target);
+		if(ttt){
+			let tttt=target.target;
+			if(!tttt)accelpos=(ttt.lasttargetpos.xy,ttt.lasttargetpos.z+32.);
+			else accelpos=(ttt.lasttargetpos.xy,ttt.lasttargetpos.z+tttt.height*0.8);
+		}else accelpos=(0,0,0);
+	}
 	states{
 	spawn:
 		BAL1 A 2 bright{
-			A_SeekerMissile(40,40);
-			A_FaceTracer(2,2);
+			if(accelpos!=(0,0,0)){
+				vector3 acceldir=(accelpos-pos);
+				acceldir/=max(abs(acceldir.x),abs(acceldir.y),abs(acceldir.z));
+				vel=vel*0.8+acceldir;
+			}
 			stamina++;
 			if(stamina>10){
+				A_FaceMovementDirection();
 				pitch+=frandom(-1,1);
 				angle+=frandom(-1,1);
 				setstatelabel("spawn2");

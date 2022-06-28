@@ -101,6 +101,7 @@ extend class HDPlayerPawn{
 				A_SetSize(default.radius*newheightmult,height);
 				scale=skinscale*newheightmult;
 				fullheight=default.height*newheightmult;
+				foreheadheight=fullheight*(1.-HDCONST_EYEHEIGHT);
 				viewheight=default.viewheight*newheightmult;
 				attackzoffset=default.attackzoffset*newheightmult;
 				userange=default.userange*newheightmult;
@@ -322,6 +323,16 @@ extend class HDPlayerPawn{
 				&&frame==4
 			)PlayRunning();
 		}
+
+
+		vector2 voff=(cos(angle),sin(angle))*heightmult*min(
+			9,
+			3
+			+7.*(1.-player.crouchfactor)
+			+pitch*0.05
+		);
+		setviewpos((voff,pitch*0.02-foreheadheight),VPSF_ABSOLUTEOFFSET);
+
 
 		//see if player is intentionally walking, running or sprinting
 		//-1 = walk, 0 = run, 1 = sprint

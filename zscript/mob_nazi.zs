@@ -22,7 +22,6 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 		}
 		givearmour(1.);
 	}
-	double turnamount;
 	int gunloaded;
 	override void deathdrop(){
 		hdweapon wp=null;
@@ -96,28 +95,12 @@ class HoopBubble:HDHumanoid replaces WolfensteinSS{
 		SSWV A 0 A_Jump(192,"see");
 		---- A 0 setstatelabel("see");
 	missile:
-		#### A 0 A_JumpIf(gunloaded<1,"reload");
-		#### A 0 A_JumpIfTargetInLOS(3,120);
-		#### CDE 2 A_FaceLastTargetPos(40);
-		#### F 1 A_SetTics(random(4,10)); //when they just start to aim,not for followup shots!
-	missile2:
-		#### A 0{
-			if(!target){
-				setstatelabel("spawn");
-				return;
-			}
-			double enemydist=distance3d(target);
-			if(enemydist<200)turnamount=50;
-			else if(enemydist<600)turnamount=30;
-			else turnamount=10;
-
-			spread=0.02*turnamount;
-		}goto turntoaim;
-	turntoaim:
-		#### F 3 A_TurnToAim(turnamount,shootstate:"leadtarget");
+		#### ABCD 3 A_TurnToAim(40,shootstate:"aiming");
 		loop;
-	leadtarget:
-		#### F 0 A_LeadTarget(lasttargetdist*0.01);
+	aiming:
+		#### E 3 A_FaceLastTargetPos(30);
+		#### F 1 A_StartAim(rate:0.85,mintics:0,maxtics:35);
+		//fallthrough to shoot
 	shoot:
 		SSWV G 1 bright light("SHOT"){
 			if(gunloaded<1){

@@ -49,7 +49,6 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 	}
 	int user_weapon;property user_weapon:user_weapon;
 	int user_colour;property user_colour:user_colour;
-	double turnamount;
 	int gunloaded;
 	int gunmax;
 	int gunspent;
@@ -59,11 +58,10 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 	override void die(actor source,actor inflictor,int dmgflags){
 		if(
 			bfriendly
-			&&!SquadGhost(self)
 			&&!BotBot(self)
 			&&!HDPlayerCorpse(self)
 			&&getage()>TICRATE
-		)A_Log(string.format("\cf%s died.",nickname));
+		)A_Log(string.format("\cf%s died.",gettag()));
 		super.die(source,inflictor,dmgflags);
 	}
 	override void Tick(){
@@ -141,11 +139,9 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		caller.painsound="operator"..ggg.."/pain";
 		caller.deathsound="operator"..ggg.."/death";
 	}
-	string nickname;
 	virtual string SetNickname(int flags=0){
 		if(!bfriendly){
 			string ano="Anonymous";
-			nickname=ano;
 			settag(ano);
 			return ano;
 		}
@@ -158,7 +154,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		HDOperator nmm;
 		thinkeriterator nmit=thinkeriterator.create("HDOperator",STAT_DEFAULT);
 		while(nmm=HDOperator(nmit.Next(exact:false))){
-			if(nmm!=self)nicknames.push(nmm.nickname.makelower());
+			if(nmm!=self)nicknames.push(nmm.gettag().makelower());
 		}
 
 		string nnn;
@@ -178,8 +174,6 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 			}
 		}while(!unique);
 
-
-		nickname=nnn;
 		settag(nnn);
 		return nnn;
 	}
@@ -319,7 +313,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 	}
 
 	actor A_OpShot(class<actor> missiletype,bool userocket=false){
-		actor mmm=spawn(missiletype,pos+(0,0,height*0.8),ALLOW_REPLACE);
+		actor mmm=spawn(missiletype,(pos.xy,pos.z+gunheight),ALLOW_REPLACE);
 		mmm.pitch=pitch+frandom(0,spread)-frandom(0,spread);
 		mmm.angle=angle+frandom(0,spread)-frandom(0,spread);
 		mmm.target=self;
@@ -480,22 +474,26 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 
 	//a better refire
 	bool A_CheckKeepShooting(statelabel shootstate){
+		vector3 lastlasttargetpos=lasttargetpos;
+		bool cts=false;
 		bool ks=
-			target
-			&&target.health>0
+			shootstate!=null
 			&&(
 				(wep>0&&gunloaded>0)
 				||(pistolloaded>0&&shootstate=="shootpistol")
 			)
-			&&absangle(angle,angleto(target))<frandom(1,4)
-			&&CheckTargetInSight()
-			&&lasttargetdist<HDCONST_SPEEDOFSOUND
+			&&!!target
+			&&(
+				!(cts=CheckTargetInSight())
+				||target.health>0
+			)
 		;
-		if(
-			ks
-			&&shootstate!=null
-		){
-			setstatelabel(shootstate);
+		if(ks){
+			if(
+				cts
+				||(lasttargetpos-lastlasttargetpos).length()<target.radius*frandom(1,4)
+			)setstatelabel("missile");
+			else setstatelabel(shootstate);
 		}else setstatelabel("see");
 		return ks;
 	}
@@ -546,52 +544,20 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		#### E 0 setstatelabel("roam");
 
 	missile:
-		#### A 0 A_JumpIfTargetInLOS(3,120);
-		#### CD 3 A_FaceLastTargetPos(40);
-	missile2:
-		#### A 0{
-			if(!target){
-				setstatelabel("noshot");
-				return;
-			}
-			double dist=distance3d(target);
-
-			double tgfacing=absangle(target.angleto(self),target.angle);
-			if(tgfacing>120)dist*=frandom(0.9,2.);
-			else if(tgfacing<40)dist*=frandom(0.3,1.1);
-
-			if(dist<500)turnamount=30;
-			else if(dist<900)turnamount=20;
-			else if(dist<1200)turnamount=10;
-			else if(dist<2400)turnamount=3;
-			else turnamount=1;
-		}
-	turntoaim:
-		#### E 2 A_TurnToAim(turnamount,shootstate:"aiming");
-		wait;
+		#### ABCD 3 A_TurnToAim(40,shootstate:"aiming");
+		loop;
 	aiming:
-		#### E 1{
-			spread=turnamount*0.08+min(timesdied,15);
-			int lag=max(2,10-(int(turnamount)>>5));
-			A_SetTics(lag);
-			A_LeadTarget(tics,randompick(0,0,0,1));
-		}
+		#### E 1 A_StartAim(rate:0.8,mintics:random(0,timesdied),dontlead:randompick(0,0,0,1));
 		//fallthrough to shoot
 	shoot:
-		#### E 1{
+		#### E 4{
 			if(!target||(checksight(target)&&target.health<1)){
 				target=null;
 				setstatelabel("noshot");
 				return;
 			}
 
-			int settics=clamp(int(lasttargetdist*0.001),0,30);
-			if(lastinginjury>0)settics+=random(0,min(lastinginjury,(35*5)));
-			A_SetTics(settics);
-		}
-		#### E 4{
-			if(!target)return;
-			double dist=distance3d(target);
+			double dist=lasttargetdist;
 			if(
 				!hdmobai.tryshoot(self,
 					range:1024,
@@ -668,8 +634,8 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		}
 	firezm66end:
 		#### E 2 A_ShoutAlert(1.,SAF_SILENT);
-		#### E 0 A_JumpIf(random(0,3),"turntoaim");
 		#### E 0 A_CheckKeepShooting("pullzm66");
+		goto see;
 
 
 	shootsmg:
@@ -690,8 +656,10 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		#### E 2{
 			HDWeapon.EjectCasing(self,"HDSpent9mm",11,-frandom(79,81),frandom(7,7.5));
 		}
-		#### E 0 A_JumpIf(gunloaded>0&&random(0,2),"firesmg");
+	firesmgend:
+		#### E 2 A_ShoutAlert(1.,SAF_SILENT);
 		#### E 0 A_CheckKeepShooting("firesmg");
+		goto see;
 
 
 	shootsg:
@@ -763,7 +731,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		#### E 1{
 			class<actor> mn="GyroGrenade";
 			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
-			hdmobai.DropAdjust(self,mn,speedmult:6.4);
+//			hdmobai.DropAdjust(self,mn,speedmult:6.4);  //it simply never matters
 		}
 		#### F 0 A_JumpIf(gunloaded<1,"ohforfuckssake");
 		#### F 2 bright light("SHOT"){
@@ -795,12 +763,13 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		#### E 2{
 			class<actor> mn="GyroGrenade";
 			A_LeadTarget(lasttargetdist/getdefaultbytype(mn).speed,randompick(0,0,0,1));
-			hdmobai.DropAdjust(self,mn);
 
 			//everything else assumes you're aiming for centre, try ground instead
 			double aaa=angle;
 			A_FaceLastTargetPos(10,targetheight:1.);
 			angle=aaa;
+
+			hdmobai.DropAdjust(self,mn,lasttargetdist);
 		}
 		#### F 0 A_JumpIf(!glloaded,"ohforfuckssake");
 		#### F 1 bright{
@@ -811,7 +780,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 			A_OpShot("GyroGrenade");
 		}
 		#### E 4;
-		#### E 0 A_CheckKeepShooting("shootzm66");
+		goto see;
 
 
 	shootpistol:
@@ -1035,7 +1004,7 @@ class HDOperator:HDHumanoid replaces ScriptedMarine{
 		wait;
 	raise:
 		#### A 0{
-			nickname=RandomName();
+			settag(RandomName());
 			lastinginjury=random(0,(lastinginjury>>3));
 		}
 		#### MLK 7 A_SpawnItemEx("MegaBloodSplatter",0,0,4,
@@ -1338,8 +1307,8 @@ extend class HDOperator{
 		int flags=0
 	){
 		if(caller.bcorpse||caller.health<1)return;
+		if(!(flags&HDTS_DONTFORMAT))msg="\cd"..caller.gettag()..": "..msg;
 		for(int i=0;i<MAXPLAYERS;i++){
-			string newmsg = msg;
 			if(
 				playeringame[i]
 				&&(
@@ -1355,8 +1324,7 @@ extend class HDOperator{
 			){
 				actor pmo=players[i].mo;
 				pmo.A_StartSound("misc/chat",420,CHANF_UI|CHANF_NOPAUSE|CHANF_LOCAL);
-				if(!(flags&HDTS_DONTFORMAT))newmsg="\cd"..caller.gettag()..": "..newmsg;
-				pmo.A_Log(newmsg,true);
+				pmo.A_Log(msg,true);
 			}
 		}
 	}
@@ -1383,11 +1351,9 @@ extend class HDOperator{
 			||(!bfriendly&&random(0,15))
 		)return;
 
-		if(nickname=="")SetNickname();
-
 		int x;int y;
 		if(!bfriendly){
-			nickname="Anonymous";
+			settag("Anonymous");
 			x=random(-32700,32700);
 			y=random(-32700,32700);
 		}
@@ -1433,7 +1399,6 @@ extend class HDOperator{
 			&&target.health>0
 		;
 		string barkset=Wads.ReadLump(Wads.CheckNumForName("opbarks",0));
-		barkset.Replace("\r","");
 		if(incombat)barkset=barkset.mid(barkset.indexof("\n---")+5);
 		else barkset=barkset.left(barkset.indexof("\n---"));
 		array<string>barks;barks.clear();
@@ -1450,6 +1415,7 @@ extend class HDOperator{
 		HDTeamSay(self,msg);
 	}
 }
+
 
 // ------------------------------------------------------------
 // A replacement.
@@ -1621,8 +1587,7 @@ class BotBot:HDOperator{
 			}
 		}
 		masterplayer=master.playernumber();
-		nickname=players[masterplayer].getusername();
-		settag(nickname);
+		settag(players[masterplayer].getusername());
 
 		SetSightPainDeath(self,players[masterplayer].getgender());
 
@@ -1649,16 +1614,13 @@ class BotBot:HDOperator{
 			mmm.translation=translation;
 			mmm.scale=scale;
 			mmm.settag(gettag());
-			mmm.nickname=gettag();
 			mmm.givensprite=givensprite;
 			master=mmm;
 		}
 		TNT1 A 0{
 			let mmm=HDOperator(master);
-			if(mmm){
-				mmm.settag(gettag());
-				mmm.nickname=gettag();
-			}
+			if(mmm)mmm.settag(gettag());
 		}stop;
 	}
 }
+

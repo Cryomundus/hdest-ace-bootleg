@@ -181,7 +181,7 @@ class HDGrenadeThrower:HDWeapon{
 		double ptch=owner.pitch;
 		double cpp=cos(ptch);double spp=sin(ptch);
 		[gbg,spn]=owner.A_SpawnItemEx(spoontype,
-			cpp*4,-1,height-6-spp*4,
+			cpp*4,-1,gunheight()+2-spp*4,
 				cpp*4+vel.x,
 				0,
 				-sin(pitch)*4+vel.z,

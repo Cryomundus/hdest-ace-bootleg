@@ -91,7 +91,7 @@ class BossRifle:HDWeapon{
 			int sevenrounds=hpl.countinv("SevenMilAmmo");
 			sb.drawimage("TEN7A0",(-62,-4),sb.DI_SCREEN_CENTER_BOTTOM,alpha:sevenrounds?1:0.6,scale:(1.2,1.2));
 			sb.drawnum(sevenrounds,-56,-8,sb.DI_SCREEN_CENTER_BOTTOM);
-		}
+			}
 		sb.drawwepnum(hdw.weaponstatus[BOSSS_MAG],10);
 		sb.drawwepcounter(hdw.weaponstatus[BOSSS_CHAMBER],
 			-16,-10,"blank","RBRSA1A5","RBRSA3A7","RBRSA4A6"
@@ -148,10 +148,10 @@ class BossRifle:HDWeapon{
 				sb.DI_SCREEN_CENTER
 			);
 
-			sb.fill(color(255,0,0,0),
-				bob.x-44,scaledyoffset+bob.y-44,
-				88,88,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
-			);
+				sb.fill(color(255,0,0,0),
+					bob.x-44,scaledyoffset+bob.y-44,
+					88,88,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+				);
 
 			texman.setcameratotexture(hpc,"HDXCAM_BOSS",degree);
 			let cam     = texman.CheckForTexture("HDXCAM_BOSS",TexMan.Type_Any);
@@ -455,7 +455,7 @@ class BossRifle:HDWeapon{
 			actor rrr=null;
 			if(chm>=1){
 				vector3 gunofs=HDMath.RotateVec3D((10,-1,0),angle,pitch);
-				actor rrr=spawn(rndtp,(pos.xy,pos.z+height*0.85)+gunofs);
+				actor rrr=spawn(rndtp,(pos.xy,pos.z+height*0.85)+gunofs+viewpos.offset);
 				rrr.target=self;
 				rrr.angle=angle;
 				rrr.vel=HDMath.RotateVec3D((1,-4,2),angle,pitch);

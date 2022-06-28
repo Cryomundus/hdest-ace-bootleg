@@ -19,7 +19,8 @@ class HDRL:HDWeapon{
 		tag "rocket launcher";
 		hdweapon.loadoutcodes"
 			\cuheat - 0/1, whether you start with a H.E.A.T. loaded
-			\cugrenade - 0/1, whether you start in grenade mode";
+			\cugrenade - 0/1, whether you start in grenade mode
+			\cunomag - 0-2, whether it is a single-shot (2 loads a H.E.A.T.)";
 	}
 	override bool AddSpareWeapon(actor newowner){return AddSpareWeaponRegular(newowner);}
 	override hdweapon GetSpareWeapon(actor newowner,bool reverse,bool doselect){return GetSpareWeaponRegular(newowner,reverse,doselect);}
@@ -136,9 +137,9 @@ class HDRL:HDWeapon{
 					sb.DI_SCREEN_CENTER
 				);
 
-				sb.fill(color(255,0,0,0),
-					bob.x-27,scaledyoffset+bob.y-27,
-					54,54,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
+					sb.fill(color(255,0,0,0),
+						bob.x-27,scaledyoffset+bob.y-27,
+						54,54,sb.DI_SCREEN_CENTER|sb.DI_ITEM_CENTER
 				);
 
 				texman.setcameratotexture(hpc,"HDXCAM_RLAUN",degree);
@@ -192,7 +193,7 @@ class HDRL:HDWeapon{
 	override void ForceBasicAmmo(){
 		owner.A_TakeInventory("DudRocketAmmo");
 		owner.A_SetInventory("HEATAmmo",1);
-		owner.A_SetInventory("HDRocketAmmo",5);
+		owner.A_SetInventory("HDRocketAmmo",1);
 	}
 	states{
 	select0:
@@ -220,10 +221,16 @@ class HDRL:HDWeapon{
 					&&!player.cmd.yaw
 				)
 			){
+				vector3 gunpos=gunpos();
 				flinetracedata frt;
 				linetrace(
-					angle,512*HDCONST_ONEMETRE,pitch-0.8,flags:TRF_NOSKY,
-					offsetz:height*0.88,
+					angle,
+					512*HDCONST_ONEMETRE,
+					pitch,
+					flags:TRF_NOSKY|TRF_ABSOFFSET,
+					offsetz:gunpos.z,
+					offsetforward:gunpos.x,
+					offsetside:gunpos.y,
 					data:frt
 				);
 				invoker.rangefinder=int(frt.distance*(1./HDCONST_ONEMETRE));
@@ -278,13 +285,8 @@ class HDRL:HDWeapon{
 					rrr="HDHEAT";
 					A_ChangeVelocity(cos(pitch),0,sin(pitch),CVF_RELATIVE);
 				}else rrr="GyroGrenade";
-				rkt=gyrogrenade(spawn(rrr,(
-					pos.xy,
-					pos.z+HDWeapon.GetShootOffset(
-						self,invoker.barrellength,
-						invoker.barrellength-HDCONST_SHOULDERTORADIUS
-					)
-				),ALLOW_REPLACE));
+				vector3 gpos=pos+gunpos((0,0,-getdefaultbytype(rrr).height*0.6));
+				rkt=gyrogrenade(spawn(rrr,gpos,ALLOW_REPLACE));
 				invoker.weaponstatus[RLS_SMOKE]+=50;
 				rkt.angle=angle;rkt.pitch=pitch;rkt.target=self;rkt.master=self;
 				rkt.primed=false;
@@ -340,6 +342,7 @@ class HDRL:HDWeapon{
 		#### C 2 bright A_Light1();
 		#### D 1 bright A_Light0();
 		TNT1 A 0 A_AlertMonsters();
+		stop;
 		LAUF ABCD 0;
 		MISF ABCD 0;
 		stop;
@@ -433,6 +436,8 @@ class HDRL:HDWeapon{
 			else invoker.weaponstatus[RLS_MAG]++;
 		}
 		#### BB 1 offset(10,34) A_JumpIf(!pressingreload(),"reloadend");
+		#### B 4 offset(11,38) A_StartSound("weapons/pocket",9);
+		#### B 5 offset(10,37);
 		loop;
 	reloadend:
 		#### B 5 offset(10,36) A_StartSound("weapons/rockopen2",8);
@@ -444,9 +449,15 @@ class HDRL:HDWeapon{
 	user1:
 	altreload:
 		#### A 4{
+			int ch=invoker.weaponstatus[RLS_CHAMBER];
 			if(
-				invoker.weaponstatus[RLS_CHAMBER]<2
-				&&!countinv("HEATAmmo")
+				(
+					ch>0
+					&&pressingreload()
+				)||(
+					ch<2
+					&&!countinv("HEATAmmo")
+				)
 			)setweaponstate("nope");
 		}
 		#### A 1 offset(0,34);
@@ -485,14 +496,18 @@ class HDRL:HDWeapon{
 					&&invoker.weaponstatus[RLS_MAG]<5
 				){
 					invoker.weaponstatus[RLS_MAG]++;
+					setweaponstate("loadheatintoemptychamber");
 					return;
 				}
 				if(A_JumpIfInventory("HDRocketAmmo",0,"null"))A_SpawnItemEx(
 					"HDRocketAmmo",10,0,10,vel.x,vel.y,vel.z,
 					0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION
-				);else A_GiveInventory("HDRocketAmmo",1);
+				);else{
+					A_StartSound("weapons/pocket",9);
+					A_GiveInventory("HDRocketAmmo",1);
+				}
 			}
-		}goto loadheatintoemptychamber;
+		}goto altreloadend;
 	loadheatintoemptychamber:
 		#### B 3 offset(0,38);
 		#### B 2 offset(0,34){
@@ -506,23 +521,17 @@ class HDRL:HDWeapon{
 		#### B 10 offset(1,35){
 			invoker.weaponstatus[RLS_CHAMBER]=0;
 			A_SetHelpText();
-			if(
-				A_JumpIfInventory("HEATAmmo",0,"null")
-				||(!PressingUnload()&&!PressingAltReload())
-			){
-				A_SpawnItemEx(
-					"HEATAmmo",10,0,height-16,vel.x,vel.y,vel.z+2,
-					0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION
-				);
-				setweaponstate("altreloadend");
-			}else{
+			if(A_JumpIfInventory("HEATAmmo",0,"null"))A_SpawnItemEx(
+				"HEATAmmo",10,0,height-16,vel.x,vel.y,vel.z+2,
+				0,SXF_ABSOLUTEMOMENTUM|SXF_NOCHECKPOSITION
+			);else{
 				A_StartSound("weapons/pocket",9);
 				A_GiveInventory("HEATAmmo",1);
 			}
 		}goto altreloadend;
 	altreloadend:
-		#### B 5 offset(0,36) A_StartSound("weapons/rockopen2",8);
-		#### B 0 A_StartSound("weapons/rockopen",8);
+		#### B 5 offset(0,36) A_StartSound("weapons/rockopen2",8,CHANF_OVERLAP);
+		#### B 0 A_StartSound("weapons/rockopen",8,CHANF_OVERLAP);
 		#### B 1 offset(0,38);
 		#### A 1 offset(0,36);
 		#### A 1 offset(0,34);
@@ -587,11 +596,16 @@ class HDRL:HDWeapon{
 
 	nomagreload:
 		#### A 4{
+			int ch=invoker.weaponstatus[RLS_CHAMBER];
 			if(
-				invoker.weaponstatus[RLS_CHAMBER]>=2
+				ch>0
+				&&pressingreload()
+			)setweaponstate("nope");
+			else if(
+				ch>=2
 			)setweaponstate("altreload");
 			else if(
-				invoker.weaponstatus[RLS_CHAMBER]<1
+				ch<1
 				&&!countinv("HDRocketAmmo")
 			)setweaponstate("nope");
 		}

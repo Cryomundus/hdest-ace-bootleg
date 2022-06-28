@@ -30,7 +30,10 @@ extend class HDPlayerPawn{
 		if(incaptimer>0){
 			incaptimer--;
 			muzzleclimb1.y+=(level.time&1)?-1:1;
-			if(incaptimer>TICRATE*60*5){
+			if(
+				incaptimer>TICRATE*60*10
+				||health>70
+			){
 				damagemobj(null,null,1,"maxhpdrain");
 				incaptimer-=(incaptimer>>4);
 			}
@@ -203,7 +206,10 @@ extend class HDPlayerPawn{
 			&&health<10
 		)GiveBody(7);
 		incapacitated=1;
-		incaptimer=max(incaptimer,incaptime);
+
+		if((flags&HDINCAP_FAKING))fatigue+=5;
+		else incaptimer=max(incaptimer,incaptime);
+
 		setstatelabel("spawn");
 	}
 	enum IncapFlags{

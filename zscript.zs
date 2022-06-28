@@ -23,18 +23,16 @@ const SXF_ABSOLUTE=SXF_NOCHECKPOSITION|SXF_ABSOLUTEANGLE|SXF_ABSOLUTEPOSITION;
 const HDCONST_426MAGMSG = "Reloading a 4.26 UAC Standard magazine into another firearm without authorization is a breach of the Volt End User License Agreement.";
 
 //for calculating where the gun is on a body
-//these all presuppose a player height of 54
-const HDCONST_HEIGHTOVER54=HDCONST_PLAYERHEIGHT/54.;
-const HDCONST_CROWNTOEYES=HDCONST_HEIGHTOVER54*6;
-const HDCONST_CROWNTOSHOULDER=HDCONST_HEIGHTOVER54*10;
-const HDCONST_SHOULDERTORADIUS=HDCONST_HEIGHTOVER54*10;
-const HDCONST_MINEYERANGE=HDCONST_HEIGHTOVER54*18;
+const HDCONST_EYEHEIGHT=0.92;
+const HDCONST_MINEYERANGE=HDCONST_PLAYERHEIGHT*18*(1./54);
+const HDCONST_GUNPOSOFFSET=10;
+
 
 
 #include "zscript/function.zs"
 #include "zscript/maptweaks.zs"
 
-#include "zscript/wep.zs"
+#include "zscript/weapon.zs"
 
 #include "zscript/commands.zs"
 

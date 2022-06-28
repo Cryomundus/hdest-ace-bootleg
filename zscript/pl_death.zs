@@ -5,7 +5,6 @@ extend class HDPlayerPawn{
 	bool silentdeath;
 	states{
 	death.bleedout:
-	death.invisiblebleedout:
 	death.internal:
 		---- A 0{
 			if(playercorpse)playercorpse.A_StopSound(CHAN_VOICE);
@@ -99,6 +98,8 @@ extend class HDPlayerPawn{
 		vel=(0,0,0);
 		angle=oldangle;
 		pitch=min(oldpitch+1,45);
+
+		if(deathcounter<80)setviewpos((viewpos.offset.xy+0.02*(80-deathcounter)*heightmult*(cos(angle),sin(angle)),0));
 	}
 	override void Die(actor source,actor inflictor,int dmgflags,name MeansOfDeath){
 

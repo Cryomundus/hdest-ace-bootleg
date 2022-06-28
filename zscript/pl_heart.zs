@@ -23,15 +23,19 @@ extend class HDPlayerPawn{
 
 	double strength;
 	double basestrength(){
-		double strmult=min(
-			hd_maxstrength,
-			(hd_strength?clamp(hd_strength.getfloat(),0.2,11.):11.)
-		)*(1./11.);
-		return max(0.1,(
-			0.7
-			+healthcap*0.003
-			-fatigue*0.001  //intentionally stacks on top of effect on maxhealth
-		)*strmult);
+		double stt=hd_strength?clamp(hd_strength.getfloat(),0.2,11.):11;
+		double maxstr=clamp(hd_maxstrength,1.,11.);
+		double minstr=clamp(hd_minstrength,1.,maxstr);
+
+		return
+		max(0.1,
+			clamp(stt,minstr,maxstr)*(1./11.)
+			*(
+				0.7
+				+healthcap*0.003
+				-fatigue*0.001  //intentionally stacks on top of effect on maxhealth
+			)
+		);
 	}
 
 	int healthcap;

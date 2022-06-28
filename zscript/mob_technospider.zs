@@ -26,15 +26,12 @@ class TechnoSpider:HDMobBase replaces Arachnotron{
 		hdmobbase.shields 500;
 		meleethreshold -128;
 	}
-	double gunheight;
 	override void postbeginplay(){
+		if(bplayingid)blookallaround=false;
+		else gunheight=height*0.8;
 		super.postbeginplay();
 		battery=20;
 		alt=random(0,1);
-		if(bplayingid){
-			blookallaround=false;
-			gunheight=32.;
-		}else gunheight=height*0.8;
 	}
 	override void deathdrop(){
 		if(!bhasdropped){
@@ -128,19 +125,18 @@ class TechnoSpider:HDMobBase replaces Arachnotron{
 
 	missile:
 		---- A 0 A_StartSound("baby/walk");
-		BSPI AA 3 A_TurnToAim(20,gunheight);
+		BSPI AB 5 A_TurnToAim(20,targetheight:(alt?-1:frandom(0,target.height*0.6)));
+		---- A 0 A_StartSound("baby/walk");
 		---- A 0 A_JumpIf(!HDMobAI.TryShoot(self,flags:hdmobai.TS_GEOMETRYOK),"see");
-		BSPI BB 3 A_TurnToAim(20,gunheight);
+		BSPI CD 5 A_TurnToAim(20,targetheight:(alt?-1:frandom(0,target.height*0.6)));
 		---- A 0 A_StartSound("baby/walk");
-		BSPI CC 3 A_TurnToAim(20,gunheight);
-		BSPI DD 3 A_TurnToAim(20,gunheight);
-		---- A 0 A_StartSound("baby/walk");
-		BSPI EEFF 3 A_TurnToAim(20,gunheight);
+		BSPI EF 5 A_TurnToAim(20,targetheight:(alt?-1:frandom(0,target.height*0.6)));
 		loop;
 	shoot:
-		BSPI A 10;
+		BSPI A 1 A_StartAim(mintics:4,maxtics:50,dontlead:true);
 		BSPI A 10{
-			A_FaceLastTargetPos(20,gunheight,targetheight:(alt?-1:frandom(0,target.height*0.6)));
+			angle+=frandom(-spread,spread);
+			pitch+=frandom(-spread,spread);
 			if(!HDMobAI.TryShoot(self,gunheight,max(abs(meleethreshold),lasttargetdist-300))){
 				setstatelabel("pain");
 				return;
@@ -153,7 +149,7 @@ class TechnoSpider:HDMobBase replaces Arachnotron{
 		BSPI GGGGG 3 bright light("PLAZMABX2")A_StartSound("weapons/plasidle",CHAN_WEAPON);
 	shootpb2:
 		BSPI GGGGGGGGGGGGG 2 bright light("PLAZMABX2")A_ThunderZap();
-		---- A 0 A_JumpIfTargetInLOS("shoot",3);
+		---- A 0 A_Watch();
 		---- A 0 setstatelabel("see");
 		---- A 0 A_Jump(48,"shootpb2");
 		---- A 0 setstatelabel("see");

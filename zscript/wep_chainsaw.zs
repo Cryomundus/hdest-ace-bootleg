@@ -120,10 +120,7 @@ class Lumberjack:HDCellWeapon replaces Chainsaw{
 			ftranslatedlinetarget t;
 			LineAttack(angle,48,pitch,max(0,dmg),"Chainsaw","HDSawPuff",
 				LAF_OVERRIDEZ|LAF_ISMELEEATTACK,victim:t,
-				offsetz:HDWeapon.GetShootOffset(
-					self,invoker.barrellength,
-					invoker.barrellength-HDCONST_SHOULDERTORADIUS
-				)-6
+				offsetz:hdplayerpawn(self)?hdplayerpawn(self).gunpos.z-4:height*0.7
 			);
 			if(t.linetarget)A_StartSound("weapons/sawhit",CHAN_WEAPON);
 			else{
@@ -314,7 +311,7 @@ class HDSawPuff:IdleDummy{
 			if(tracer){
 				if(tracer.bnoblood)spawn("BulletPuffMedium",pos,ALLOW_REPLACE);
 				else hdbleedingwound.inflict(tracer,random(1,7),source:target);
-			}
+					}
 		}stop;
 	crash:
 		TNT1 A 1{
