@@ -1,7 +1,12 @@
 # Hideous Destructor [AceCorp Bootleg]
 If you're reading this, you already know what the fuck this mod is and how to load it.
 
-For the most part this build is the same as the master branch at any given time.
+# A final note from me
+I've moved on from HD. No, this isn't like the last fifty times that Ace Quits Modding. I've already moved on to working on a different and far more interesting project where I am not limited by the severe retardation of someone else. That's possibly the main reason this repository and my addons are even public again. Everything I have ever touched in the HDest namespace is hereby officially discontinued and the latest versions are up for grabs.
+
+At the time of this writing (2022/07/04) the bootleg is somewhat outdated. The addons will only work with this. Some other mods won't work with it at all because I took some creative liberties when I needed functionality on the addon side of things. Meanwhile, most of my addons will not work with the master branch of HD. So you have a choice here: play with my up-to-date mods on an outdated and possibly superior fork of HD but without many of the addons you might normally play with, or play on master without my stuff and completely ignore that this thing exists. Or wait for someone completely unhinged to fix them. Good luck with that. You'll need it.
+
+With this, I consider my HDest saga concluded. You will not hear from me ever again because frankly I want nothing to do with you. I know the feeling is mutual.
 
 ### Things that I have not ported and will not port, ever, in no particular order
 ---
@@ -13,7 +18,7 @@ For the most part this build is the same as the master branch at any given time.
 - New blur. It's trash, get over it;
 - Woke shit. Keep your politics and personal views out of games and mods.
 
-### Things that are different
+### Things that are different (might be missing a few things)
 ---
 - Various optimizations. More to come as more bottlenecks are spotted:
 	- Barrels have been optimized and explosions will no longer grind the game to a halt;
@@ -28,7 +33,7 @@ For the most part this build is the same as the master branch at any given time.
 	- Shield regen amount per cycle can be set using the Speed property.
 - Various bugfixes:
 	- Fixed extremely rare desync that happens if one player has CRLF line endings while the other has only LF;
-	- Fixed desync if hd_helptext is different between one player;
+	- Fixed desync if hd_helptext is different for one player;
 	- Fixed damage factors not being taken into account for the purpose of bodydamage, rendering the entire concept of damage factors pointless;
 	- A_HDBlast's pushing actually works now;
 	- Bloodbags don't immediately come off if another player puts one on you while you're incapped;
